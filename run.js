@@ -256,8 +256,8 @@ define(function(require, module, exports) {
                     + "~\\/\\.c9\\/\\.run_" + procName + "\\.watch", "m");
             }
             var WATCHFILE_PREFIXED = (testing ? base : "") + WATCHFILE;
-            var TRUNCATE = "; ([ -e '" + WATCHFILE_PREFIXED + "' ] "
-                + "&& echo -n > '" + WATCHFILE_PREFIXED + "')";
+            var TRUNCATE = "; ([ -e " + WATCHFILE_PREFIXED + " ] "
+                + "&& echo -n > " + WATCHFILE_PREFIXED + ")";
     
             /***** Methods *****/
             
