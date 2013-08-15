@@ -243,7 +243,7 @@ define(function(require, module, exports) {
                 WATCHFILE = "/.run_" + procName + ".watch";
                 PIDMATCH  = new RegExp("^"
                     + (c9.platform == "darwin" ? "\\s*\\d+" : "")
-                    + "\\s*(\\d+)\\s.*echo -n > '"
+                    + "\\s*(\\d+)\\s.*echo -n > "
                     + base.replace(/\//g, "\\/") + "\\/\\.run_" + procName 
                     + "\\.watch", "m");
             }
@@ -252,12 +252,12 @@ define(function(require, module, exports) {
                 WATCHFILE = "~/.c9/.run_" + procName + ".watch";
                 PIDMATCH  = new RegExp("^"
                     + (c9.platform == "darwin" ? "\\s*\\d+" : "")
-                    + "\\s*(\\d+)\\s.*echo -n > '"
+                    + "\\s*(\\d+)\\s.*echo -n > "
                     + "~\\/\\.c9\\/\\.run_" + procName + "\\.watch", "m");
             }
             var WATCHFILE_PREFIXED = (testing ? base : "") + WATCHFILE;
             var TRUNCATE = "; ([ -e " + WATCHFILE_PREFIXED + " ] "
-                + "&& echo -n > " + WATCHFILE_PREFIXED + ")";
+                + "&& echo > " + WATCHFILE_PREFIXED + ")";
     
             /***** Methods *****/
             
@@ -455,7 +455,7 @@ define(function(require, module, exports) {
                                     return;
                                 }
                                 
-                                if (data && data.length)
+                                if (data && data.trim().length)
                                     return;
                                 
                                 // Process is stopped
