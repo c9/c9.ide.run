@@ -241,23 +241,18 @@ define(function(require, module, exports) {
             if (testing) {
                 PIDFILE   = "/.run_" + procName + ".pid";
                 WATCHFILE = "/.run_" + procName + ".watch";
-                PIDMATCH  = new RegExp("^"
-                    + (c9.platform == "darwin" ? "\\s*\\d+" : "")
-                    + "\\s*(\\d+)\\s.*echo -n > '"
+                PIDMATCH  = new RegExp("^\\s*(\\d+)\\s.*truncate \\-c \\-s0 " 
                     + base.replace(/\//g, "\\/") + "\\/\\.run_" + procName 
-                    + "\\.watch", "m");
+                    + "\\.watch", "mg");
             }
             else {
                 PIDFILE   = "~/.c9/.run_" + procName + ".pid";
                 WATCHFILE = "~/.c9/.run_" + procName + ".watch";
-                PIDMATCH  = new RegExp("^"
-                    + (c9.platform == "darwin" ? "\\s*\\d+" : "")
-                    + "\\s*(\\d+)\\s.*echo -n > '"
-                    + "~\\/\\.c9\\/\\.run_" + procName + "\\.watch", "m");
+                PIDMATCH  = new RegExp("^\\s*(\\d+)\\s.*truncate \\-c \\-s0 " 
+                    + "~\\/\\.c9\\/\\.run_" + procName + "\\.watch", "mg");
             }
-            var WATCHFILE_PREFIXED = (testing ? base : "") + WATCHFILE;
-            var TRUNCATE = "; ([ -e '" + WATCHFILE_PREFIXED + "' ] "
-                + "&& echo -n > '" + WATCHFILE_PREFIXED + "')";
+            var TRUNCATE = "; truncate -c -s0 " 
+                + (testing ? base : "") + WATCHFILE;
     
             /***** Methods *****/
             
