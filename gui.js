@@ -268,7 +268,7 @@ define(function(require, module, exports) {
             menus.addItemByPath("View/Tabs/~", new apf.divider(), 300, plugin)
     
             tabbehavior.getElement("mnuContextTabs", function(mnuContextTabs){
-                menus.addItemByPath("~", new apf.divider(), 800, mnuContextTabs, plugin),
+                menus.addItemByPath("~", new apf.divider(), 800, mnuContextTabs, plugin);
                 menus.addItemByPath("Run This File", itmRunFile2, 850, mnuContextTabs, plugin);
             });
             
