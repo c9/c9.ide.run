@@ -252,7 +252,7 @@ define(function(require, module, exports) {
                 WATCHFILE = "~/.c9/.run_" + procName + ".watch";
                 PIDMATCH  = new RegExp("^"
                     + (c9.platform == "darwin" ? "\\s*\\d+" : "")
-                    + "\\s*(\\d+)\\s.*echo -n > "
+                    + "\\s*(\\d+)\\s.*echo > "
                     + "~\\/\\.c9\\/\\.run_" + procName + "\\.watch", "m");
             }
             var WATCHFILE_PREFIXED = (testing ? base : "") + WATCHFILE;
