@@ -30,13 +30,13 @@ define(function(require, module, exports) {
         var handle     = new Plugin("Ajax.org", main.consumes);
         var handleEmit = handle.getEmitter();
         
-        const STOPPING = -1;
-        const STOPPED  = 0;
-        const STARTING = 1;
-        const STARTED  = 2;
+        var STOPPING = -1;
+        var STOPPED  = 0;
+        var STARTING = 1;
+        var STARTED  = 2;
         
-        const TMUX = options.tmux || "~/.c9/bin/tmux";
-        const BASH = "bash"; // /bin/bash
+        var TMUX = options.tmux || "~/.c9/bin/tmux";
+        var BASH = "bash"; // /bin/bash
         
         var runners   = options.runners;
         var testing   = options.testing;
