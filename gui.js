@@ -111,7 +111,7 @@ define(function(require, module, exports) {
             });
             
             // Check after state.change
-            c9.on("state.change", function(e){
+            c9.on("stateChange", function(e){
                 // @todo consider moving this to the run plugin
                 if (itemCtxTreeRunFile)
                     itemCtxTreeRunFile.setAttribute("disabled", !(e.state & c9.PROCESS));
@@ -287,7 +287,7 @@ define(function(require, module, exports) {
             // run.on("started", updateRunFile, plugin);
             run.on("stopped", updateRunFile, plugin);
             
-            c9.on("state.change", function(e){
+            c9.on("stateChange", function(e){
                 btnRun.setAttribute("disabled", !(e.state & c9.PROCESS));
             }, plugin);
             

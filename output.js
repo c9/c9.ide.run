@@ -92,7 +92,7 @@ define(function(require, exports, module) {
                 ui.insertMarkup(e.page, markup, plugin);
             });
             
-            plugin.on("document.load", function(e){
+            plugin.on("documentLoad", function(e){
                 var doc     = e.doc;
                 var page    = e.doc.page;
                 var session = doc.getSession();
@@ -140,11 +140,11 @@ define(function(require, exports, module) {
                 }
             });
             
-            plugin.on("document.activate", function(e){
+            plugin.on("documentActivate", function(e){
                 
             });
             
-            plugin.on("document.unload", function(e){
+            plugin.on("documentUnload", function(e){
                 
             });
             
