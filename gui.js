@@ -331,7 +331,7 @@ define(function(require, module, exports) {
                 }
             }, plugin);
             
-            tabs.on("page.destroy", function(e){
+            tabs.on("pageDestroy", function(e){
                 updateRunFile();
                 
                 if (e.last) {
