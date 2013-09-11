@@ -815,16 +815,16 @@ define(function(require, module, exports) {
              *      prior to running the processes. This message can contain 
              *      variables.
              *   [variants] {Array} currently not supported.
-             * @param options {Object} 
-             *   object:
+             * @param {Object} 
+             options *   object:
              *   path  {String} the path to the file to execute
              *   cwd   {String} the current working directory
              *   debug {Boolean} whether to start the process in debug mode
-             * @param name   {String} the unique name of the output buffer. 
+             * @param {String} name   the unique name of the output buffer. 
              *   Defaults to "output". There can only be one process running on
              *   an output buffer at the same time. After a process has ended
              *   the process object is stale.
-             * @param callback {Function} called when the process is started
+             * @param {Function} callback called when the process is started
              * @returns process {Process} the process object
              */
             run : run
