@@ -35,7 +35,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             packagePath: "plugins/c9.ide.console/console",
             testing : 2
         },
-        "plugins/c9.ide.editors/tab",
+        "plugins/c9.ide.editors/pane",
         "plugins/c9.ide.editors/page",
         "plugins/c9.ide.terminal/terminal",
         "plugins/c9.ide.run/output",
@@ -101,7 +101,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         
         expect.html.setConstructor(function(page){
             if (typeof page == "object")
-                return page.tab.aml.getPage("editor::" + page.editorType).$ext;
+                return page.pane.aml.getPage("editor::" + page.editorType).$ext;
         });
         
         describe('terminal', function() {

@@ -39,7 +39,7 @@ define(function(require, exports, module) {
                 name    : "showoutput",
                 group   : "Panels",
                 exec    : function (editor) {
-                    // Search for the output tab
+                    // Search for the output pane
                     if (search()) return;
                     
                     // If not found show the console
@@ -52,7 +52,7 @@ define(function(require, exports, module) {
                     tabs.open({
                         editorType : "output", 
                         active     : true,
-                        tab        : console.getTabs()[0],
+                        pane        : console.getTabs()[0],
                         document   : {
                             title  : "Output",
                             output : {
