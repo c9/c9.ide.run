@@ -121,8 +121,8 @@ define(function(require, module, exports) {
             var c = 1000;
             var itmRun = menus.addItemByPath("Run/Run", new ui.item({
                 isAvailable : function(){
-                    var page = tabs.focussedPage;
-                    var path = page && page.path;
+                    var tab = tabs.focussedPage;
+                    var path = tab && tab.path;
                     
                     if (process && process.running) {
                         itmRun.setAttribute("caption", "Stop"); 
@@ -320,10 +320,10 @@ define(function(require, module, exports) {
                 if (process && process.running)
                     return;
                 
-                if (e.page.path) {
+                if (e.tab.path) {
                     btnRun.enable();
                     btnRun.setAttribute("tooltip", "Run " 
-                        + fs.getFilename(e.page.path));
+                        + fs.getFilename(e.tab.path));
                 }
                 else {
                     btnRun.disable();
@@ -331,7 +331,7 @@ define(function(require, module, exports) {
                 }
             }, plugin);
             
-            tabs.on("pageDestroy", function(e){
+            tabs.on("tabDestroy", function(e){
                 updateRunFile();
                 
                 if (e.last) {
@@ -499,11 +499,11 @@ define(function(require, module, exports) {
         }
     
         function onHelpClick() {
-            var page = "running_and_debugging_code";
+            var tab = "running_and_debugging_code";
             if (ide.infraEnv)
-                require("ext/docum" + "entation/documentation").show(page);
+                require("ext/docum" + "entation/documentation").show(tab);
             else
-                window.open("https://docs.c9.io/" + page + ".html");
+                window.open("https://docs.c9.io/" + tab + ".html");
         }
     
         /***** Lifecycle *****/

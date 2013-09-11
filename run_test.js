@@ -28,13 +28,13 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 type  : "pane", 
                 nodes : [
                     {
-                        type : "page",
+                        type : "tab",
                         editorType : "output",
                         document : { title : "Output" },
                         active : "true"
                     },
                     {
-                        type : "page",
+                        type : "tab",
                         editorType : "output",
                         document : {
                             title : "Output2",
@@ -59,7 +59,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             testing     : 2
         },
         "plugins/c9.ide.editors/pane",
-        "plugins/c9.ide.editors/page",
+        "plugins/c9.ide.editors/tab",
         "plugins/c9.ide.terminal/terminal",
         "plugins/c9.ide.run/output",
         "plugins/c9.ide.console/console",
@@ -123,9 +123,9 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         var tabs     = imports.tabs;
         var cnsl     = imports.console;
         
-        expect.html.setConstructor(function(page){
-            if (typeof page == "object")
-                return page.pane.aml.getPage("editor::" + page.editorType).$ext;
+        expect.html.setConstructor(function(tab){
+            if (typeof tab == "object")
+                return tab.pane.aml.getPage("editor::" + tab.editorType).$ext;
         });
         
         function countEvents(count, expected, done){

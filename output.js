@@ -52,7 +52,7 @@ define(function(require, exports, module) {
                     tabs.open({
                         editorType : "output", 
                         active     : true,
-                        pane        : console.getTabs()[0],
+                        pane        : console.getPanes()[0],
                         document   : {
                             title  : "Output",
                             output : {
@@ -89,12 +89,12 @@ define(function(require, exports, module) {
             
             plugin.on("draw", function(e){
                 // Create UI elements
-                ui.insertMarkup(e.page, markup, plugin);
+                ui.insertMarkup(e.tab, markup, plugin);
             });
             
             plugin.on("documentLoad", function(e){
                 var doc     = e.doc;
-                var page    = e.doc.page;
+                var tab    = e.doc.tab;
                 var session = doc.getSession();
                 
                 session.filter = function(data){
@@ -106,7 +106,7 @@ define(function(require, exports, module) {
                         data.match(/\[exited\]\r/) ||
                         data.match(/Set option: remain-on-exit \-\> on/)
                     ) {
-                        page.className.add("loading");
+                        tab.className.add("loading");
                         return;
                     }
                     
@@ -115,7 +115,7 @@ define(function(require, exports, module) {
                         data = data
                           .replace(/Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
                           .replace(/Pane is dead/g, "[Process stopped]");
-                        page.className.remove("loading");
+                        tab.className.remove("loading");
                     }
                     
                     return data;

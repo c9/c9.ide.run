@@ -36,7 +36,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             testing : 2
         },
         "plugins/c9.ide.editors/pane",
-        "plugins/c9.ide.editors/page",
+        "plugins/c9.ide.editors/tab",
         "plugins/c9.ide.terminal/terminal",
         "plugins/c9.ide.run/output",
         {
@@ -99,16 +99,16 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         var proc     = imports.proc;
         var fs       = imports.fs;
         
-        expect.html.setConstructor(function(page){
-            if (typeof page == "object")
-                return page.pane.aml.getPage("editor::" + page.editorType).$ext;
+        expect.html.setConstructor(function(tab){
+            if (typeof tab == "object")
+                return tab.pane.aml.getPage("editor::" + tab.editorType).$ext;
         });
         
         describe('terminal', function() {
             before(function(done){
                 apf.config.setProperty("allow-select", false);
                 apf.config.setProperty("allow-blur", false);
-                tabs.getTabs()[0].focus();
+                tabs.getPanes()[0].focus();
                 
                 bar.$ext.style.background = "rgba(220, 220, 220, 0.93)";
                 bar.$ext.style.position = "fixed";
@@ -144,7 +144,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             }
                         }
                         
-                    }, function(err, page){
+                    }, function(err, tab){
                         setTimeout(function(){
                             expect.html(tabs.focussedPage.editor.ace.container).text(/Hello\s*World/);
                             done();
