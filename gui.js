@@ -79,7 +79,7 @@ define(function(require, module, exports) {
                 "hint"  : "run or debug current file (stops the app if running)",
                 exec    : function(){ runThisTab() },
                 isAvailable : function(){
-                    return tabs.focussedPage && tabs.focussedPage.path;
+                    return tabs.focussedTab && tabs.focussedTab.path;
                 }
             }, plugin);
     
@@ -121,7 +121,7 @@ define(function(require, module, exports) {
             var c = 1000;
             var itmRun = menus.addItemByPath("Run/Run", new ui.item({
                 isAvailable : function(){
-                    var tab = tabs.focussedPage;
+                    var tab = tabs.focussedTab;
                     var path = tab && tab.path;
                     
                     if (process && process.running) {
@@ -277,10 +277,10 @@ define(function(require, module, exports) {
             
             // Hooks
             function updateRunFile(){
-                itmRunFile1.setAttribute("disable", !tabs.focussedPage ||
-                    !tabs.focussedPage.path || !process || !process.running);
-                itmRunFile2.setAttribute("disable", !tabs.focussedPage ||
-                    !tabs.focussedPage.path || !process || !process.running);
+                itmRunFile1.setAttribute("disable", !tabs.focussedTab ||
+                    !tabs.focussedTab.path || !process || !process.running);
+                itmRunFile2.setAttribute("disable", !tabs.focussedTab ||
+                    !tabs.focussedTab.path || !process || !process.running);
             }
             
             // run.on("starting", updateRunFile, plugin);
@@ -385,7 +385,7 @@ define(function(require, module, exports) {
         
         function runNow(runner, path){
             if (!path) {
-                path = tabs.focussedPage && tabs.focussedPage.path;
+                path = tabs.focussedTab && tabs.focussedTab.path;
                 if (!path) return;
             }
             
@@ -450,7 +450,7 @@ define(function(require, module, exports) {
                 btnRun.enable();
             }
             else {
-                var path = tabs.focussedPage && tabs.focussedPage.path;
+                var path = tabs.focussedTab && tabs.focussedTab.path;
                     
                 btnRun.setAttribute("icon", 
                     btnRun.checked ? "bug.png" : "run.png");
@@ -492,7 +492,7 @@ define(function(require, module, exports) {
         }
     
         function runThisTab() {
-            var file = ide.getActivePageModel();
+            var file = ide.getActiveTabModel();
             var node = this.addConfig(true, file);
     
             this.runConfig(node);

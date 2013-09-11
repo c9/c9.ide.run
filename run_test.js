@@ -218,7 +218,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 count++;
                                 
                                 setTimeout(function(){
-                                    expect.html(tabs.focussedPage, "Output Mismatch")
+                                    expect.html(tabs.focussedTab, "Output Mismatch")
                                         .text(/Hello\sWorld/);
                                     
                                     fs.rmfile("/helloworld.js", function(){
@@ -275,7 +275,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 count++;
                                 
                                 setTimeout(function(){
-                                    expect.html(tabs.focussedPage, "Output Mismatch")
+                                    expect.html(tabs.focussedTab, "Output Mismatch")
                                         .text(/Hello\sWorld[\s\S]*Hello\sWorld/);
                                     
                                     fs.rmfile("/helloworld.js", function(){
@@ -290,8 +290,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 it('should run an interactive proces in the second output window', function(done) {
                     var count = 0;
                     
-                    var outputPage2 = tabs.getPages()[1];
-                    tabs.focusPage(outputPage2);
+                    var outputTab2 = tabs.getTabs()[1];
+                    tabs.focusTab(outputTab2);
                     
                     run.getRunner("pythoni", false, function(err, runner){
                         if (err) throw err.message;
@@ -305,7 +305,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             expect(process.running).to.equal(run.STARTED);
                             
                             setTimeout(function(){
-                                var output = outputPage2.editor;
+                                var output = outputTab2.editor;
                                 
                                 output.write("print 1\n");
                                 
@@ -327,7 +327,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             process.off("stopped", c1);
                             
                             setTimeout(function(){
-                                expect.html(tabs.focussedPage, "Output Mismatch")
+                                expect.html(tabs.focussedTab, "Output Mismatch")
                                     .text(/Python/);
                                 
                                 count++;
@@ -342,8 +342,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 it('should run a file with a runner automatically selected in the second output window', function(done) {
                     var foundPid, count = 0;
                     
-                    var outputPage2 = tabs.getPages()[1];
-                    tabs.focusPage(outputPage2);
+                    var outputTab2 = tabs.getTabs()[1];
+                    tabs.focusTab(outputTab2);
                     
                     run.getRunner("node", false, function(err, runner){
                         if (err) throw err.message;
@@ -382,7 +382,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 count++;
 
                                 setTimeout(function(){
-                                    expect.html(tabs.focussedPage, "Output Mismatch")
+                                    expect.html(tabs.focussedTab, "Output Mismatch")
                                         .text(/Hello\sWorld/);
                                     
                                     fs.rmfile("/helloworld.js", function(){

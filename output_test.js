@@ -146,7 +146,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         
                     }, function(err, tab){
                         setTimeout(function(){
-                            expect.html(tabs.focussedPage.editor.ace.container).text(/Hello\s*World/);
+                            expect.html(tabs.focussedTab.editor.ace.container).text(/Hello\s*World/);
                             done();
                         }, 2000)
                     });

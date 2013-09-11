@@ -67,12 +67,12 @@ define(function(require, exports, module) {
         //Search through pages
         function search(id){
             if (!id) id = "output";
-            var pages = tabs.getPages(), session;
+            var pages = tabs.getTabs(), session;
             for (var i = 0; i < pages.length; i++) {
                 if (pages[i].editorType == "output"
                   && (session = pages[i].document.getSession())
                   && session.id == id) {
-                    tabs.focusPage(pages[i]);
+                    tabs.focusTab(pages[i]);
                     return true;
                 }
             }

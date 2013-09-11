@@ -495,7 +495,7 @@ define(function(require, module, exports) {
                     name == "project_extension" ||
                     name == "project_base_name"
                 ) {
-                    ppath = tabs.focussedPage && tabs.focussedPage.path;
+                    ppath = tabs.focussedTab && tabs.focussedTab.path;
                     if (!ppath) return "";
                     return getVariable(name.replace("project", "name"), ppath);
                 }
