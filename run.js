@@ -694,16 +694,16 @@ define(function(require, module, exports) {
          * @property STARTED  {2} to be tested against the `running` property. Indicates the process is running.
          * 
          * @event stopping Fires when the process is going to be killed
-         *   object:
+         * @param {Object} e
          *   process {Process} the process that is stopping
          * @event stopped Fires when the process stopped running
-         *   object:
+         * @param {Object} e
          *   process {Process} the process that is stopped
          * @event starting Fires when the process is being started
-         *   object:
+         * @param {Object} e
          *   process {Process} the process that is starting
          * @event started Fires when the process is started. This event also fires during startup if there's a PID file present
-         *   object:
+         * @param {Object} e
          *   process {Process} the process that is stopped
          */
         handle.freezePublicAPI({
@@ -778,7 +778,7 @@ define(function(require, module, exports) {
              * 
              * @param runner {Object, "auto"} Object describing how to run a process. 
              *   Alternatively this can be set to "auto" to auto-detect the runner.
-             *   object:
+             * @param {Object} e
              *   cmd {Array} Array containing the command to run and its desired 
              *      arguments. If you don’t specify an absolute path, the 
              *      external program will be searched in your PATH, one of your 
@@ -816,7 +816,7 @@ define(function(require, module, exports) {
              *      variables.
              *   [variants] {Array} currently not supported.
              * @param {Object} 
-             options *   object:
+             options * @param {Object} e
              *   path  {String} the path to the file to execute
              *   cwd   {String} the current working directory
              *   debug {Boolean} whether to start the process in debug mode
