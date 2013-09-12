@@ -30,7 +30,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.ide.editors/undomanager",
         "plugins/c9.ide.editors/editors",
         "plugins/c9.ide.editors/editor",
-        "plugins/c9.ide.editors/tabs",
+        "plugins/c9.ide.editors/tabmanager",
         {
             packagePath: "plugins/c9.ide.console/console",
             testing : 2
@@ -84,7 +84,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             setup    : expect.html.mocked
         },
         {
-            consumes : ["tabs", "proc", "output", "fs"],
+            consumes : ["tabManager", "proc", "output", "fs"],
             provides : [],
             setup    : main
         }
@@ -95,7 +95,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
     });
     
     function main(options, imports, register) {
-        var tabs     = imports.tabs;
+        var tabs     = imports.tabManager;
         var proc     = imports.proc;
         var fs       = imports.fs;
         

@@ -10,7 +10,7 @@
 define(function(require, module, exports) {
     main.consumes = [
         "c9", "plugin", "run", "settings", "menus", "save", 
-        "tabbehavior", "ace", "commands", "layout", "tabs", "preferences", 
+        "tabbehavior", "ace", "commands", "layout", "tabManager", "preferences", 
         "ui", "fs", "layout", "output", "debugger", "tree"
     ];
     main.provides = ["rungui"];
@@ -28,7 +28,7 @@ define(function(require, module, exports) {
         var layout      = imports.layout;
         var save        = imports.save;
         var tree        = imports.tree;
-        var tabs        = imports.tabs;
+        var tabs        = imports.tabManager;
         var output      = imports.output;
         var tabbehavior = imports.tabbehavior;
         var debug       = imports.debugger;

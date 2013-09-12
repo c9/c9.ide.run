@@ -8,7 +8,7 @@
 define(function(require, module, exports) {
     main.consumes = [
         "plugin", "proc", "settings", "fs", "menus", "c9",
-        "tabs", "preferences" //@todo move tabs and preferences to the ui part of run
+        "tabManager", "preferences" //@todo move tabs and preferences to the ui part of run
     ];
     main.provides = ["run"];
     return main;
@@ -20,7 +20,7 @@ define(function(require, module, exports) {
         var settings    = imports.settings;
         var prefs       = imports.preferences;
         var proc        = imports.proc;
-        var tabs        = imports.tabs;
+        var tabs        = imports.tabManager;
         var fs          = imports.fs;
         var menus       = imports.menus;
         var c9          = imports.c9;

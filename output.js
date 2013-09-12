@@ -7,7 +7,7 @@
 define(function(require, exports, module) {
     main.consumes = [
         "editor", "editors", "util", "commands", "menus", "terminal",
-        "settings", "ui", "proc", "c9", "tabs", "run", "console"
+        "settings", "ui", "proc", "c9", "tabManager", "run", "console"
     ];
     main.provides = ["output"];
     return main;
@@ -19,7 +19,7 @@ define(function(require, exports, module) {
         var commands = imports.commands;
         var console  = imports.console;
         var menus    = imports.menus;
-        var tabs     = imports.tabs;
+        var tabs     = imports.tabManager;
         var run      = imports.run;
         var Terminal = imports.terminal.Terminal;
         
