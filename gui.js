@@ -9,7 +9,7 @@
 // remember to - ask bas what feature he missed.
 define(function(require, module, exports) {
     main.consumes = [
-        "c9", "plugin", "run", "settings", "menus", "save", 
+        "c9", "Plugin", "run", "settings", "menus", "save", 
         "tabbehavior", "ace", "commands", "layout", "tabManager", "preferences", 
         "ui", "fs", "layout", "output", "debugger", "tree"
     ];
@@ -17,7 +17,7 @@ define(function(require, module, exports) {
     return main;
 
     function main(options, imports, register) {
-        var Plugin      = imports.plugin;
+        var Plugin      = imports.Plugin;
         var settings    = imports.settings;
         var menus       = imports.menus;
         var commands    = imports.commands;

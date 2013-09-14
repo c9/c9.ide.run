@@ -7,7 +7,7 @@
 
 define(function(require, module, exports) {
     main.consumes = [
-        "plugin", "proc", "settings", "fs", "menus", "c9",
+        "Plugin", "proc", "settings", "fs", "menus", "c9",
         "tabManager", "preferences" //@todo move tabs and preferences to the ui part of run
     ];
     main.provides = ["run"];
@@ -16,7 +16,7 @@ define(function(require, module, exports) {
     // @todo auto/console/@autoshow
 
     function main(options, imports, register) {
-        var Plugin      = imports.plugin;
+        var Plugin      = imports.Plugin;
         var settings    = imports.settings;
         var prefs       = imports.preferences;
         var proc        = imports.proc;

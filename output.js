@@ -6,7 +6,7 @@
  */
 define(function(require, exports, module) {
     main.consumes = [
-        "editor", "editors", "util", "commands", "menus", "terminal",
+        "Editor", "editors", "util", "commands", "menus", "terminal",
         "settings", "ui", "proc", "c9", "tabManager", "run", "console"
     ];
     main.provides = ["output"];
