@@ -100,7 +100,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             consumes : ["emitter", "apf", "ui"],
             provides : [
                 "commands", "menus", "layout", "watcher", 
-                "save", "fs", "preferences", "anims", "clipboard"
+                "save", "preferences", "anims", "clipboard"
             ],
             setup    : expect.html.mocked
         },
@@ -176,7 +176,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             describe("run()", function(){
                 this.timeout(10000);
                 
-                it('should run a file with a runner', function(done) {
+                it.only('should run a file with a runner', function(done) {
                     var foundPid, count = 0;
                     
                     run.getRunner("node", false, function(err, runner){
