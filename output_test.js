@@ -78,7 +78,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             consumes : ["emitter", "apf", "ui"],
             provides : [
                 "commands", "menus", "commands", "layout", "watcher", 
-                "save", "fs", "anims", "clipboard"
+                "save", "anims", "clipboard"
             ],
             setup    : expect.html.mocked
         },
@@ -95,7 +95,6 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
     
     function main(options, imports, register) {
         var tabs     = imports.tabs;
-        var proc     = imports.proc;
         var fs       = imports.fs;
         
         expect.html.setConstructor(function(page){
@@ -147,14 +146,14 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         setTimeout(function(){
                             expect.html(tabs.focussedPage.editor.ace.container).text(/Hello\s*World/);
                             done();
-                        }, 2000)
+                        }, 2000);
                     });
                 });
             });
             
             if (!onload.remain){
                 after(function(done){
-                    outline.unload();
+                    tabs.unload();
                     
                     document.body.style.marginBottom = "";
                     done();
