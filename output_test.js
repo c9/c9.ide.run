@@ -94,6 +94,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
     
     function main(options, imports, register) {
         var tabs     = imports.tabs;
+        var output   = imports.output;
         var fs       = imports.fs;
         
         expect.html.setConstructor(function(page){
@@ -153,6 +154,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             if (!onload.remain){
                 after(function(done){
                     tabs.unload();
+                    output.unload();
                     
                     document.body.style.marginBottom = "";
                     done();
