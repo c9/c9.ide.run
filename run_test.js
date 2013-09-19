@@ -17,7 +17,6 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         },
         
         "plugins/c9.core/ext",
-        "plugins/c9.core/events",
         "plugins/c9.core/http",
         "plugins/c9.core/util",
         "plugins/c9.ide.ui/lib_apf",
@@ -97,7 +96,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         
         // Mock plugins
         {
-            consumes : ["emitter", "apf", "ui"],
+            consumes : ["apf", "ui"],
             provides : [
                 "commands", "menus", "layout", "watcher", 
                 "save", "preferences", "anims", "clipboard"
@@ -176,7 +175,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             describe("run()", function(){
                 this.timeout(10000);
                 
-                it.only('should run a file with a runner', function(done) {
+                it('should run a file with a runner', function(done) {
                     var foundPid, count = 0;
                     
                     run.getRunner("node", false, function(err, runner){
