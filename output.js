@@ -6,8 +6,8 @@
  */
 define(function(require, exports, module) {
     main.consumes = [
-        "Editor", "editors", "util", "commands", "menus", "terminal",
-        "settings", "ui", "proc", "c9", "tabManager", "run", "console"
+        "editor", "editors", "util", "commands", "menus", "terminal",
+        "settings", "ui", "proc", "c9", "tabs", "run", "console"
     ];
     main.provides = ["output"];
     return main;
@@ -19,7 +19,7 @@ define(function(require, exports, module) {
         var commands = imports.commands;
         var console  = imports.console;
         var menus    = imports.menus;
-        var tabs     = imports.tabManager;
+        var tabs     = imports.tabs;
         var run      = imports.run;
         var Terminal = imports.terminal.Terminal;
         
@@ -39,7 +39,7 @@ define(function(require, exports, module) {
                 name    : "showoutput",
                 group   : "Panels",
                 exec    : function (editor) {
-                    // Search for the output pane
+                    // Search for the output tab
                     if (search()) return;
                     
                     // If not found show the console
@@ -52,7 +52,7 @@ define(function(require, exports, module) {
                     tabs.open({
                         editorType : "output", 
                         active     : true,
-                        pane        : console.getPanes()[0],
+                        tab        : console.getTabs()[0],
                         document   : {
                             title  : "Output",
                             output : {
@@ -67,12 +67,12 @@ define(function(require, exports, module) {
         //Search through pages
         function search(id){
             if (!id) id = "output";
-            var pages = tabs.getTabs(), session;
+            var pages = tabs.getPages(), session;
             for (var i = 0; i < pages.length; i++) {
                 if (pages[i].editorType == "output"
                   && (session = pages[i].document.getSession())
                   && session.id == id) {
-                    tabs.focusTab(pages[i]);
+                    tabs.focusPage(pages[i]);
                     return true;
                 }
             }
@@ -89,12 +89,12 @@ define(function(require, exports, module) {
             
             plugin.on("draw", function(e){
                 // Create UI elements
-                ui.insertMarkup(e.tab, markup, plugin);
+                ui.insertMarkup(e.page, markup, plugin);
             });
             
-            plugin.on("documentLoad", function(e){
+            plugin.on("document.load", function(e){
                 var doc     = e.doc;
-                var tab    = e.doc.tab;
+                var page    = e.doc.page;
                 var session = doc.getSession();
                 
                 session.filter = function(data){
@@ -106,7 +106,7 @@ define(function(require, exports, module) {
                         /\[exited\]\r/.test(data) ||
                         /Set option: remain-on-exit \-\> on/.test(data)
                     ) {
-                        tab.className.add("loading");
+                        page.className.add("loading");
                         return;
                     }
                     
@@ -121,7 +121,7 @@ define(function(require, exports, module) {
                               .replace(/Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
                               .replace(/Pane is dead/g, "[Process stopped]");
                         }
-                        tab.className.remove("loading");
+                        page.className.remove("loading");
                     }
                     
                     return data;
@@ -146,11 +146,11 @@ define(function(require, exports, module) {
                 }
             });
             
-            plugin.on("documentActivate", function(e){
+            plugin.on("document.activate", function(e){
                 
             });
             
-            plugin.on("documentUnload", function(e){
+            plugin.on("document.unload", function(e){
                 
             });
             

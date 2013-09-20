@@ -9,15 +9,15 @@
 // remember to - ask bas what feature he missed.
 define(function(require, module, exports) {
     main.consumes = [
-        "c9", "Plugin", "run", "settings", "menus", "save", 
-        "tabbehavior", "ace", "commands", "layout", "tabManager", "preferences", 
+        "c9", "plugin", "run", "settings", "menus", "save", 
+        "tabbehavior", "ace", "commands", "layout", "tabs", "preferences", 
         "ui", "fs", "layout", "output", "debugger", "tree"
     ];
     main.provides = ["rungui"];
     return main;
 
     function main(options, imports, register) {
-        var Plugin      = imports.Plugin;
+        var Plugin      = imports.plugin;
         var settings    = imports.settings;
         var menus       = imports.menus;
         var commands    = imports.commands;
@@ -28,7 +28,7 @@ define(function(require, module, exports) {
         var layout      = imports.layout;
         var save        = imports.save;
         var tree        = imports.tree;
-        var tabs        = imports.tabManager;
+        var tabs        = imports.tabs;
         var output      = imports.output;
         var tabbehavior = imports.tabbehavior;
         var debug       = imports.debugger;
@@ -79,7 +79,7 @@ define(function(require, module, exports) {
                 "hint"  : "run or debug current file (stops the app if running)",
                 exec    : function(){ runThisTab() },
                 isAvailable : function(){
-                    return tabs.focussedTab && tabs.focussedTab.path;
+                    return tabs.focussedPage && tabs.focussedPage.path;
                 }
             }, plugin);
     
@@ -111,7 +111,7 @@ define(function(require, module, exports) {
             });
             
             // Check after state.change
-            c9.on("stateChange", function(e){
+            c9.on("state.change", function(e){
                 // @todo consider moving this to the run plugin
                 if (itemCtxTreeRunFile)
                     itemCtxTreeRunFile.setAttribute("disabled", !(e.state & c9.PROCESS));
@@ -121,8 +121,8 @@ define(function(require, module, exports) {
             var c = 1000;
             var itmRun = menus.addItemByPath("Run/Run", new ui.item({
                 isAvailable : function(){
-                    var tab = tabs.focussedTab;
-                    var path = tab && tab.path;
+                    var page = tabs.focussedPage;
+                    var path = page && page.path;
                     
                     if (process && process.running) {
                         itmRun.setAttribute("caption", "Stop"); 
@@ -277,17 +277,17 @@ define(function(require, module, exports) {
             
             // Hooks
             function updateRunFile(){
-                itmRunFile1.setAttribute("disable", !tabs.focussedTab ||
-                    !tabs.focussedTab.path || !process || !process.running);
-                itmRunFile2.setAttribute("disable", !tabs.focussedTab ||
-                    !tabs.focussedTab.path || !process || !process.running);
+                itmRunFile1.setAttribute("disable", !tabs.focussedPage ||
+                    !tabs.focussedPage.path || !process || !process.running);
+                itmRunFile2.setAttribute("disable", !tabs.focussedPage ||
+                    !tabs.focussedPage.path || !process || !process.running);
             }
             
             // run.on("starting", updateRunFile, plugin);
             // run.on("started", updateRunFile, plugin);
             run.on("stopped", updateRunFile, plugin);
             
-            c9.on("stateChange", function(e){
+            c9.on("state.change", function(e){
                 btnRun.setAttribute("disabled", !(e.state & c9.PROCESS));
             }, plugin);
             
@@ -320,10 +320,10 @@ define(function(require, module, exports) {
                 if (process && process.running)
                     return;
                 
-                if (e.tab.path) {
+                if (e.page.path) {
                     btnRun.enable();
                     btnRun.setAttribute("tooltip", "Run " 
-                        + fs.getFilename(e.tab.path));
+                        + fs.getFilename(e.page.path));
                 }
                 else {
                     btnRun.disable();
@@ -331,7 +331,7 @@ define(function(require, module, exports) {
                 }
             }, plugin);
             
-            tabs.on("tabDestroy", function(e){
+            tabs.on("page.destroy", function(e){
                 updateRunFile();
                 
                 if (e.last) {
@@ -385,7 +385,7 @@ define(function(require, module, exports) {
         
         function runNow(runner, path){
             if (!path) {
-                path = tabs.focussedTab && tabs.focussedTab.path;
+                path = tabs.focussedPage && tabs.focussedPage.path;
                 if (!path) return;
             }
             
@@ -450,7 +450,7 @@ define(function(require, module, exports) {
                 btnRun.enable();
             }
             else {
-                var path = tabs.focussedTab && tabs.focussedTab.path;
+                var path = tabs.focussedPage && tabs.focussedPage.path;
                     
                 btnRun.setAttribute("icon", 
                     btnRun.checked ? "bug.png" : "run.png");
@@ -492,18 +492,18 @@ define(function(require, module, exports) {
         }
     
         function runThisTab() {
-            var file = ide.getActiveTabModel();
+            var file = ide.getActivePageModel();
             var node = this.addConfig(true, file);
     
             this.runConfig(node);
         }
     
         function onHelpClick() {
-            var tab = "running_and_debugging_code";
+            var page = "running_and_debugging_code";
             if (ide.infraEnv)
-                require("ext/docum" + "entation/documentation").show(tab);
+                require("ext/docum" + "entation/documentation").show(page);
             else
-                window.open("https://docs.c9.io/" + tab + ".html");
+                window.open("https://docs.c9.io/" + page + ".html");
         }
     
         /***** Lifecycle *****/

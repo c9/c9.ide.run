@@ -23,16 +23,16 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         {
             packagePath : "plugins/c9.core/settings",
             settings : "<settings><state><console>" + JSON.stringify({
-                type  : "pane", 
+                type  : "tab", 
                 nodes : [
                     {
-                        type : "tab",
+                        type : "page",
                         editorType : "output",
                         document : { title : "Output" },
                         active : "true"
                     },
                     {
-                        type : "tab",
+                        type : "page",
                         editorType : "output",
                         document : {
                             title : "Output2",
@@ -53,11 +53,11 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.ide.editors/editors",
         "plugins/c9.ide.editors/editor",
         {
-            packagePath : "plugins/c9.ide.editors/tabmanager",
+            packagePath : "plugins/c9.ide.editors/tabs",
             testing     : 2
         },
-        "plugins/c9.ide.editors/pane",
         "plugins/c9.ide.editors/tab",
+        "plugins/c9.ide.editors/page",
         "plugins/c9.ide.terminal/terminal",
         "plugins/c9.ide.run/output",
         "plugins/c9.ide.console/console",
@@ -105,7 +105,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             setup    : expect.html.mocked
         },
         {
-            consumes : ["run", "proc", "fs", "tabManager", "console", "output"],
+            consumes : ["run", "proc", "fs", "tabs", "console", "output"],
             provides : [],
             setup    : main
         }
@@ -119,12 +119,12 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         var run      = imports.run;
         var proc     = imports.proc;
         var fs       = imports.fs;
-        var tabs     = imports.tabManager;
+        var tabs     = imports.tabs;
         var cnsl     = imports.console;
         
-        expect.html.setConstructor(function(tab){
-            if (typeof tab == "object")
-                return tab.pane.aml.getPage("editor::" + tab.editorType).$ext;
+        expect.html.setConstructor(function(page){
+            if (typeof page == "object")
+                return page.tab.aml.getPage("editor::" + page.editorType).$ext;
         });
         
         function countEvents(count, expected, done){
@@ -217,7 +217,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 count++;
                                 
                                 setTimeout(function(){
-                                    expect.html(tabs.focussedTab, "Output Mismatch")
+                                    expect.html(tabs.focussedPage, "Output Mismatch")
                                         .text(/Hello\sWorld/);
                                     
                                     fs.rmfile("/helloworld.js", function(){
@@ -274,7 +274,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 count++;
                                 
                                 setTimeout(function(){
-                                    expect.html(tabs.focussedTab, "Output Mismatch")
+                                    expect.html(tabs.focussedPage, "Output Mismatch")
                                         .text(/Hello\sWorld[\s\S]*Hello\sWorld/);
                                     
                                     fs.rmfile("/helloworld.js", function(){
@@ -289,8 +289,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 it('should run an interactive proces in the second output window', function(done) {
                     var count = 0;
                     
-                    var outputTab2 = tabs.getTabs()[1];
-                    tabs.focusTab(outputTab2);
+                    var outputPage2 = tabs.getPages()[1];
+                    tabs.focusPage(outputPage2);
                     
                     run.getRunner("pythoni", false, function(err, runner){
                         if (err) throw err.message;
@@ -304,7 +304,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             expect(process.running).to.equal(run.STARTED);
                             
                             setTimeout(function(){
-                                var output = outputTab2.editor;
+                                var output = outputPage2.editor;
                                 
                                 output.write("print 1\n");
                                 
@@ -326,7 +326,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             process.off("stopped", c1);
                             
                             setTimeout(function(){
-                                expect.html(tabs.focussedTab, "Output Mismatch")
+                                expect.html(tabs.focussedPage, "Output Mismatch")
                                     .text(/Python/);
                                 
                                 count++;
@@ -341,8 +341,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 it('should run a file with a runner automatically selected in the second output window', function(done) {
                     var foundPid, count = 0;
                     
-                    var outputTab2 = tabs.getTabs()[1];
-                    tabs.focusTab(outputTab2);
+                    var outputPage2 = tabs.getPages()[1];
+                    tabs.focusPage(outputPage2);
                     
                     run.getRunner("node", false, function(err, runner){
                         if (err) throw err.message;
@@ -381,7 +381,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 count++;
 
                                 setTimeout(function(){
-                                    expect.html(tabs.focussedTab, "Output Mismatch")
+                                    expect.html(tabs.focussedPage, "Output Mismatch")
                                         .text(/Hello\sWorld/);
                                     
                                     fs.rmfile("/helloworld.js", function(){

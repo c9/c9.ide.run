@@ -28,13 +28,13 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.ide.editors/undomanager",
         "plugins/c9.ide.editors/editors",
         "plugins/c9.ide.editors/editor",
-        "plugins/c9.ide.editors/tabmanager",
+        "plugins/c9.ide.editors/tabs",
         {
             packagePath: "plugins/c9.ide.console/console",
             testing : 2
         },
-        "plugins/c9.ide.editors/pane",
         "plugins/c9.ide.editors/tab",
+        "plugins/c9.ide.editors/page",
         "plugins/c9.ide.terminal/terminal",
         "plugins/c9.ide.run/output",
         {
@@ -83,7 +83,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             setup    : expect.html.mocked
         },
         {
-            consumes : ["tabManager", "proc", "output", "fs"],
+            consumes : ["tabs", "proc", "output", "fs"],
             provides : [],
             setup    : main
         }
@@ -94,20 +94,20 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
     });
     
     function main(options, imports, register) {
-        var tabs     = imports.tabManager;
+        var tabs     = imports.tabs;
         var output   = imports.output;
         var fs       = imports.fs;
         
-        expect.html.setConstructor(function(tab){
-            if (typeof tab == "object")
-                return tab.pane.aml.getPage("editor::" + tab.editorType).$ext;
+        expect.html.setConstructor(function(page){
+            if (typeof page == "object")
+                return page.tab.aml.getPage("editor::" + page.editorType).$ext;
         });
         
         describe('terminal', function() {
             before(function(done){
                 apf.config.setProperty("allow-select", false);
                 apf.config.setProperty("allow-blur", false);
-                tabs.getPanes()[0].focus();
+                tabs.getTabs()[0].focus();
                 
                 bar.$ext.style.background = "rgba(220, 220, 220, 0.93)";
                 bar.$ext.style.position = "fixed";
@@ -143,9 +143,9 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             }
                         }
                         
-                    }, function(err, tab){
+                    }, function(err, page){
                         setTimeout(function(){
-                            expect.html(tabs.focussedTab.editor.ace.container).text(/Hello\s*World/);
+                            expect.html(tabs.focussedPage.editor.ace.container).text(/Hello\s*World/);
                             done();
                         }, 2000);
                     });
