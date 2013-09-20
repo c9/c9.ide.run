@@ -99,12 +99,12 @@ define(function(require, exports, module) {
                 
                 session.filter = function(data){
                     // Ignore clear screen when detaching
-                    if (data.match(/output:0:.*\[dead\] - /))
+                    if (/output:0:.*\[dead\] - /.test(data))
                         return;
 
                     if (
-                        data.match(/\[exited\]\r/) ||
-                        data.match(/Set option: remain-on-exit \-\> on/)
+                        /\[exited\]\r/.test(data) ||
+                        /Set option: remain-on-exit \-\> on/.test(data)
                     ) {
                         tab.className.add("loading");
                         return;
@@ -112,9 +112,15 @@ define(function(require, exports, module) {
                     
                     // Change the last lines of TMUX saying the pane is dead
                     if (data.indexOf("Pane is dead") > -1) {
-                        data = data
-                          .replace(/Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
-                          .replace(/Pane is dead/g, "[Process stopped]");
+                        if (data.lastIndexOf("\x1b[1mPane is dead\x1b[H") === 0) {
+                            data = "\n[Process stopped]";
+                        } else if (data === "\r\x1b[1mPane is dead\x1b[m\x1b[K") {
+                            data = "";
+                        } else {
+                            data = data
+                              .replace(/Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
+                              .replace(/Pane is dead/g, "[Process stopped]");
+                        }
                         tab.className.remove("loading");
                     }
                     

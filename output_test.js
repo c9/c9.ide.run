@@ -10,14 +10,12 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             workspaceId : "johndoe/dev",
             startdate   : new Date(),
             debug       : true,
-            smithIo     : "{\"prefix\":\"/smith.io/server\"}",
             hosted      : true,
             local       : false,
             davPrefix   : "/"
         },
         
         "plugins/c9.core/ext",
-        "plugins/c9.core/events",
         "plugins/c9.core/http",
         "plugins/c9.core/util",
         "plugins/c9.ide.ui/lib_apf",
@@ -69,17 +67,18 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         {
             packagePath: "plugins/c9.vfs.client/vfs_client",
             smithIo     : {
-                "prefix": "/smith.io/server"
+                "path": "/smith.io/server"
             }
         },
+        "plugins/c9.vfs.client/endpoint.standalone",
         "plugins/c9.ide.auth/auth",
         
         // Mock plugins
         {
-            consumes : ["emitter", "apf", "ui"],
+            consumes : ["apf", "ui"],
             provides : [
                 "commands", "menus", "commands", "layout", "watcher", 
-                "save", "fs", "anims", "clipboard"
+                "save", "anims", "clipboard"
             ],
             setup    : expect.html.mocked
         },
@@ -96,7 +95,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
     
     function main(options, imports, register) {
         var tabs     = imports.tabManager;
-        var proc     = imports.proc;
+        var output   = imports.output;
         var fs       = imports.fs;
         
         expect.html.setConstructor(function(tab){
@@ -148,14 +147,15 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         setTimeout(function(){
                             expect.html(tabs.focussedTab.editor.ace.container).text(/Hello\s*World/);
                             done();
-                        }, 2000)
+                        }, 2000);
                     });
                 });
             });
             
             if (!onload.remain){
                 after(function(done){
-                    outline.unload();
+                    tabs.unload();
+                    output.unload();
                     
                     document.body.style.marginBottom = "";
                     done();
