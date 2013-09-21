@@ -7,8 +7,8 @@
 
 define(function(require, module, exports) {
     main.consumes = [
-        "plugin", "proc", "settings", "fs", "menus", "c9",
-        "tabs", "preferences" //@todo move tabs and preferences to the ui part of run
+        "Plugin", "proc", "settings", "fs", "menus", "c9",
+        "tabManager", "preferences" //@todo move tabs and preferences to the ui part of run
     ];
     main.provides = ["run"];
     return main;
@@ -16,11 +16,11 @@ define(function(require, module, exports) {
     // @todo auto/console/@autoshow
 
     function main(options, imports, register) {
-        var Plugin      = imports.plugin;
+        var Plugin      = imports.Plugin;
         var settings    = imports.settings;
         var prefs       = imports.preferences;
         var proc        = imports.proc;
-        var tabs        = imports.tabs;
+        var tabs        = imports.tabManager;
         var fs          = imports.fs;
         var menus       = imports.menus;
         var c9          = imports.c9;
@@ -495,7 +495,7 @@ define(function(require, module, exports) {
                     name == "project_extension" ||
                     name == "project_base_name"
                 ) {
-                    ppath = tabs.focussedPage && tabs.focussedPage.path;
+                    ppath = tabs.focussedTab && tabs.focussedTab.path;
                     if (!ppath) return "";
                     return getVariable(name.replace("project", "name"), ppath);
                 }
@@ -694,16 +694,16 @@ define(function(require, module, exports) {
          * @property STARTED  {2} to be tested against the `running` property. Indicates the process is running.
          * 
          * @event stopping Fires when the process is going to be killed
-         *   object:
+         * @param {Object} e
          *   process {Process} the process that is stopping
          * @event stopped Fires when the process stopped running
-         *   object:
+         * @param {Object} e
          *   process {Process} the process that is stopped
          * @event starting Fires when the process is being started
-         *   object:
+         * @param {Object} e
          *   process {Process} the process that is starting
          * @event started Fires when the process is started. This event also fires during startup if there's a PID file present
-         *   object:
+         * @param {Object} e
          *   process {Process} the process that is stopped
          */
         handle.freezePublicAPI({
@@ -778,7 +778,7 @@ define(function(require, module, exports) {
              * 
              * @param runner {Object, "auto"} Object describing how to run a process. 
              *   Alternatively this can be set to "auto" to auto-detect the runner.
-             *   object:
+             * @param {Object} e
              *   cmd {Array} Array containing the command to run and its desired 
              *      arguments. If you don’t specify an absolute path, the 
              *      external program will be searched in your PATH, one of your 
@@ -815,16 +815,16 @@ define(function(require, module, exports) {
              *      prior to running the processes. This message can contain 
              *      variables.
              *   [variants] {Array} currently not supported.
-             * @param options {Object} 
-             *   object:
+             * @param {Object} 
+             options * @param {Object} e
              *   path  {String} the path to the file to execute
              *   cwd   {String} the current working directory
              *   debug {Boolean} whether to start the process in debug mode
-             * @param name   {String} the unique name of the output buffer. 
+             * @param {String} name   the unique name of the output buffer. 
              *   Defaults to "output". There can only be one process running on
              *   an output buffer at the same time. After a process has ended
              *   the process object is stale.
-             * @param callback {Function} called when the process is started
+             * @param {Function} callback called when the process is started
              * @returns process {Process} the process object
              */
             run : run
