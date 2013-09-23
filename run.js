@@ -1,6 +1,6 @@
 define(function(require, module, exports) {
     main.consumes = [
-        "Plugin", "proc", "settings", "fs", "menus", "c9",
+        "Plugin", "proc", "settings", "fs", "c9",
         "tabManager", "preferences" //@todo move tabs and preferences to the ui part of run
     ];
     main.provides = ["run"];
@@ -15,8 +15,11 @@ define(function(require, module, exports) {
         var proc        = imports.proc;
         var tabs        = imports.tabManager;
         var fs          = imports.fs;
-        var menus       = imports.menus;
         var c9          = imports.c9;
+        
+        var basename    = require("path").basename;
+        var dirname     = require("path").dirname;
+
         
         /***** Initialization *****/
         
@@ -29,7 +32,7 @@ define(function(require, module, exports) {
         var STARTED  = 2;
         
         var TMUX = options.tmux || "~/.c9/bin/tmux";
-        var BASH = "bash"; // /bin/bash
+        var BASH = "bash";
         
         var runners   = options.runners;
         var testing   = options.testing;
@@ -341,7 +344,7 @@ define(function(require, module, exports) {
                         rows : 5,
                         env  : runner.env,
                         cwd  : options.cwd || runner[0].working_dir 
-                            || options.path && fs.getParentPath(options.path) || "/"
+                            || options.path && dirname(options.path) || "/"
                     }, function(err, pty){
                         // Handle a possible error
                         if (err)
@@ -465,18 +468,18 @@ define(function(require, module, exports) {
                 if (name == "file") 
                     return path || "";
                 if (name == "file_path")
-                    return fs.getParentPath(path || "");
+                    return dirname(path || "");
                 if (name == "file_name") 
-                    return fs.getFilename(path || "");
+                    return basename(path || "");
                 if (name == "file_extension") {
                     if (!path) return "";
-                    fnme = fs.getFilename(path);
+                    fnme = basename(path);
                     idx = fnme.lastIndexOf(".");
                     return idx == -1 ? "" : fnme.substr(idx + 1);
                 }
                 if (name == "file_base_name") {
                     if (!path) return "";
-                    fnme = fs.getFilename(path);
+                    fnme = basename(path);
                     idx = fnme.lastIndexOf(".");
                     return idx == -1 ? fnme : fnme.substr(0, idx);
                 }
