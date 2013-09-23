@@ -516,7 +516,7 @@ define(function(require, module, exports) {
         /***** Register and define API *****/
         
         /**
-         * UI for the Run plugin. This plugin is responsible for the Run
+         * UI for the {@link run} plugin. This plugin is responsible for the Run
          * menu in the main menu bar, as well as the settings and the 
          * preferences UI for the run plugin.
          * @singleton

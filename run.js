@@ -785,7 +785,7 @@ define(function(require, module, exports) {
          * 
          * A process is always started in a [TMUX](http://en.wikipedia.org/wiki/Tmux) 
          * session. TMUX is a PTY multi-plexer which has several advantages; 
-         * multiple clients canconnect to the same session and the sessions are 
+         * multiple clients can connect to the same session and the sessions are 
          * kept even if no user is connected. 
          * 
          * You can connect an {@link output} pane to the started process to
@@ -883,14 +883,18 @@ define(function(require, module, exports) {
              * the sublime build scripts. Besides the build in runners, the
              * user can store runners in ~/.c9/runners. This list will contain
              * both the user's runners as well as the build-in runners.
-             * @param callback(err, runners) {Function} called when the runners are retrieved
+             * @param {Function} callback           Called when the runners are retrieved
+             * @param {Error}    callback.err       The error object if an error occurred.
+             * @param {String[]} callback.runners   A list of names of runners.
              */
             listRunners : listRunners,
             
             /**
              * Retrieves an individual runner's JSON object based on it's name.
              * The names of available runners can be retrieved using `listRunners`.
-             * @param callback(err, runner) {Function} called when the runner is retrieved
+             * @param {Function} callback         Called when the runner is retrieved
+             * @param {Function} callback.err     The error object if an error occurred.
+             * @param {Function} callback.runner  A runner object. See {@link #run} for more information.
              */
             getRunner : getRunner,
             
