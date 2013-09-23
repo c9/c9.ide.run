@@ -1,19 +1,12 @@
- /**
- * Output viewer for the Cloud9 IDE
- *
- * @copyright 2010, Ajax.org B.V.
- * @license GPLv3 <http://www.gnu.org/licenses/gpl.txt>
- */
 define(function(require, exports, module) {
     main.consumes = [
         "Editor", "editors", "util", "commands", "menus", "terminal",
-        "settings", "ui", "proc", "c9", "tabManager", "run", "console"
+        "settings", "ui", "proc", "tabManager", "run", "console"
     ];
     main.provides = ["output"];
     return main;
     
     function main(options, imports, register) {
-        var c9       = imports.c9;
         var editors  = imports.editors;
         var ui       = imports.ui;
         var commands = imports.commands;

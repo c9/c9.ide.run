@@ -1,10 +1,3 @@
-/**
- * Runs a single process at a time
- *
- * @copyright 2010, Ajax.org B.V.
- * @license GPLv3 <http://www.gnu.org/licenses/gpl.txt>
- */
-
 define(function(require, module, exports) {
     main.consumes = [
         "Plugin", "proc", "settings", "fs", "menus", "c9",
@@ -619,33 +612,76 @@ define(function(require, module, exports) {
             /***** Register and define API *****/
         
             /**
-             * Process representation of process started with the runner
+             * Represents a process started with a `runner`. 
              * 
-             * @property running {Number} Indicates the state of the process.
-             * @property runner {Object} The object describing how to run the process.
-             * @property pid {Number} The pid of the running process if any
+             * See the {@link run.run run plugin} for information on how to
+             * start a process.
              * 
-             * @property STOPPING {-1} to be tested against the `runner` property. Indicates the process is being killed.
-             * @property STOPPED  {0} to be tested against the `runner` property. Indicates the process is not running.
-             * @property STARTING {1} to be tested against the `runner` property. Indicates the process is getting started.
-             * @property STARTED  {2} to be tested against the `runner` property. Indicates the process is running.
-             * 
-             * @event stopping Fires when the process is going to be killed
-             * @event stopped Fires when the process stopped running
-             * @event starting Fires when the process is being started
-             * @event started Fires when the process is started. This event also fires during startup if there's a PID file present
-             * @event draw 
+             * @class run.Process
              */
             plugin.freezePublicAPI({
+                /**
+                 * @property {-1} STOPPING  Indicates the process is being 
+                 * killed. To be tested against the `runner` property.
+                 */
                 STOPPING : STOPPING,
+                /**
+                 * @property  {0} STOPPED  Indicates the process is not running. 
+                 * To be tested against the `runner` property.
+                 */
                 STOPPED  : STOPPED,
+                /**
+                 * @property {1} STARTING  Indicates the process is getting 
+                 * started. To be tested against the `runner` property.
+                 */
                 STARTING : STARTING,
+                /**
+                 * @property  {2} STARTED  Indicates the process is running. 
+                 * To be tested against the `runner` property.
+                 */
                 STARTED  : STARTED,
                 
+                /**
+                 * @property {Number} running  Indicates the state of the process.
+                 */
                 get running(){ return running; },
+                /**
+                 * @property {Object} runner  The object describing how to run 
+                 * the process.
+                 */
                 get runner(){ return runner; },
+                /**
+                 * @property {Number} pid  The pid of the running process if any
+                 */
                 get pid(){ return pid; },
+                /**
+                 * @property {String} name  The name of the process.
+                 */
                 get name(){ return procName; },
+                
+                _events : [
+                    /**
+                     * Fires when the process is going to be killed
+                     * @event stopping
+                     */
+                    "stopping",
+                    /**
+                     * Fires when the process stopped running
+                     * @event stopped
+                     */
+                    "stopped",
+                    /**
+                     * Fires when the process is being started
+                     * @event starting
+                     */
+                    "starting",
+                    /**
+                     * Fires when the process is started. This event also fires 
+                     * during startup if there's a PID file present
+                     * @event started
+                     */
+                    "started"
+                ],
                 
                 /**
                  * Detach from the currently running process. This is only 
@@ -655,8 +691,10 @@ define(function(require, module, exports) {
                 detach : detach,
                 
                 /**
-                 * Stop the currently running process, if any
-                 * @param callback(err, e) {Function} called when the process is stopped
+                 * Stop the currently running process.
+                 * @param {Function} callback     Called when the process is stopped
+                 * @param {Error}    callback.err The error object, if an error 
+                 * has occured.
                  */
                 stop : stop
             });
@@ -684,36 +722,159 @@ define(function(require, module, exports) {
         /***** Register and define API *****/
         
         /**
-         * Runs arbitrary programs and code within Cloud9 IDE
+         * Runs arbitrary programs and code from within Cloud9 IDE based on a
+         * runner. 
          * 
-         * @property processes {Array} List of running processes
+         * *NB.: If you just want to run a process in the background you should
+         * use {@link proc#spawn} or related methods. This runner is architected
+         * specifically for running (and debugging) processes in Cloud9 that the
+         * user monitors in an {@link output} pane.*
          * 
-         * @property STOPPING {-1} to be tested against the `running` property. Indicates the process is being killed.
-         * @property STOPPED  {0} to be tested against the `running` property. Indicates the process is not running.
-         * @property STARTING {1} to be tested against the `running` property. Indicates the process is getting started.
-         * @property STARTED  {2} to be tested against the `running` property. Indicates the process is running.
+         * Example:
          * 
-         * @event stopping Fires when the process is going to be killed
-         * @param {Object} e
-         *   process {Process} the process that is stopping
-         * @event stopped Fires when the process stopped running
-         * @param {Object} e
-         *   process {Process} the process that is stopped
-         * @event starting Fires when the process is being started
-         * @param {Object} e
-         *   process {Process} the process that is starting
-         * @event started Fires when the process is started. This event also fires during startup if there's a PID file present
-         * @param {Object} e
-         *   process {Process} the process that is stopped
+         *     run.getRunner("node", false, function(err, runner){
+         *         if (err) throw err.message;
+         *         
+         *         var process = run.run(runner, {
+         *             path: "/helloworld.js"
+         *         }, function(err, pid){
+         *             if (err) throw err.message;
+         * 
+         *             console.log("The PID is ", pid);
+         *         });
+         *     });
+         * 
+         * You can also ask for auto-detection of the runner based on the file
+         * extension:
+         * 
+         *     var process = run.run("auto", {
+         *         path: "/helloworld.js"
+         *     }, function(err, pid){
+         *         if (err) throw err.message;
+         *     
+         *         console.log("The PID is ", pid);
+         *     });
+         * 
+         * A runner is a simple struct that describes how to run a 
+         * certain subset of files. For instance a runner describing how to run 
+         * Node.js files looks like this:
+         * 
+         *     {
+         *         "caption" : "Node.js",
+         *         "cmd": [node, "${debug?--debug-brk=15454}", "$file"],
+         *         "debugger": "v8",
+         *         "debugport": 15454,
+         *         "selector": "source.js",
+         *         "info": "Your code is running at $hostname"
+         *     }
+         * 
+         * The concept of runners is based on the
+         * [Sublime Text(tm) Build Systems](http://docs.sublimetext.info/en/sublime-text-3/file_processing/build_systems.html),
+         * and is compatible with that format. There are a several
+         * build-in runners, and external plugins can add new runners as well.
+         * Users can also add runners to their .c9/runners directory in
+         * the workspace. We recommend users to commit these runners to their
+         * repository.
+         * 
+         * The {@link build Cloud9 Build System} also uses a compatible
+         * format for the cloud9 builders.
+         * 
+         * It is possible to combine builders and runners, therefore it is
+         * often not needed to describe the build and run step in the same
+         * definition.
+         * 
+         * A process is always started in a [TMUX](http://en.wikipedia.org/wiki/Tmux) 
+         * session. TMUX is a PTY multi-plexer which has several advantages; 
+         * multiple clients canconnect to the same session and the sessions are 
+         * kept even if no user is connected. 
+         * 
+         * You can connect an {@link output} pane to the started process to
+         * see the output of your running process. The name passed to
+         * {@link run#run} should be the same as the name of the output pane
+         * you open:
+         * 
+         *     tabManager.open({
+         *         editorType : "output", 
+         *         active     : true,
+         *         document   : {
+         *             title  : "My Process Name",
+         *             output : {
+         *                 id : "name_of_process"
+         *             }
+         *         }
+         *     }, function(){});
+         * 
+         * Note that by default the process name is "output" and is shown in the
+         * default output panel (available via the View menu).
+         * 
+         * @singleton
          */
         handle.freezePublicAPI({
+            /**
+             * Indicates the process is being killed. To be tested against 
+             * the `running` property.
+             * @property {-1} STOPPING
+             */
             STOPPING : STOPPING,
+            /**
+             * Indicates the process is not running. To be tested against 
+             * the `running` property.
+             * @property {0}  STOPPED 
+             */
             STOPPED  : STOPPED,
+            /**
+             * Indicates the process is getting started. To be tested against 
+             * the `running` property.
+             * @property {1}  STARTING
+             */
             STARTING : STARTING,
+            /**
+             * Indicates the process is running. To be tested against 
+             * the `running` property.
+             * @property {2}  STARTED 
+             */
             STARTED  : STARTED,
             
+            /**
+             * @property {run.Process[]}  processes  List of running processes
+             */
             get processes(){ return processes; },
+            /**
+             * @property {Object[]}  runners  List of available runners
+             */
             get runners(){ return runners; },
+            
+            _events : [
+                /**
+                 * Fires when the process is going to be killed
+                 * @event stopping
+                 * @param {Object} e
+                 * @param {run.Process} e.process the process that is stopping
+                 */
+                "stopping",
+                /**
+                 * Fires when the process stopped running
+                 * @event stopped 
+                 * @param {Object} e
+                 * @param {run.Process} e.process the process that is stopped
+                 */
+                "stopped",
+                /**
+                 * Fires when the process is being started
+                 * @event starting 
+                 * @param {Object} e
+                 * @param {run.Process} e.process the process that is starting
+                 */
+                "starting",
+                /**
+                 * Fires when the process is started. This event also fires 
+                 * during startup if there's a PID file present
+                 * @event started 
+                 * @param {Object} e
+                 * @param {run.Process} e.process the process that is stopped
+                 */
+                "started"
+            ],
             
             /**
              * Retrieves an array of names of runners available to the system.
@@ -749,83 +910,88 @@ define(function(require, module, exports) {
              * prior to running the command. The following list are the supported
              * variables:
              * 
-             * $file_path           The directory of the current file, e. g., C:\Files.
-             * $file                The full path to the current file, e. g., C:\Files\Chapter1.txt.
-             * $file_name           The name portion of the current file, e. g., Chapter1.txt.
-             * $file_extension      The extension portion of the current file, e. g., txt.
-             * $file_base_name      The name only portion of the current file, e. g., Document.
-             * $packages            The full path to the Packages folder.
-             * $project             The full path to the current project file.
-             * $project_path        The directory of the current project file.
-             * $project_name        The name portion of the current project file.
-             * $project_extension   The extension portion of the current project file.
-             * $project_base_name   The name only portion of the current project file.
-             * $hostname            The hostname of the workspace
-             * $port                The port assigned to the workspace
-             * $ip                  The ip address to run a process against in the workspace
-             *
+             * <table>
+             * <tr><td>`$file_path`</td><td>           The directory of the current file, e. g., C:\Files.</td></tr>
+             * <tr><td>`$file`</td><td>                The full path to the current file, e. g., C:\Files\Chapter1.txt.</td></tr>
+             * <tr><td>`$file_name`</td><td>           The name portion of the current file, e. g., Chapter1.txt.</td></tr>
+             * <tr><td>`$file_extension`</td><td>      The extension portion of the current file, e. g., txt.</td></tr>
+             * <tr><td>`$file_base_name`</td><td>      The name only portion of the current file, e. g., Document.</td></tr>
+             * <tr><td>`$packages`</td><td>            The full path to the Packages folder.</td></tr>
+             * <tr><td>`$project`</td><td>             The full path to the current project file.</td></tr>
+             * <tr><td>`$project_path`</td><td>        The directory of the current project file.</td></tr>
+             * <tr><td>`$project_name`</td><td>        The name portion of the current project file.</td></tr>
+             * <tr><td>`$project_extension`</td><td>   The extension portion of the current project file.</td></tr>
+             * <tr><td>`$project_base_name`</td><td>   The name only portion of the current project file.</td></tr>
+             * <tr><td>`$hostname`</td><td>            The hostname of the workspace</td></tr>
+             * <tr><td>`$port`</td><td>                The port assigned to the workspace</td></tr>
+             * <tr><td>`$ip`</td><td>                  The ip address to run a process against in the workspace</td></tr>
+             * </table>
+             * 
              * The following declarations can be used to add defaults or regexp
              * replacements to the these variables:
              * 
-             * ${debug?--debug}
+             *     ${debug?--debug}
+             * 
              * This will emit --debug if the debug option is set to true
              * 
-             * ${project_name:Default}
+             *     ${project_name:Default}
+             * 
              * This will emit the name of the current project if there is one, otherwise Default.
              * 
-             * ${file/\.php/\.txt/}
+             *     ${file/\.php/\.txt/}
+             * 
              * This will emit the full path of the current file, replacing .php with .txt.
              * 
-             * @param runner {Object, "auto"} Object describing how to run a process. 
+             * @param runner {Object/"auto"} Object describing how to run a process. 
              *   Alternatively this can be set to "auto" to auto-detect the runner.
              * @param {Object} e
-             *   cmd {Array} Array containing the command to run and its desired 
+             * @param {Array} e.cmd Array containing the command to run and its desired 
              *      arguments. If you don’t specify an absolute path, the 
              *      external program will be searched in your PATH, one of your 
              *      system’s environmental variables. The command can contain 
              *      variables.
-             *   [file_regex] {RegExp} Regular expression (Perl-style) to 
+             * @param {RegExp} [e.file_regex] Regular expression (Perl-style) to 
              *      capture error output of cmd. See the next section for details.
-             *   [line_regex] {RegExp} If file_regex doesn’t match on the 
+             * @param {RegExp} [e.line_regex] If file_regex doesn’t match on the 
              *      current line, but line_regex exists, and it does match on 
              *      the current line, then walk backwards through the buffer 
              *      until a line matching file regex is found, and use these two 
              *      matches to determine the file and line to go to.
-             *   [selector] {RegExp} Used when the automatic selection of the
+             * @param {RegExp} [e.selector] Used when the automatic selection of the
              *      runner is set. Cloud9 IDE uses this scope selector to 
              *      find the appropriate build system for the active view.
-             *   [working_dir] {String} Directory to change the current 
+             * @param {String} [e.working_dir] Directory to change the current 
              *      directory to before running cmd. The original current 
              *      directory is restored afterwards.
-             *   [env] {Object} Dictionary of environment variables to be merged 
+             * @param {Object} [e.env] Dictionary of environment variables to be merged 
              *      with the current process’ before passing them to cmd.
              * 
              *      Use this element, for example, to add or modify environment 
              *      variables without modifying your system’s settings.
-             *   [shell] {Boolean} If true, cmd will be run through the shell.
+             * @param {Boolean} [e.shell] If true, cmd will be run through the shell.
              *      In our implementation all commands run through the shell.
              *      This cannot be changed.
-             *   [path] {String} This string will replace the current process’ 
+             * @param {String} [e.path] This string will replace the current process’ 
              *      PATH before calling cmd. The old PATH value will be restored 
              *      after that.
              * 
              *      Use this option to add directories to PATH without having 
              *      to modify your system’s settings.
-             *   [info] {String} message to be outputted in the output buffer
+             * @param {String} [e.info] message to be outputted in the output buffer
              *      prior to running the processes. This message can contain 
              *      variables.
-             *   [variants] {Array} currently not supported.
-             * @param {Object} 
-             options * @param {Object} e
-             *   path  {String} the path to the file to execute
-             *   cwd   {String} the current working directory
-             *   debug {Boolean} whether to start the process in debug mode
+             * @param {Array} [e.variants] currently not supported.
+             * @param {Object}  options
+             * @param {String}  options.path  the path to the file to execute
+             * @param {String}  options.cwd   the current working directory
+             * @param {Boolean} options.debug whether to start the process in debug mode
              * @param {String} name   the unique name of the output buffer. 
              *   Defaults to "output". There can only be one process running on
              *   an output buffer at the same time. After a process has ended
              *   the process object is stale.
-             * @param {Function} callback called when the process is started
-             * @returns process {Process} the process object
+             * @param {Function} callback     called when the process is started
+             * @param {Error}    callback.err The error object if an error occurred.
+             * @returns {run.Process} The process object
              */
             run : run
         });

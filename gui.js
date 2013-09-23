@@ -1,19 +1,10 @@
-/**
- * Node Runner Module for the Cloud9 IDE
- *
- * @copyright 2010, Ajax.org B.V.
- * @license GPLv3 <http://www.gnu.org/licenses/gpl.txt>
- */
-
-// @todo skipped this one until more of its dependencies are refactored
-// remember to - ask bas what feature he missed.
 define(function(require, module, exports) {
     main.consumes = [
         "c9", "Plugin", "run", "settings", "menus", "save", 
         "tabbehavior", "ace", "commands", "layout", "tabManager", "preferences", 
         "ui", "fs", "layout", "output", "debugger", "tree"
     ];
-    main.provides = ["rungui"];
+    main.provides = ["run.gui"];
     return main;
 
     function main(options, imports, register) {
@@ -67,15 +58,15 @@ define(function(require, module, exports) {
             }, plugin);
     
             commands.addCommand({
-                group   : "Run & Debug",
                 name    : "runthisfile",
+                group   : "Run & Debug",
                 "hint"  : "run or debug this file (stops the app if running)",
                 exec    : function(){ runThisFile() }
             }, plugin);
     
             commands.addCommand({
-                group   : "Run & Debug",
                 name    : "runthistab",
+                group   : "Run & Debug",
                 "hint"  : "run or debug current file (stops the app if running)",
                 exec    : function(){ runThisTab() },
                 isAvailable : function(){
@@ -84,8 +75,8 @@ define(function(require, module, exports) {
             }, plugin);
     
             commands.addCommand({
-                group   : "Run & Debug",
                 name    : "runlast",
+                group   : "Run & Debug",
                 "hint"  : "run or debug the last run file",
                 bindKey: { mac: "F5", win: "F5" },
                 exec    : function(){ runLastFile() },
@@ -525,14 +516,26 @@ define(function(require, module, exports) {
         /***** Register and define API *****/
         
         /**
-         * UI for the Run plugin
+         * UI for the Run plugin. This plugin is responsible for the Run
+         * menu in the main menu bar, as well as the settings and the 
+         * preferences UI for the run plugin.
+         * @singleton
+         */
+        /**
+         * @command run Runs the currently focussed tab.
+         */
+        /**
+         * @command stop Stops the running process.
+         */
+        /**
+         * @command runlast Stops the last run file
          */
         plugin.freezePublicAPI({
             
         });
         
         register(null, {
-            "rungui": plugin
+            "run.gui": plugin
         });
     }
 });
