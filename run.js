@@ -236,7 +236,7 @@ define(function(require, module, exports) {
                 WATCHFILE = "/.run_" + procName + ".watch";
                 PIDMATCH  = new RegExp("^"
                     + (c9.platform == "darwin" ? "\\s*\\d+" : "")
-                    + "\\s*(\\d+)\\s.*echo -n > "
+                    + "\\s*(\\d+)\\s.*echo > "
                     + base.replace(/\//g, "\\/") + "\\/\\.run_" + procName 
                     + "\\.watch", "m");
             }
