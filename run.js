@@ -358,7 +358,7 @@ define(function(require, module, exports) {
                         emit("started", { pty: pty });
                         
                         if (options.detach === false) {
-                            pty.on("data", function(data){ emit("data", data); })
+                            pty.on("data", function(data){ emit("data", data); });
                             pty.on("exit", function(){ emit("detach"); });
                         }
                         else {
