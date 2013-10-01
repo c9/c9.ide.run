@@ -915,20 +915,21 @@ define(function(require, module, exports) {
              * variables:
              * 
              * <table>
-             * <tr><td>`$file_path`</td><td>           The directory of the current file, e. g., C:\Files.</td></tr>
-             * <tr><td>`$file`</td><td>                The full path to the current file, e. g., C:\Files\Chapter1.txt.</td></tr>
-             * <tr><td>`$file_name`</td><td>           The name portion of the current file, e. g., Chapter1.txt.</td></tr>
-             * <tr><td>`$file_extension`</td><td>      The extension portion of the current file, e. g., txt.</td></tr>
-             * <tr><td>`$file_base_name`</td><td>      The name only portion of the current file, e. g., Document.</td></tr>
-             * <tr><td>`$packages`</td><td>            The full path to the Packages folder.</td></tr>
-             * <tr><td>`$project`</td><td>             The full path to the current project file.</td></tr>
-             * <tr><td>`$project_path`</td><td>        The directory of the current project file.</td></tr>
-             * <tr><td>`$project_name`</td><td>        The name portion of the current project file.</td></tr>
-             * <tr><td>`$project_extension`</td><td>   The extension portion of the current project file.</td></tr>
-             * <tr><td>`$project_base_name`</td><td>   The name only portion of the current project file.</td></tr>
-             * <tr><td>`$hostname`</td><td>            The hostname of the workspace</td></tr>
-             * <tr><td>`$port`</td><td>                The port assigned to the workspace</td></tr>
-             * <tr><td>`$ip`</td><td>                  The ip address to run a process against in the workspace</td></tr>
+             * <tr><td>Variable</td><td>               Description</td></tr>
+             * <tr><td>"$file_path"</td><td>           The directory of the current file, e. g., C:\Files.</td></tr>
+             * <tr><td>"$file"</td><td>                The full path to the current file, e. g., C:\Files\Chapter1.txt.</td></tr>
+             * <tr><td>"$file_name"</td><td>           The name portion of the current file, e. g., Chapter1.txt.</td></tr>
+             * <tr><td>"$file_extension"</td><td>      The extension portion of the current file, e. g., txt.</td></tr>
+             * <tr><td>"$file_base_name"</td><td>      The name only portion of the current file, e. g., Document.</td></tr>
+             * <tr><td>"$packages"</td><td>            The full path to the Packages folder.</td></tr>
+             * <tr><td>"$project"</td><td>             The full path to the current project file.</td></tr>
+             * <tr><td>"$project_path"</td><td>        The directory of the current project file.</td></tr>
+             * <tr><td>"$project_name"</td><td>        The name portion of the current project file.</td></tr>
+             * <tr><td>"$project_extension"</td><td>   The extension portion of the current project file.</td></tr>
+             * <tr><td>"$project_base_name"</td><td>   The name only portion of the current project file.</td></tr>
+             * <tr><td>"$hostname"</td><td>            The hostname of the workspace</td></tr>
+             * <tr><td>"$port"</td><td>                The port assigned to the workspace</td></tr>
+             * <tr><td>"$ip"</td><td>                  The ip address to run a process against in the workspace</td></tr>
              * </table>
              * 
              * The following declarations can be used to add defaults or regexp
@@ -950,40 +951,40 @@ define(function(require, module, exports) {
              *   Alternatively this can be set to "auto" to auto-detect the runner.
              * @param {Object} e
              * @param {Array} e.cmd Array containing the command to run and its desired 
-             *      arguments. If you don’t specify an absolute path, the 
-             *      external program will be searched in your PATH, one of your 
-             *      system’s environmental variables. The command can contain 
-             *      variables.
+             *  arguments. If you don’t specify an absolute path, the 
+             *  external program will be searched in your PATH, one of your 
+             *  system’s environmental variables. The command can contain 
+             *  variables.
              * @param {RegExp} [e.file_regex] Regular expression (Perl-style) to 
-             *      capture error output of cmd. See the next section for details.
+             *  capture error output of cmd. See the next section for details.
              * @param {RegExp} [e.line_regex] If file_regex doesn’t match on the 
-             *      current line, but line_regex exists, and it does match on 
-             *      the current line, then walk backwards through the buffer 
-             *      until a line matching file regex is found, and use these two 
-             *      matches to determine the file and line to go to.
+             *  current line, but line_regex exists, and it does match on 
+             *  the current line, then walk backwards through the buffer 
+             *  until a line matching file regex is found, and use these two 
+             *  matches to determine the file and line to go to.
              * @param {RegExp} [e.selector] Used when the automatic selection of the
-             *      runner is set. Cloud9 IDE uses this scope selector to 
-             *      find the appropriate build system for the active view.
+             *  runner is set. Cloud9 IDE uses this scope selector to 
+             *  find the appropriate build system for the active view.
              * @param {String} [e.working_dir] Directory to change the current 
-             *      directory to before running cmd. The original current 
-             *      directory is restored afterwards.
+             *  directory to before running cmd. The original current 
+             *  directory is restored afterwards.
              * @param {Object} [e.env] Dictionary of environment variables to be merged 
-             *      with the current process’ before passing them to cmd.
+             *  with the current process’ before passing them to cmd.
              * 
-             *      Use this element, for example, to add or modify environment 
-             *      variables without modifying your system’s settings.
+             *  Use this element, for example, to add or modify environment 
+             *  variables without modifying your system’s settings.
              * @param {Boolean} [e.shell] If true, cmd will be run through the shell.
-             *      In our implementation all commands run through the shell.
-             *      This cannot be changed.
+             *  In our implementation all commands run through the shell.
+             *  This cannot be changed.
              * @param {String} [e.path] This string will replace the current process’ 
-             *      PATH before calling cmd. The old PATH value will be restored 
-             *      after that.
+             *  PATH before calling cmd. The old PATH value will be restored 
+             *  after that.
              * 
-             *      Use this option to add directories to PATH without having 
-             *      to modify your system’s settings.
+             *  Use this option to add directories to PATH without having 
+             *  to modify your system’s settings.
              * @param {String} [e.info] message to be outputted in the output buffer
-             *      prior to running the processes. This message can contain 
-             *      variables.
+             *  prior to running the processes. This message can contain 
+             *  variables.
              * @param {Array} [e.variants] currently not supported.
              * @param {Object}  options
              * @param {String}  options.path  the path to the file to execute
