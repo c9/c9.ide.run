@@ -614,7 +614,7 @@ define(function(require, module, exports) {
             /**
              * Represents a process started with a `runner`. 
              * 
-             * See the {@link run.run run plugin} for information on how to
+             * See the {@link run#run run plugin} for information on how to
              * start a process.
              * 
              * @class run.Process
