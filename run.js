@@ -771,7 +771,7 @@ define(function(require, module, exports) {
          * The concept of runners is based on the
          * [Sublime Text(tm) Build Systems](http://docs.sublimetext.info/en/sublime-text-3/file_processing/build_systems.html),
          * and is compatible with that format. There are a several
-         * build-in runners, and external plugins can add new runners as well.
+         * built-in runners, and external plugins can add new runners as well.
          * Users can also add runners to their .c9/runners directory in
          * the workspace. We recommend users to commit these runners to their
          * repository.
