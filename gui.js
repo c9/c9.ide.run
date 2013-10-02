@@ -1,6 +1,6 @@
 define(function(require, module, exports) {
     main.consumes = [
-        "c9", "Plugin", "run", "settings", "menus", "save", 
+        "c9", "Plugin", "run", "settings", "menus",
         "tabbehavior", "ace", "commands", "layout", "tabManager", "preferences", 
         "ui", "fs", "layout", "output", "debugger", "tree"
     ];
@@ -17,7 +17,6 @@ define(function(require, module, exports) {
         var ui          = imports.ui;
         var fs          = imports.fs;
         var layout      = imports.layout;
-        var save        = imports.save;
         var tree        = imports.tree;
         var tabs        = imports.tabManager;
         var output      = imports.output;
@@ -27,7 +26,8 @@ define(function(require, module, exports) {
         var ace         = imports.ace;
         
         var cssString = require("text!./style.css");
-        
+        var basename  = require("path").basename;
+
         /***** Initialization *****/
         
         var plugin  = new Plugin("Ajax.org", main.consumes);
@@ -125,7 +125,7 @@ define(function(require, module, exports) {
                         if (runner) {
                             itmRun.setAttribute("command", "run"); 
                             itmRun.setAttribute("caption", "Run " 
-                                + fs.getFilename(path) + " with "
+                                + basename(path) + " with "
                                 + runner.caption);
                             return true;
                         }
@@ -149,7 +149,7 @@ define(function(require, module, exports) {
                             : lastRun[0];
                         
                         itmRunLast.setAttribute("caption", "Run Last ("
-                            + fs.getFilename(lastRun[1]) + ", " 
+                            + basename(lastRun[1]) + ", " 
                             + (runner.caption || "auto") + ")");
                         return true;
                     }
@@ -314,7 +314,7 @@ define(function(require, module, exports) {
                 if (e.tab.path) {
                     btnRun.enable();
                     btnRun.setAttribute("tooltip", "Run " 
-                        + fs.getFilename(e.tab.path));
+                        + basename(e.tab.path));
                 }
                 else {
                     btnRun.disable();
@@ -425,7 +425,7 @@ define(function(require, module, exports) {
                         btnRun.disable();
                 }, plugin);
                 
-                transformButton("stop")
+                transformButton("stop");
             }
             
             lastRun = [runner, path];
@@ -447,7 +447,7 @@ define(function(require, module, exports) {
                     btnRun.checked ? "bug.png" : "run.png");
                 btnRun.setAttribute("caption", "Run");
                 btnRun.setAttribute("tooltip", (path 
-                    ? "Run " + fs.getFilename(path)
+                    ? "Run " + basename(path)
                     : ""));
                 btnRun.setAttribute("class", "stopped");
                 btnRun.setAttribute("command", "run");
@@ -472,7 +472,7 @@ define(function(require, module, exports) {
         
         function runLastFile(){
             if (lastRun)
-                runNow.apply(this, lastRun)
+                runNow.apply(this, lastRun);
         }
     
         function runThisFile() {
