@@ -399,11 +399,14 @@ define(function(require, module, exports) {
                     path  : path,
                     debug : bDebug
                 }, function(err, pid){
-                    if (err) 
+                    if (err) {
+                        transformButton();
+                        process = null;
                         return layout.showError(err);
+                    }
                     
                     if (bDebug) {
-                        debug.debug(process.runner[0], function(err){
+                        debug.debug(process, function(err){
                             if (err)
                                 return; // Either the debugger is not found or paused
                         });
