@@ -480,7 +480,7 @@ define(function(require, module, exports) {
         }
     
         function runThisFile() {
-            var file = trFiles.selected;
+            var file = tree.selected;
             var node = this.addConfig(true, file);
     
             this.runConfig(node);
