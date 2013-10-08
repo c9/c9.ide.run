@@ -110,6 +110,7 @@ define(function(require, module, exports) {
             
             // Menus
             var c = 1000;
+            menus.setRootMenu("Run", 600, plugin);
             var itmRun = menus.addItemByPath("Run/Run", new ui.item({
                 isAvailable : function(){
                     var tab = tabs.focussedTab;
