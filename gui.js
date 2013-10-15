@@ -81,8 +81,7 @@ define(function(require, module, exports) {
                 }
             });
             tree.getElement("mnuCtxTree", function(mnuCtxTree) {
-                menus.addItemToMenu(mnuCtxTree, new apf.divider(), 800, plugin);
-                menus.addItemToMenu(mnuCtxTree, itemCtxTreeRunFile, 810, plugin);
+                menus.addItemToMenu(mnuCtxTree, itemCtxTreeRunFile, 150, plugin);
             });
             
             // Check after state.change
