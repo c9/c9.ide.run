@@ -133,6 +133,7 @@ define(function(require, module, exports) {
                         else {
                             itmRun.setAttribute("command", "run"); 
                             itmRun.setAttribute("caption", "Run");
+                            return false;
                         }
                     }
                 }
