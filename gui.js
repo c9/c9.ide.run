@@ -71,9 +71,7 @@ define(function(require, module, exports) {
             // Tree context menu
             // Needs to be hidden in readonly mode
             var itemCtxTreeRunFile = new apf.item({
-                id      : "itemCtxTreeRunFile",
-                match   : "[file]",
-                visible : "{!c9.readonly}",
+                enabled : !c9.readonly,
                 caption : "Run",
                 isAvailable : function(){
                     return tree.selectedNode && !tree.selectedNode.isFolder;
@@ -83,16 +81,14 @@ define(function(require, module, exports) {
                 }
             });
             tree.getElement("mnuCtxTree", function(mnuCtxTree) {
-                menus.addItemToMenu(mnuCtxTree, new apf.divider({
-                    visible: "{!c9.readonly}"
-                }), 800, plugin);
+                menus.addItemToMenu(mnuCtxTree, new apf.divider(), 800, plugin);
                 menus.addItemToMenu(mnuCtxTree, itemCtxTreeRunFile, 810, plugin);
             });
             
             // Check after state.change
             c9.on("stateChange", function(e){
                 // @todo consider moving this to the run plugin
-                if (itemCtxTreeRunFile)
+                if (itemCtxTreeRunFile && !c9.readonly)
                     itemCtxTreeRunFile.setAttribute("disabled", !(e.state & c9.PROCESS));
             }, plugin);
             
