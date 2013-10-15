@@ -58,23 +58,6 @@ define(function(require, module, exports) {
             }, plugin);
     
             commands.addCommand({
-                name    : "runthisfile",
-                group   : "Run & Debug",
-                "hint"  : "run or debug this file (stops the app if running)",
-                exec    : function(){ runThisFile() }
-            }, plugin);
-    
-            commands.addCommand({
-                name    : "runthistab",
-                group   : "Run & Debug",
-                "hint"  : "run or debug current file (stops the app if running)",
-                exec    : function(){ runThisTab() },
-                isAvailable : function(){
-                    return tabs.focussedTab && tabs.focussedTab.path;
-                }
-            }, plugin);
-    
-            commands.addCommand({
                 name    : "runlast",
                 group   : "Run & Debug",
                 "hint"  : "run or debug the last run file",
@@ -91,8 +74,13 @@ define(function(require, module, exports) {
                 id      : "itemCtxTreeRunFile",
                 match   : "[file]",
                 visible : "{!c9.readonly}",
-                command : "runthisfile",
-                caption : "Run"
+                caption : "Run",
+                isAvailable : function(){
+                    return tree.selectedNode && !tree.selectedNode.isFolder;
+                },
+                onclick : function(){
+                    runNow("auto", tree.selected);
+                }
             });
             tree.getElement("mnuCtxTree", function(mnuCtxTree) {
                 menus.addItemToMenu(mnuCtxTree, new apf.divider({
@@ -480,20 +468,6 @@ define(function(require, module, exports) {
         function runLastFile(){
             if (lastRun)
                 runNow.apply(this, lastRun);
-        }
-    
-        function runThisFile() {
-            var file = tree.selected;
-            var node = this.addConfig(true, file);
-    
-            this.runConfig(node);
-        }
-    
-        function runThisTab() {
-            var file = ide.getActiveTabModel();
-            var node = this.addConfig(true, file);
-    
-            this.runConfig(node);
         }
     
         function onHelpClick() {
