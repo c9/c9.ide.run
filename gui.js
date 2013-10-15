@@ -286,7 +286,9 @@ define(function(require, module, exports) {
             // Preferences
             prefs.add({
                 "Run" : {
+                    position : 600,
                     "Run & Debug" : {
+                        position : 100,
                         "Save All Unsaved Tabs Before Running" : {
                            type : "checkbox",
                            path : "user/runconfig/@saveallbeforerun",

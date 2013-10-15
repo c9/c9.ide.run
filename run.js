@@ -92,6 +92,7 @@ define(function(require, module, exports) {
             prefs.add({
                 "Project" : {
                     "Run & Debug" : {
+                        position : 300,
                         "Runner Path in Workspace" : {
                             type : "textbox",
                             path : "project/run/@path",
