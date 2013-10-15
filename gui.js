@@ -237,31 +237,22 @@ define(function(require, module, exports) {
             
             // Other Menus
             
-            var itmRunFile1 = new apf.item({ command : "runthistab" });
-            var itmRunFile2 = new apf.item({ command : "runthistab" });
-            
-            menus.addItemByPath("View/Tabs/Run This File", itmRunFile1, 400, plugin);
-            menus.addItemByPath("View/Tabs/~", new apf.divider(), 300, plugin)
-    
-            tabbehavior.getElement("mnuContextTabs", function(mnuContextTabs){
-                menus.addItemByPath("~", new apf.divider(), 800, mnuContextTabs, plugin);
-                menus.addItemByPath("Run This File", itmRunFile2, 850, mnuContextTabs, plugin);
-            });
+            var mnuContext = tabbehavior.contextMenu;
+            // menus.addItemByPath("~", new ui.divider(), 800, mnuContext, plugin);
+            menus.addItemByPath("Run This File", new ui.item({ 
+                onclick : function(){
+                    var tab = mnuContext.$tab;
+                    if (tab && tab.path)
+                        runNow("auto", tab.path);
+                },
+                isAvailable: function(){
+                    var tab = mnuContext.$tab;
+                    return tab && tab.path && (!process || !process.running);
+                }
+            }), 150, mnuContext, plugin);
             
             // Draw
             draw();
-            
-            // Hooks
-            function updateRunFile(){
-                itmRunFile1.setAttribute("disable", !tabs.focussedTab ||
-                    !tabs.focussedTab.path || !process || !process.running);
-                itmRunFile2.setAttribute("disable", !tabs.focussedTab ||
-                    !tabs.focussedTab.path || !process || !process.running);
-            }
-            
-            // run.on("starting", updateRunFile, plugin);
-            // run.on("started", updateRunFile, plugin);
-            run.on("stopped", updateRunFile, plugin);
             
             c9.on("stateChange", function(e){
                 btnRun.setAttribute("disabled", !(e.state & c9.PROCESS));
@@ -293,8 +284,6 @@ define(function(require, module, exports) {
             }, plugin);
     
             tabs.on("focus", function(e){
-                updateRunFile();
-                
                 if (process && process.running)
                     return;
                 
@@ -310,8 +299,6 @@ define(function(require, module, exports) {
             }, plugin);
             
             tabs.on("tabDestroy", function(e){
-                updateRunFile();
-                
                 if (e.last) {
                     btnRun.disable();
                     btnRun.setAttribute("tooltip", "");
@@ -321,7 +308,7 @@ define(function(require, module, exports) {
             ace.getElement("menu", function(menu){
                 menus.addItemToMenu(menu, new ui.item({
                     caption  : "Run This File",
-                    command  : "runthistab",
+                    command  : "run",
                 }), 800, plugin);
                 menus.addItemToMenu(menu, new ui.divider(), 900, plugin);
             });
