@@ -1,17 +1,5 @@
 <a:application xmlns:a="http://ajax.org/2005/aml">
     <a:hbox pack="end" bottom="7" right="3" height="24" align="center" padding="0">
         <a:button id="btnConsoleClear" skin="btn_icon_only" icon="console_clear.png" margin="2 2 0 0" />
-        <a:button id="btnConsoleSettings" skin="btn_icon_only"
-          icon    = "console_settings.png"
-          margin  = "2 4 0 0" />
     </a:hbox>
-        
-    <a:menu id="mnuConsoleSettings">
-        <a:item type="check"
-          checked = "[{settings.model}::user/console/@autoshow]"
-          caption = "Auto-show console when running" />
-        <a:item type="check"
-          checked = "[{settings.model}::user/console/@clearonrun]"
-          caption = "Clear output on run" />
-    </a:menu>
 </a:application>

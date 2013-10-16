@@ -6,8 +6,6 @@ define(function(require, module, exports) {
     main.provides = ["run"];
     return main;
 
-    // @todo auto/console/@autoshow
-
     function main(options, imports, register) {
         var Plugin      = imports.Plugin;
         var settings    = imports.settings;
@@ -19,7 +17,6 @@ define(function(require, module, exports) {
         
         var basename    = require("path").basename;
         var dirname     = require("path").dirname;
-
         
         /***** Initialization *****/
         
@@ -44,21 +41,6 @@ define(function(require, module, exports) {
             if (loaded) return false;
             loaded = true;
             
-            // @todo, this should probably be abstracted away to the output plugin / run plugin
-//                stProcessRunning.addEventListener("activate", function() {
-//                    var autoshow = settings.model.queryValue("user/console/@autoshow");
-//                    if (_self.autoOpen && apf.isTrue(autoshow)) {
-//                        setTimeout(function(){
-//                            _self.show();
-//                            _self.showOutput();
-//                        }, 200);
-//                    }
-//                    else {
-//                        if (self.tabConsole && tabConsole.visible)
-//                            _self.showOutput();
-//                    }
-//                });
-
             // Check for running process
 //            findPID(function(err, storedPID){
 //                if (err || !storedPID) {
@@ -255,6 +237,16 @@ define(function(require, module, exports) {
             var WATCHFILE_PREFIXED = (testing ? base : "") + WATCHFILE;
             var TRUNCATE = "; ([ -e " + WATCHFILE_PREFIXED + " ] "
                 + "&& echo > " + WATCHFILE_PREFIXED + ")";
+            
+            // Deal with connection issues
+            c9.on("stateChange", function(e){
+                if (e.state & c9.PROCESS) {
+                    
+                }
+                else {
+                    
+                }
+            });
     
             /***** Methods *****/
             
@@ -505,6 +497,9 @@ define(function(require, module, exports) {
                 
                 return "$" + name;
             }
+            function reverse(str){ 
+                return str.split('').reverse().join('');
+            }
             function insertVariables(cmd, options){
                 cmd = cmd.replace(/(^|[^\\])\$([\w_]+)|(^|[^\\])\$\{([^}]+)\}/g, 
                 function(m, char, name, nchar, nacco){
@@ -522,17 +517,13 @@ define(function(require, module, exports) {
                             
                         // Test for regular expression
                         if (nacco.match(/^([\w_]+)\/(.*)$/)) {
-                            function reverse(str){ 
-                                return str.split('').reverse().join('');
-                            }
-                            
                             return nchar + reverse(nacco)
                                 .replace(/^\/?(.*)\/(?!\\)(.*)\/(?!\\)([\w_]+)$/, 
                                 function (m, replace, find, name){
                                     var data = getVariable(reverse(name), options.path);
                                     var re   = new RegExp(reverse(find), "g");
                                     return data.replace(re, reverse(replace));
-                                })
+                                });
                         }
                         
                         // Assume just a name
