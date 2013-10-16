@@ -41,23 +41,6 @@ define(function(require, module, exports) {
             if (loaded) return false;
             loaded = true;
             
-            // Check for running process
-//            findPID(function(err, storedPID){
-//                if (err || !storedPID) {
-//                    if (running > 0) stop();
-//                    return;
-//                }
-//                
-//                pid = storedPID;
-//                
-//                // if there's a PID we're running
-//                running = STARTED;
-//                emit("started", storedPID);
-//                
-//                // Lets double check if the PID is still alive
-//                monitor(function(track){ track(function(){}); }, function(){});
-//            });
-            
             // Settings
             settings.on("read", function(e){
                 // Defaults
@@ -88,15 +71,6 @@ define(function(require, module, exports) {
         }
         
         /***** Methods *****/
-        
-//        function findPID(callback){
-//            // var pid = settings.getNumer("user/run/@pid");
-//            // if (pid) return callback(null, pid);
-//            
-//            fs.readFile(PIDFILE, "utf8", function(err, data){
-//                return callback(err, data);
-//            });
-//        }
         
         function listRunners(callback){
             var runners = Object.keys(options.runners || {});
@@ -166,8 +140,12 @@ define(function(require, module, exports) {
                     
                     runners[name] = runner;
                     callback(null, runner);
-                })
+                });
             }
+        }
+        
+        function restoreProcess(state){
+            return new Process(state);
         }
         
         function run(runner, options, name, callback){
@@ -189,13 +167,13 @@ define(function(require, module, exports) {
             
             var event = { process: proc };
             
-            proc.on("starting", function(){ handleEmit("starting", event); })
-            proc.on("started", function(){ handleEmit("started", event); })
-            proc.on("stopping", function(){ handleEmit("stopping", event); })
+            proc.on("starting", function(){ handleEmit("starting", event); });
+            proc.on("started", function(){ handleEmit("started", event); });
+            proc.on("stopping", function(){ handleEmit("stopping", event); });
             proc.on("stopped", function(){ 
                 handleEmit("stopped", event); 
                 processes.remove(proc);
-            })
+            });
             
             return proc;
         }
@@ -203,7 +181,7 @@ define(function(require, module, exports) {
         function stopAll(){
             processes.forEach(function(proc){
                 proc.stop();
-            })
+            });
         }
         
         /***** Process Class *****/
@@ -215,6 +193,13 @@ define(function(require, module, exports) {
             
             var running = STOPPED;
             var pid, process;
+            
+            if (typeof procName == "object") {
+                pid      = procName.pid;
+                runner   = procName.runner;
+                running  = procName.running;
+                procName = procName.name;
+            }
             
             var PIDFILE, PIDMATCH, WATCHFILE;
             if (testing) {
@@ -609,6 +594,15 @@ define(function(require, module, exports) {
                 });
             }
             
+            function getState(){
+                return {
+                    pid     : pid,
+                    name    : procName,
+                    running : running,
+                    runner  : runner
+                };
+            }
+            
             function detach(callback){
                 // Kill the pty session
                 if (process)
@@ -694,6 +688,12 @@ define(function(require, module, exports) {
                 ],
                 
                 /**
+                 * Returns the state of this process for use later.
+                 * @return {Object}
+                 */
+                getState : getState,
+                
+                /**
                  * Detach from the currently running process. This is only 
                  * relevant if options.detach was set to false when starting 
                  * the process.
@@ -709,12 +709,7 @@ define(function(require, module, exports) {
                 stop : stop
             });
             
-            if (options.pid) {
-                pid     = options.pid;
-                running = STARTED;
-                checkState();
-            }
-            else
+            if (!pid)
                 run(runner, options, callback);
             
             return plugin;
@@ -918,6 +913,13 @@ define(function(require, module, exports) {
              * Stop all running processes
              */
             stopAll : stopAll,
+            
+            /**
+             * Gets a process based on a pid
+             * @param {Object} state  The state object returned by {@link run.Process.getState}.
+             * @return {run.Process}
+             */
+            restoreProcess : restoreProcess,
             
             /**
              * Starts a process based on a runner and options that are passed.

@@ -277,6 +277,13 @@ define(function(require, module, exports) {
                     ["showconsole", "true"],
                     ["showruncfglist", "false"]
                 ]);
+                
+                var state = settings.getJson("state/run/process");
+                if (state) {
+                    process = run.restoreProcess(state);
+                    decorateProcess();
+                    transformButton("stop");
+                }
             }, plugin);
     
             tabs.on("focus", function(e){
@@ -375,6 +382,8 @@ define(function(require, module, exports) {
                         return layout.showError(err);
                     }
                     
+                    settings.setJson("state/run/process", process.getState());
+                    
                     if (bDebug) {
                         debug.debug(process, function(err){
                             if (err)
@@ -383,32 +392,34 @@ define(function(require, module, exports) {
                     }
                 });
                 
-                process.on("away", function(){
-                    btnRun.disable();
-                });
-                process.on("back", function(){
-                    btnRun.enable();
-                });
-                
-                process.on("stopping", function(){
-                    btnRun.disable();
-                }, plugin);
-                
-                process.on("stopped", function(){
-                    btnRun.enable();
-                    
-                    var path = transformButton();
-                    
-                    if (path)
-                        btnRun.enable();
-                    else
-                        btnRun.disable();
-                }, plugin);
-                
+                decorateProcess();
                 transformButton("stop");
             }
             
             lastRun = [runner, path];
+        }
+        
+        function decorateProcess(){
+            process.on("away", function(){
+                btnRun.disable();
+            });
+            process.on("back", function(){
+                btnRun.enable();
+            });
+            process.on("stopping", function(){
+                btnRun.disable();
+            }, plugin);
+            process.on("stopped", function(){
+                btnRun.enable();
+                
+                var path = transformButton();
+                if (path)
+                    btnRun.enable();
+                else
+                    btnRun.disable();
+                
+                settings.set("state/run/process", "");
+            }, plugin);
         }
         
         function transformButton(to){
