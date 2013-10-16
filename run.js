@@ -241,19 +241,8 @@ define(function(require, module, exports) {
             // Deal with connection issues
             c9.on("stateChange", function(e){
                 if (e.state & c9.PROCESS) {
-                    if (running == STARTED) {
-                        // Check the watch file
-                        fs.readFile(WATCHFILE, function(err, data) {
-                            // Process is running
-                            if (!err && data && data.trim().length) {
-                                emit("back");
-                                return;
-                            }
-                            
-                            // Process is stopped
-                            cleanup();
-                        });
-                    }
+                    if (running == STARTED || running == STARTING)
+                        checkState();
                 }
                 else {
                     emit("away");
@@ -606,6 +595,20 @@ define(function(require, module, exports) {
                 });
             }
             
+            function checkState(){
+                // Check the watch file
+                fs.readFile(WATCHFILE, function(err, data) {
+                    // Process is running
+                    if (!err && data && data.trim().length) {
+                        emit("back");
+                        return;
+                    }
+                    
+                    // Process is stopped
+                    cleanup();
+                });
+            }
+            
             function detach(callback){
                 // Kill the pty session
                 if (process)
@@ -706,7 +709,13 @@ define(function(require, module, exports) {
                 stop : stop
             });
             
-            run(runner, options, callback);
+            if (options.pid) {
+                pid     = options.pid;
+                running = STARTED;
+                checkState();
+            }
+            else
+                run(runner, options, callback);
             
             return plugin;
         }
