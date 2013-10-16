@@ -241,7 +241,17 @@ define(function(require, module, exports) {
             // Deal with connection issues
             c9.on("stateChange", function(e){
                 if (e.state & c9.PROCESS) {
-                    
+                    if (running == STARTED) {
+                        // Check the watch file
+                        fs.readFile(WATCHFILE, function(err, data) {
+                            // Process is running
+                            if (!err && data && data.trim().length)
+                                return;
+                            
+                            // Process is stopped
+                            cleanup();
+                        });
+                    }
                 }
                 else {
                     
