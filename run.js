@@ -245,8 +245,10 @@ define(function(require, module, exports) {
                         // Check the watch file
                         fs.readFile(WATCHFILE, function(err, data) {
                             // Process is running
-                            if (!err && data && data.trim().length)
+                            if (!err && data && data.trim().length) {
+                                emit("back");
                                 return;
+                            }
                             
                             // Process is stopped
                             cleanup();
@@ -254,7 +256,7 @@ define(function(require, module, exports) {
                     }
                 }
                 else {
-                    
+                    emit("away");
                 }
             });
     

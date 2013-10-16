@@ -254,10 +254,6 @@ define(function(require, module, exports) {
             // Draw
             draw();
             
-            c9.on("stateChange", function(e){
-                btnRun.setAttribute("disabled", !(e.state & c9.PROCESS));
-            }, plugin);
-            
             // Preferences
             prefs.add({
                 "Run" : {
@@ -385,6 +381,13 @@ define(function(require, module, exports) {
                                 return; // Either the debugger is not found or paused
                         });
                     }
+                });
+                
+                process.on("away", function(){
+                    btnRun.disable();
+                });
+                process.on("back", function(){
+                    btnRun.enable();
                 });
                 
                 process.on("stopping", function(){
