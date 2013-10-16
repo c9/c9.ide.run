@@ -70,7 +70,8 @@ define(function(require, module, exports) {
             
             // Tree context menu
             // Needs to be hidden in readonly mode
-            var itemCtxTreeRunFile = new apf.item({
+            var itemCtxTreeRunFile = new ui.item({
+                match   : "file",
                 enabled : !c9.readonly,
                 caption : "Run",
                 isAvailable : function(){
@@ -283,6 +284,15 @@ define(function(require, module, exports) {
                     process = run.restoreProcess(state);
                     decorateProcess();
                     transformButton("stop");
+                    
+                    if (state.debug) {
+                        process.on("back", function(){
+                            debug.debug(process, true, function(err){
+                                if (err)
+                                    return; // Either the debugger is not found or paused
+                            });
+                        })
+                    }
                 }
             }, plugin);
     
@@ -382,7 +392,9 @@ define(function(require, module, exports) {
                         return layout.showError(err);
                     }
                     
-                    settings.setJson("state/run/process", process.getState());
+                    var state = process.getState();
+                    state.debug = bDebug;
+                    settings.setJson("state/run/process", state);
                     
                     if (bDebug) {
                         debug.debug(process, function(err){

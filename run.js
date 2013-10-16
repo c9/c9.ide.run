@@ -585,7 +585,7 @@ define(function(require, module, exports) {
                 fs.readFile(WATCHFILE, function(err, data) {
                     // Process is running
                     if (!err && data && data.trim().length) {
-                        emit("back");
+                        monitor(function(){ emit("back"); }, function(){})
                         return;
                     }
                     
@@ -711,6 +711,8 @@ define(function(require, module, exports) {
             
             if (!pid)
                 run(runner, options, callback);
+            else
+                checkState();
             
             return plugin;
         }
