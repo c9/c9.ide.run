@@ -300,13 +300,29 @@ define(function(require, module, exports) {
                 if (process && process.running)
                     return;
                 
-                if (e.tab.path) {
+                var path = findTabToRun();
+                if (path) {
                     btnRun.enable();
+                    btnRun.setAttribute("command", "run");
+                    btnRun.setAttribute("caption", "Run");
                     btnRun.setAttribute("tooltip", "Run " 
-                        + basename(e.tab.path));
+                        + basename(path));
+                }
+                else if (lastRun) {
+                    var runner = lastRun[0] == "auto"
+                        ? getRunner(lastRun[1])
+                        : lastRun[0];
+                    
+                    btnRun.enable();
+                    btnRun.setAttribute("command", "runlast");
+                    btnRun.setAttribute("caption", "Run Last");
+                    btnRun.setAttribute("tooltip", "Run Last ("
+                        + basename(lastRun[1]) + ", " 
+                        + (runner.caption || "auto") + ")");
                 }
                 else {
                     btnRun.disable();
+                    btnRun.setAttribute("caption", "Run");
                     btnRun.setAttribute("tooltip", "")
                 }
             }, plugin);
@@ -363,7 +379,7 @@ define(function(require, module, exports) {
         
         function runNow(runner, path){
             if (!path) {
-                path = tabs.focussedTab && tabs.focussedTab.path;
+                path = findTabToRun();
                 if (!path) return;
             }
             
@@ -425,13 +441,32 @@ define(function(require, module, exports) {
                 btnRun.enable();
                 
                 var path = transformButton();
-                if (path)
+                if (path || lastRun)
                     btnRun.enable();
                 else
                     btnRun.disable();
                 
                 settings.set("state/run/process", "");
             }, plugin);
+        }
+        
+        function findTabToRun(){
+            var path = tabs.focussedTab && tabs.focussedTab.path;
+            if (path) return path;
+            
+            var foundActive;
+            if (tabs.getPanes().every(function(pane){
+                var tab = pane.activeTab;
+                if (tab && tab.path) {
+                    if (foundActive) return false;
+                    foundActive = tab;
+                }
+                return true;
+            }) && foundActive) {
+                return foundActive.path;
+            }
+            
+            return false;
         }
         
         function transformButton(to){
@@ -444,16 +479,23 @@ define(function(require, module, exports) {
                 btnRun.enable();
             }
             else {
-                var path = tabs.focussedTab && tabs.focussedTab.path;
+                var path = findTabToRun();
+                
+                var runner = !path && lastRun && (lastRun[0] == "auto"
+                    ? getRunner(lastRun[1])
+                    : lastRun[0]);
                     
-                btnRun.setAttribute("icon", 
-                    btnRun.checked ? "bug.png" : "run.png");
-                btnRun.setAttribute("caption", "Run");
-                btnRun.setAttribute("tooltip", (path 
+                btnRun.setAttribute("icon", "run.png");
+                btnRun.setAttribute("caption", !path && lastRun ? "Run Last" : "Run");
+                btnRun.setAttribute("tooltip", path 
                     ? "Run " + basename(path)
-                    : ""));
+                    : (lastRun 
+                        ? "Run Last ("
+                            + basename(lastRun[1]) + ", " 
+                            + (runner.caption || "auto") + ")"
+                        : ""));
                 btnRun.setAttribute("class", "stopped");
-                btnRun.setAttribute("command", "run");
+                btnRun.setAttribute("command", !path && lastRun ? "runlast" : "run");
                 
                 return path;
             }
