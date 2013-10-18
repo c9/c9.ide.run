@@ -268,7 +268,7 @@ define(function(require, module, exports) {
                     
                     // Display a message prior to running the command
                     if (runner.info)
-                        cmd += "echo '" + runner.info.replace(/'/g, "") + "' ; ";
+                        cmd += "echo -e '" + runner.info.replace(/'/g, "") + "' ; ";
                         
                     // Set the PATH variable if needed
                     if (runner.path)
