@@ -192,6 +192,7 @@ define(function(require, module, exports) {
             emit.setMaxListeners(100);
             
             var running = STOPPED;
+            var meta    = {};
             var pid, process;
             
             if (typeof procName == "object") {
@@ -662,6 +663,10 @@ define(function(require, module, exports) {
                  * @property {String} name  The name of the process.
                  */
                 get name(){ return procName; },
+                /**
+                 * @property {Object} meta
+                 */
+                get meta(){ return meta; },
                 
                 _events : [
                     /**
