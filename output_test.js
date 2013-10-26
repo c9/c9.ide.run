@@ -21,7 +21,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.ide.ui/lib_apf",
         {
             packagePath: "plugins/c9.core/settings",
-            settings: "<settings><user /><state /><project /></settings>"
+            testing: true
         },
         {
             packagePath  : "plugins/c9.ide.ui/ui",
