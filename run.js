@@ -269,7 +269,7 @@ define(function(require, module, exports) {
                     
                     // Display a message prior to running the command
                     if (runner.info)
-                        cmd += "echo -e '" + runner.info.replace(/'/g, "") + "' ; ";
+                        cmd += "printf '" + runner.info.replace(/%/g, "%%") + "\n' ; ";
                         
                     // Set the PATH variable if needed
                     if (runner.path)
