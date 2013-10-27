@@ -311,7 +311,8 @@ define(function(require, module, exports) {
                     //"\\;", "set-option", "mouse-select-window", "on",
                     //"\\;", "set-option", "mouse-utf8", "on",
                     "\\;", "set-option", "set-titles", "on",
-                    "\\;", "set-option", "remain-on-exit", "on"
+                    // "\\;", "set-option", "remain-on-exit", "on",
+                    "\\;", "set-window-option", "-g", "aggressive-resize", "on"
                 ];
                 // if (options.detach !== false)
                 //     args.push("\\;", "detach-client");
