@@ -13,7 +13,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             hosted      : true,
             local       : false,
             hostname    : "dev.javruben.c9.io",
-            davPrefix   : "/"
+            davPrefix   : "/",
+            platform    : navigator.appVersion.indexOf("Mac OS X") > -1 ? "darwin" : "linux"
         },
         
         "plugins/c9.core/ext",
@@ -119,10 +120,11 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         var tabs     = imports.tabManager;
         var cnsl     = imports.console;
         
-        expect.html.setConstructor(function(tab){
+        function getHtmlElement(tab){
             if (typeof tab == "object")
                 return tab.pane.aml.getPage("editor::" + tab.editorType).$ext;
-        });
+        }
+        expect.html.setConstructor(getHtmlElement);
         
         function countEvents(count, expected, done){
             if (count == expected) 
@@ -130,6 +132,21 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             else
                 throw new Error("Wrong Event Count: "
                     + count + " of " + expected);
+        }
+        
+        var maxTries = 3, retries = 0;
+        function waitForOutput(match, callback){
+            setTimeout(function(){
+                if (retries < maxTries && !getHtmlElement(tabs.focussedTab).innerText.match(match)) {
+                    retries++;
+                    return waitForOutput(match, callback);
+                }
+                    
+                expect.html(tabs.focussedTab, "Output Mismatch")
+                    .text(match);
+                
+                callback();
+            }, 500);
         }
         
         describe('run', function() {
@@ -191,8 +208,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             }, function(err, pid){
                                 if (err) throw err.message;
 
-                                expect(parseInt(pid, 10))
-                                    .to.ok;
+                                expect(parseInt(pid, 10)).to.ok;
                                 expect(process.running).to.not.equal(run.STARTING);
 
                                 foundPid = true;
@@ -205,20 +221,19 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             process.on("stopping", c2);
                             
                             process.on("stopped", function c1(){
-                                expect(process.running).is.equal(run.STOPPED);
-                                expect(foundPid, "found-pid").to.ok;
-                                
-                                process.off("started", c2);
-                                process.off("stopping", c2);
-                                process.off("stopped", c1);
-                                count++;
-                                
                                 setTimeout(function(){
-                                    expect.html(tabs.focussedTab, "Output Mismatch")
-                                        .text(/Hello\sWorld/);
+                                    expect(process.running).is.equal(run.STOPPED);
+                                    expect(foundPid, "found-pid").to.ok;
                                     
-                                    fs.rmfile("/helloworld.js", function(){
-                                        countEvents(count, 3, done);
+                                    process.off("started", c2);
+                                    process.off("stopping", c2);
+                                    process.off("stopped", c1);
+                                    count++;
+                                    
+                                    waitForOutput(/Hello\sWorld/, function(){
+                                        fs.rmfile("/helloworld.js", function(){
+                                            countEvents(count, 3, done);
+                                        });
                                     });
                                 }, 500);
                             });
@@ -270,14 +285,11 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 process.off("stopped", c1);
                                 count++;
                                 
-                                setTimeout(function(){
-                                    expect.html(tabs.focussedTab, "Output Mismatch")
-                                        .text(/Hello\sWorld[\s\S]*Hello\sWorld/);
-                                    
+                                waitForOutput(/Hello\sWorld[\s\S]*Hello\sWorld/, function(){
                                     fs.rmfile("/helloworld.js", function(){
                                         countEvents(count, 3, done);
                                     });
-                                }, 500);
+                                });
                             });
                         });
                     });
@@ -322,13 +334,10 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             process.off("stopping", c2);
                             process.off("stopped", c1);
                             
-                            setTimeout(function(){
-                                expect.html(tabs.focussedTab, "Output Mismatch")
-                                    .text(/Python/);
-                                
+                            waitForOutput(/Python/, function(){
                                 count++;
                                 countEvents(count, 3, done);
-                            }, 1000);
+                            });
                         });
                         
                         expect(process.running).to.equal(run.STARTING);
@@ -369,22 +378,21 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             process.on("stopping", c2);
                             
                             process.on("stopped", function c1(){
-                                expect(process.running).is.equal(run.STOPPED);
-                                expect(foundPid, "found-pid").to.ok;
-                                
-                                process.off("started", c2);
-                                process.off("stopping", c2);
-                                process.off("stopped", c1);
-                                count++;
-
                                 setTimeout(function(){
-                                    expect.html(tabs.focussedTab, "Output Mismatch")
-                                        .text(/Hello\sWorld/);
+                                    expect(process.running).is.equal(run.STOPPED);
+                                    expect(foundPid, "found-pid").to.ok;
                                     
-                                    fs.rmfile("/helloworld.js", function(){
-                                        countEvents(count, 3, done);
+                                    process.off("started", c2);
+                                    process.off("stopping", c2);
+                                    process.off("stopped", c1);
+                                    count++;
+    
+                                    waitForOutput(/Hello\sWorld/, function(){
+                                        fs.rmfile("/helloworld.js", function(){
+                                            countEvents(count, 3, done);
+                                        });
                                     });
-                                }, 1000);                                
+                                });
                             });
                         });
                     });
