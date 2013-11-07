@@ -311,7 +311,9 @@ define(function(require, module, exports) {
                     //"\\;", "set-option", "mouse-select-window", "on",
                     //"\\;", "set-option", "mouse-utf8", "on",
                     "\\;", "set-option", "set-titles", "on",
-                    // "\\;", "set-option", "remain-on-exit", "on",
+                    // Note that the following line is absolutely necessary. 
+                    // It keeps the output visible for the user.
+                    "\\;", "set-option", "remain-on-exit", "on", 
                     "\\;", "set-window-option", "-g", "aggressive-resize", "on"
                 ];
                 // if (options.detach !== false)
