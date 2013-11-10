@@ -144,10 +144,16 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         }
                         
                     }, function(err, tab){
-                        setTimeout(function(){
-                            expect.html(tabs.focussedTab.editor.ace.container).text(/Hello\s*World/);
-                            done();
-                        }, 2000);
+                        var ace = tabs.focussedTab.editor.ace;
+                        ace.session.term.once('afterWrite', function(){
+                            ace.renderer.on('afterRender', function(){
+                                if (tab.className.names.indexOf("loading") == -1
+                                  && ace.getValue().match(/Hello\s*World/)) {
+                                    expect.html(ace.container).text(/Hello\s*World/);
+                                    done();
+                                }
+                            });
+                        });
                     });
                 });
             });
