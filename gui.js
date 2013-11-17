@@ -2,7 +2,7 @@ define(function(require, module, exports) {
     main.consumes = [
         "c9", "Plugin", "run", "settings", "menus",
         "tabbehavior", "ace", "commands", "layout", "tabManager", "preferences", 
-        "ui", "fs", "layout", "output", "debugger", "tree"
+        "ui", "fs", "layout", "debugger", "tree"
     ];
     main.provides = ["run.gui"];
     return main;
@@ -19,7 +19,6 @@ define(function(require, module, exports) {
         var layout      = imports.layout;
         var tree        = imports.tree;
         var tabs        = imports.tabManager;
-        var output      = imports.output;
         var tabbehavior = imports.tabbehavior;
         var debug       = imports.debugger;
         var prefs       = imports.preferences;
@@ -224,8 +223,6 @@ define(function(require, module, exports) {
             menus.addItemByPath("Run/Run History/", new ui.item({
                 isAvailable : function(){ return false; }
             }), c += 100, plugin);
-            menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
-            
             menus.addItemByPath("Run/Run Configurations", new ui.item({
                 isAvailable : function(){ return false; }
             }), c += 100, plugin);
