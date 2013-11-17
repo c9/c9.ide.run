@@ -89,8 +89,6 @@ define(function(require, module, exports) {
         }
         
         function detectRunner(options, callback){
-            var ext = fs.getExtension(options.path);
-            
             listRunners(function(err, names){
                 if (err) return callback(err);
                 
@@ -109,14 +107,34 @@ define(function(require, module, exports) {
             
             function done(){
                 for (var name in runners) {
-                    var builder = runners[name];
-                    if (builder.selector == "source." + ext)
-                        return callback(null, builder);
+                    var runner = runners[name];
+                    if (matchSelector(runner.selector, options.path))
+                        return callback(null, runner);
                 }
                 
                 var err = new Error("Could not find Runner");
                 err.code = "ERUNNERNOTFOUND";
                 callback(err);
+            }
+        }
+        
+        function matchSelector(selector, path){
+            if (typeof selector == "string") {
+                if (selector.indexOf("source.") === 0)
+                    return selector == "source." + fs.getExtension(path);
+                else {
+                    var re   = new RegExp(selector);
+                    var file = basename(path);
+                    return re.test(file);
+                }
+            }
+            else if (selector instanceof Array) {
+                return selector.some(function(n){
+                    return matchSelector(n, path);
+                });
+            }
+            else {
+                return false;
             }
         }
         
@@ -925,6 +943,13 @@ define(function(require, module, exports) {
             stopAll : stopAll,
             
             /**
+             * Check whether a selector matches a certain path
+             * @param {String/Array} selector
+             * @param {String}       path
+             */
+            matchSelector : matchSelector,
+            
+            /**
              * Gets a process based on a pid
              * @param {Object} state  The state object returned by {@link run.Process.getState}.
              * @return {run.Process}
@@ -983,8 +1008,6 @@ define(function(require, module, exports) {
              *  external program will be searched in your PATH, one of your 
              *  system’s environmental variables. The command can contain 
              *  variables.
-             * @param {RegExp} [e.file_regex] Regular expression (Perl-style) to 
-             *  capture error output of cmd. See the next section for details.
              * @param {RegExp} [e.line_regex] If file_regex doesn’t match on the 
              *  current line, but line_regex exists, and it does match on 
              *  the current line, then walk backwards through the buffer 
