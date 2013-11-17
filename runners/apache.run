@@ -1,0 +1,5 @@
+{
+    "caption" : "Apache (PHP, HTML)",
+    "cmd": ["apache", "$project_path", "$file"],
+    "selector": "^.*\\.(php|phtml|html|shtml)$"
+}
