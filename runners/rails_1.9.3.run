@@ -1,6 +1,6 @@
 {
-    "caption" : "Ruby 1.8.7",
-    "cmd": ["rvm use 1.8.7;", "ruby", "$file"],
+    "caption" : "Ruby On Rails (ruby 1.9.3)",
+    "cmd": ["rvm use 1.9.3;", "ruby", "s", "-p", "$port", "-b", "$ip"],
     "env": {
         "ruby_PATH" : "$project_path/../npm_global/lib/ruby_modules"
     },

@@ -1,6 +1,6 @@
 {
     "caption" : "Ruby 1.9.3",
-    "cmd": ["rvm use 1.9.3;", "ruby", "--",  "$file"],
+    "cmd": ["rvm use 1.9.3;", "ruby", "$file"],
     "selector": "^.*\\.(ruby|rb)$",
     "env": {
         "ruby_PATH" : "$project_path/../npm_global/lib/ruby_modules"
