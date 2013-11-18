@@ -1,9 +1,0 @@
-{
-    "caption" : "Ruby On Rails (ruby 1.8.7)",
-    "cmd": ["rvm use 1.8.7;", "ruby", "s", "-p", "$port", "-b", "$ip"],
-    "env": {
-        "ruby_PATH" : "$project_path/../npm_global/lib/ruby_modules"
-    },
-    "info": "Your code is running at \\033[01;34m$hostname\\033[00m.\n"
-        + "\\033[01;31mImportant:\\033[00m use \\033[01;32mENV['PORT']\\033[00m as the port and \\033[01;32mENV['IP']\\033[00m as the host in your scripts!\n"
-}

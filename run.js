@@ -502,7 +502,12 @@ define(function(require, module, exports) {
                     return c9.port;
                 if (name == "ip")
                     return "0.0.0.0";
-                
+                if (name == "home")
+                    return c9.home;
+                if (name == "shared_root")
+                    return "/usr/libexec/openshift/cartridges/c9-0.1/root/";
+                if (name == "ruby_193_root")
+                    return "/opt/rh/ruby193/root";
                 return "$" + name;
             }
             function reverse(str){ 
