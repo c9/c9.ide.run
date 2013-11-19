@@ -1,8 +1,0 @@
-{
-    "caption" : "Typescript",
-    "cmd": ["tsc", "-e", "$file"],
-    "selector": "^.*\\.(ts)$",
-    "selector": "source.ts",
-    "info": "Your code is running at \\033[01;34m$hostname\\033[00m.\n"
-        + "\\033[01;31mImportant:\\033[00m use \\033[01;32mprocess.env.PORT\\033[00m as the port and \\033[01;32mprocess.env.IP\\033[00m as the host in your scripts!\n"
-}

@@ -1,5 +1,5 @@
 {
     "caption" : "Go",
     "cmd": ["go", "run", "$file"],
-    "selector": "^.*\\.(go)$",
+    "selector": "source.go"
 }
