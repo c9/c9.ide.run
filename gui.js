@@ -33,7 +33,7 @@ define(function(require, module, exports) {
         var emit    = plugin.getEmitter();
         
         var counter = 0;
-        var btnRun, lastRun, process;
+        var btnRun, lastRun, process, mnuRunCfg;
         
         var loaded = false;
         function load(){
@@ -141,9 +141,6 @@ define(function(require, module, exports) {
                     }
                 }
             }), c += 100, plugin);
-            menus.addItemByPath("Run/Show Output Window", new ui.item({
-                command: "showoutput"
-            }), c += 100, plugin);
             menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
             
             menus.addItemByPath("Run/Run in Debug Mode", new ui.item({
@@ -225,15 +222,48 @@ define(function(require, module, exports) {
                     settings.set("project/run/@runner", e.value);
                 }
             });
-            plugin.addElement(mnuRunAs);
+            mnuRunCfg = new ui.menu({
+                id : "mnuRunCfg",
+                "onprop.visible": function(e){
+                    if (e.value) {
+                        var nodes = mnuRunCfg.childNodes;
+                        for (var i = nodes.length - 3; i >= 0; i--) {
+                            mnuRunCfg.removeChild(nodes[i]);
+                        }
+                        
+                        var configs = settings.getJson("project/run/configs") || {};
+                        for (var name in configs) {
+                            var c = 0;
+                            menus.addItemToMenu(mnuRunCfg, new ui.item({
+                                caption  : name,
+                                value    : configs[name]
+                            }), c++, plugin);
+                        }
+                    }
+                },
+                "onitemclick": function(e){
+                    if (e.value == "new-run-config") {
+                        commands.exec("showoutput", null, {
+                            id : "output" + counter++
+                        });
+                        return;
+                    }
+                    
+                    openRunConfig(e.value);
+                }
+            });
+            plugin.addElement(mnuRunAs, mnuRunCfg);
             
-            menus.addItemByPath("Run/Run With/", mnuRunAs, 
-                c += 100, plugin);
+            menus.addItemByPath("Run/Run With/", mnuRunAs, c += 100, plugin);
             menus.addItemByPath("Run/Run History/", new ui.item({
                 isAvailable : function(){ return false; }
             }), c += 100, plugin);
-            menus.addItemByPath("Run/Run Configurations", new ui.item({
-                isAvailable : function(){ return false; }
+            menus.addItemByPath("Run/Run Configurations/", mnuRunCfg, c += 100, plugin);
+
+            c = 0;
+            menus.addItemByPath("Run/Run Configurations/~", new ui.divider(), c += 1000, plugin);
+            menus.addItemByPath("Run/Run Configurations/New Run Configuration", new ui.item({
+                value : "new-run-config"
             }), c += 100, plugin);
             
             c = 0;
@@ -386,6 +416,11 @@ define(function(require, module, exports) {
                 visible  : "true"
             }), 100, plugin);
             
+            btnRun.on("contextmenu", function(e){
+                mnuRunCfg.display(e.x, e.y);
+                return false;
+            });
+            
             emit("draw");
         }
         
@@ -398,6 +433,30 @@ define(function(require, module, exports) {
                     return run.runners[name];
             }
             return false;
+        }
+        
+        function openRunConfig(cfg){
+            var found = false;
+            tabs.getTabs().some(function(tab){
+                if (tab.editorType == "output" 
+                  && tab.document.getSession().config.name == cfg.name) {
+                    found = tab;
+                    return true;
+                }
+            });
+            
+            if (found) {
+                var session = found.document.getSession();
+                if (!session.process || !session.process.running)
+                    session.run();
+                return tabs.focusTab(found);
+            }
+            
+            commands.exec("showoutput", null, {
+                id     : "output" + counter++,
+                run    : true,
+                config : cfg
+            });
         }
         
         function runNow(runner, path){

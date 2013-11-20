@@ -18,7 +18,7 @@ define(function(require, exports, module) {
         var tabs     = imports.tabManager;
         var run      = imports.run;
         var runGui   = imports["run.gui"];
-        var question = imports["dialog.question"];
+        var question = imports["dialog.question"].show;
         var Terminal = imports.terminal.Terminal;
         var debug    = imports.debugger;
         var settings = imports.settings;
@@ -195,6 +195,8 @@ define(function(require, exports, module) {
             
             function stop(callback) {
                 var session = currentSession
+                if (!session) return;
+                
                 var process = session.process;
                 if (process)
                     process.stop(function(err){
@@ -225,7 +227,7 @@ define(function(require, exports, module) {
                 if (!currentSession || !currentSession.config.name)
                     return;
                 
-                var json = settings.getJson("project/run/configs");
+                var json = settings.getJson("project/run/configs") || {};
                 json[currentSession.config.name] = currentSession.config;
                 settings.setJson("project/run/configs", json);
             }
@@ -279,7 +281,7 @@ define(function(require, exports, module) {
                             "You have cleared the name of this configuration.",
                             "Would you like to remove this configuration from your project settings?",
                             function(){ // Yes
-                                var json = settings.getJson("project/run/configs");
+                                var json = settings.getJson("project/run/configs") || {};
                                 delete json[currentSession.config.name];
                                 settings.setJson("project/run/configs", json);
                             },
@@ -325,6 +327,10 @@ define(function(require, exports, module) {
                 
                 if (!session.config)
                     session.config = {};
+                
+                session.run = function(){
+                    runNow(session);
+                }
                 
                 session.setRunner = function(runner){
                     if (!runner) {
@@ -391,8 +397,8 @@ define(function(require, exports, module) {
                     // session.terminal.element.style.visibility = "hidden";
                 };
                 
-                tab.on("beforeUnload", function(){
-                    if (!session.config.name) {
+                tab.on("beforeClose", function(){
+                    if (!session.config.name && session.config.command && !tab.meta.$ignore) {
                         question("Unsaved changes",
                             "Would you like to save this as a run configuration?",
                             "You can keep these settings in a run configuration "
@@ -403,6 +409,7 @@ define(function(require, exports, module) {
                                 // do nothing
                             }, 
                             function(){ // No
+                                tab.meta.$ignore = true;
                                 tab.close();
                             });
                         return false;
