@@ -463,11 +463,12 @@ define(function(require, module, exports) {
                 }
             }
             
-            function getVariable(name, path){
+            function getVariable(name, path, args){
                 var fnme, idx, ppath;
                 
                 if (name == "file") 
-                    return path || "";
+                    return (path || "") 
+                        + (args && args.length ? " "  + args.join(" ") : "");
                 if (name == "file_path")
                     return dirname(path || "");
                 if (name == "file_name") 
@@ -512,12 +513,12 @@ define(function(require, module, exports) {
                 cmd = cmd.replace(/(^|[^\\])\$([\w_]+)|(^|[^\\])\$\{([^}]+)\}/g, 
                 function(m, char, name, nchar, nacco){
                     if (char)
-                        return char + getVariable(name, options.path);
+                        return char + getVariable(name, options.path, options.args);
                     else if (nchar) {
                         
                         // Test for default value
                         if (nacco.match(/^([\w_]+)\:(.*)$/))
-                            return nchar + (getVariable(RegExp.$1, options.path) || RegExp.$2);
+                            return nchar + (getVariable(RegExp.$1, options.path, options.args) || RegExp.$2);
                             
                         // Test for conditional value
                         if (nacco.match(/^([\w_]+)\?(.*)$/))
@@ -528,14 +529,14 @@ define(function(require, module, exports) {
                             return nchar + reverse(nacco)
                                 .replace(/^\/?(.*)\/(?!\\)(.*)\/(?!\\)([\w_]+)$/, 
                                 function (m, replace, find, name){
-                                    var data = getVariable(reverse(name), options.path);
+                                    var data = getVariable(reverse(name), options.path, options.args);
                                     var re   = new RegExp(reverse(find), "g");
                                     return data.replace(re, reverse(replace));
                                 });
                         }
                         
                         // Assume just a name
-                        return nchar + getVariable(nacco, options.path);
+                        return nchar + getVariable(nacco, options.path, options.args);
                     }
                 });
                 
@@ -929,6 +930,13 @@ define(function(require, module, exports) {
             listRunners : listRunners,
             
             /**
+             * Detect the runner that will be used to run a certain file
+             * @param {Object}   options
+             * @param {Function} callback
+             */
+            detectRunner : detectRunner,
+            
+            /**
              * Retrieves an individual runner's JSON object based on it's name.
              * The names of available runners can be retrieved using `listRunners`.
              * @param {Function} callback         Called when the runner is retrieved
@@ -1000,46 +1008,46 @@ define(function(require, module, exports) {
              * 
              * This will emit the full path of the current file, replacing .php with .txt.
              * 
-             * @param runner {Object/"auto"} Object describing how to run a process. 
+             * @param {Object/"auto"} runner Object describing how to run a process. 
              *   Alternatively this can be set to "auto" to auto-detect the runner.
-             * @param {Object} e
-             * @param {Array} e.cmd Array containing the command to run and its desired 
+             * @param {Array} runner.cmd Array containing the command to run and its desired 
              *  arguments. If you don’t specify an absolute path, the 
              *  external program will be searched in your PATH, one of your 
              *  system’s environmental variables. The command can contain 
              *  variables.
-             * @param {RegExp} [e.line_regex] If file_regex doesn’t match on the 
+             * @param {RegExp} [runner.line_regex] If file_regex doesn’t match on the 
              *  current line, but line_regex exists, and it does match on 
              *  the current line, then walk backwards through the buffer 
              *  until a line matching file regex is found, and use these two 
              *  matches to determine the file and line to go to.
-             * @param {RegExp} [e.selector] Used when the automatic selection of the
+             * @param {RegExp} [runner.selector] Used when the automatic selection of the
              *  runner is set. Cloud9 IDE uses this scope selector to 
              *  find the appropriate build system for the active view.
-             * @param {String} [e.working_dir] Directory to change the current 
+             * @param {String} [runner.working_dir] Directory to change the current 
              *  directory to before running cmd. The original current 
              *  directory is restored afterwards.
-             * @param {Object} [e.env] Dictionary of environment variables to be merged 
+             * @param {Object} [runner.env] Dictionary of environment variables to be merged 
              *  with the current process’ before passing them to cmd.
              * 
              *  Use this element, for example, to add or modify environment 
              *  variables without modifying your system’s settings.
-             * @param {Boolean} [e.shell] If true, cmd will be run through the shell.
+             * @param {Boolean} [runner.shell] If true, cmd will be run through the shell.
              *  In our implementation all commands run through the shell.
              *  This cannot be changed.
-             * @param {String} [e.path] This string will replace the current process’ 
+             * @param {String} [runner.path] This string will replace the current process’ 
              *  PATH before calling cmd. The old PATH value will be restored 
              *  after that.
              * 
              *  Use this option to add directories to PATH without having 
              *  to modify your system’s settings.
-             * @param {String} [e.info] message to be outputted in the output buffer
+             * @param {String} [runner.info] message to be outputted in the output buffer
              *  prior to running the processes. This message can contain 
              *  variables.
-             * @param {Array} [e.variants] currently not supported.
+             * @param {Array} [runner.variants] currently not supported.
              * @param {Object}  options
              * @param {String}  options.path  the path to the file to execute
              * @param {String}  options.cwd   the current working directory
+             * @param {Array}   options.args  arguments to be passed to the program
              * @param {Boolean} options.debug whether to start the process in debug mode
              * @param {String} name   the unique name of the output buffer. 
              *   Defaults to "output". There can only be one process running on

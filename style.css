@@ -1,32 +1,73 @@
-.c9-debugInfo {
+.output .toolbar{
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    height: 22px;
+    padding : 2px;
     position: absolute;
-    width: 223px;
-    height: 81px;
-    top: 10px;
-    left: 345px;
-    z-index: 50000;
-    min-width: 0px;
-    min-height: 0px;
-    max-width: 9998px;
-    max-height: 9992px;
-    opacity: 0;
-    display: block;
-    line-height: 13px;
-    overflow: visible;
+    top: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0 1px rgba(255, 255, 255, 0.04);
+    display : flex;
+}
+.output .toolbar>*{
+    margin-right: 3px;
 }
 
-.debugInfoContainer {
-    padding: 5px 7px 1px 12px;
+.output .c9terminal .c9terminalcontainer.dark {
+    .gradient(~"linear-gradient(top, rgba(0, 0, 0, 0.29) 0, rgba(0, 0, 0, 0.1) 28px, rgba(0, 0, 0, 0.29) 28px, rgba(0, 0, 0, 0.11) 36px, rgba(0, 0, 0, 0.01) 41px, transparent 43px);");
 }
 
-.debugInfoDesc {
-    color: #bdbdbd;
+.output .ace_editor{
+    top : 30px !important;
+}
+
+.output .toolbar .tbsimple{
     background: transparent;
-    line-height: 16px;
-    position: relative;
-    padding-left: 5px;
+    /*.gradient(~"linear-gradient(right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.04) 100%);");*/
+    /*background: rgba(255, 255, 255, 0.05);*/
+    color: rgba(255,255,255,0.7);
+    margin-top: 1px;
+    padding: 1px 6px 2px 6px;
+    .font-smoothing(true);
+    height: 17px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    .transition(background-color 0.1s linear);
 }
 
-.debugInfoArrow {
-    left: 98px;
+.output .toolbar .tbsimpleInitial{
+    color: rgba(255,255,255,0.2);
+}
+
+.output .toolbar .tbsimple:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.output .toolbar .tbsimple.tbsimpleFocus {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgb(226, 226, 226);
+}
+
+.output .toolbar .c9-divider{
+    height: 26px;
+    margin-top: -2px;
+    border-left: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+.output .toolbar .label{
+    padding : 4px 0 0 4px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    /*color: rgba(255, 255, 255, 0.6);*/
+}
+
+.output .toolbar .c9-toolbarbutton-glossyOver {
+    border: 1px solid rgba(0, 0, 0, 0.38);
+    .gradient(~"linear-gradient(top, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.03) 55%, rgba(32, 32, 34, 0.12) 55%, rgba(45, 45, 46, 0.25) 100%)");
+    .box-shadow(~"inset 1px 1px rgba(255, 255, 255, 0.05), inset -1px -1px rgba(255, 255, 255, 0.05);");
+}
+
+.output .toolbar .c9-toolbarbutton-glossyDown {
+    border: 1px solid rgba(0, 0, 0, 0.69);
+    .gradient(~"linear-gradient(top, rgba(38, 38, 39, 0.25) 0%, rgba(37, 37, 37, 0.25) 55%, rgba(25, 25, 25, 0.25) 55%, rgba(31, 31, 31, 0.25) 100%)");
+    .box-shadow(~"inset 1px 1px rgba(30, 30, 30, 0.4), inset -1px -1px rgba(30, 30, 30, 0.4);");
 }

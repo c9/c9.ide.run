@@ -1,5 +1,25 @@
 <a:application xmlns:a="http://ajax.org/2005/aml">
-    <a:hbox pack="end" bottom="7" right="3" height="24" align="center" padding="0">
-        <a:button id="btnConsoleClear" skin="btn_icon_only" icon="console_clear.png" margin="2 2 0 0" />
-    </a:hbox>
+    <div class="toolbar">
+        <a:button
+            id       = "btnRun"
+            skin     = "c9-toolbarbutton-glossy"
+            caption  = "Run"
+            width    = "54"
+            icon     = "run.png"
+            visible  = "true" />
+        <!--<a:button skin="c9-toolbarbutton-glossy" id="btnConsoleClear" class="clear" icon="console_clear.png" />-->
+        <a:textbox skin="tbsimple" id="tbName" initial-message="Run Config Name" />
+        <a:divider skin="c9-divider" />
+        <a:label>Command:</a:label>
+        <a:textbox skin="tbsimple" id="tbCommand" initial-message="Example: ./server.js --help" style="flex:2"/>
+        <a:button
+            id       = "btnDebug"
+            skin     = "c9-toolbarbutton-glossy"
+            icon     = "bug.png"
+            state    = "true"
+            class    = "bug"
+            tooltip  = "Run in Debug Mode" />
+        <a:button skin="c9-toolbarbutton-glossy" id="btnRunner" caption="Runner: Auto" />
+        <a:button skin="c9-toolbarbutton-glossy" id="btnEnv" caption="Environment" />
+    </div>
 </a:application>

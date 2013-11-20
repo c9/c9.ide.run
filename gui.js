@@ -1,8 +1,8 @@
 define(function(require, module, exports) {
     main.consumes = [
-        "c9", "Plugin", "run", "settings", "menus",
-        "tabbehavior", "ace", "commands", "layout", "tabManager", "preferences", 
-        "ui", "fs", "layout", "debugger", "tree"
+        "c9", "Plugin", "run", "settings", "menus", "tabbehavior", "ace", 
+        "commands", "layout", "tabManager", "preferences", "ui", "fs", 
+        "layout", "debugger", "tree"
     ];
     main.provides = ["run.gui"];
     return main;
@@ -164,7 +164,9 @@ define(function(require, module, exports) {
             
             menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
             
+            var lastOpener;
             var mnuRunAs = new ui.menu({
+                id: "mnuRunAs",
                 "onprop.visible": function(e){
                     if (e.value) {
                         run.listRunners(function(err, names){
@@ -181,6 +183,8 @@ define(function(require, module, exports) {
                                 }), c++, plugin);
                             });
                         });
+                        
+                        lastOpener = this.opener;
                     }
                 },
                 "onitemclick": function(e){
@@ -207,6 +211,9 @@ define(function(require, module, exports) {
                         return;
                     }
                     
+                    if (lastOpener && lastOpener.onitemclick)
+                        return lastOpener.onitemclick(e.value);
+                    
                     run.getRunner(e.value, function(err, runner){
                         if (err)
                             return layout.showError(err);
@@ -214,9 +221,10 @@ define(function(require, module, exports) {
                         runNow(runner);
                     });
                     
-                    settings.set("project/build/@builder", e.value);
+                    settings.set("project/run/@runner", e.value);
                 }
             });
+            plugin.addElement(mnuRunAs);
             
             menus.addItemByPath("Run/Run With/", mnuRunAs, 
                 c += 100, plugin);
@@ -259,9 +267,26 @@ define(function(require, module, exports) {
                     "Run & Debug" : {
                         position : 100,
                         "Save All Unsaved Tabs Before Running" : {
-                           type : "checkbox",
-                           path : "user/runconfig/@saveallbeforerun",
+                           type     : "checkbox",
+                           path     : "user/runconfig/@saveallbeforerun",
                            position : 100
+                        }
+                    },
+                    "Run Configurations" : {
+                        position : 200,
+                        "Run Configurations" : {
+                            type     : "custom",
+                            title    : "Run Configurations",
+                            position : 120,
+                            node     : new ui.hsplitbox({
+                                height     : 200,
+                                padding    : 5,
+                                anchors    : "80 0 0 0",
+                                edge       : "10 10 10 10",
+                                childNodes : [
+                                    
+                                ]
+                            })
                         }
                     }
                 }
@@ -427,10 +452,10 @@ define(function(require, module, exports) {
         function decorateProcess(){
             process.on("away", function(){
                 btnRun.disable();
-            });
+            }, plugin);
             process.on("back", function(){
                 btnRun.enable();
-            });
+            }, plugin);
             process.on("stopping", function(){
                 btnRun.disable();
             }, plugin);
@@ -559,7 +584,8 @@ define(function(require, module, exports) {
          * @command runlast Stops the last run file
          */
         plugin.freezePublicAPI({
-            
+            get lastRun(){ return lastRun },
+            set lastRun(lr){ lastRun = lr }
         });
         
         register(null, {
