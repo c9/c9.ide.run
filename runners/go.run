@@ -1,0 +1,6 @@
+{
+    "caption" : "Go",
+    "cmd": ["go", "run", "$file"],
+    "selector": "source.go",
+    "info": "Your code is running at \\033[01;34m$hostname\\033[00m.\n\\033[01;31mImportant:\\033[00m use \\033[01;32mos.Getenv('PORT')\\033[00m as the port and \\033[01;32mos.Getenv('IP')\\033[00m as the host in your scripts!\n"
+}

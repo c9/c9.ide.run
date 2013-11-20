@@ -1,5 +1,5 @@
 {
     "caption" : "Bash Script",
     "cmd": ["bash", "$file"],
-    "selector": "source.sh"
+    "selector": "^.*\\.(sh)$"
 }

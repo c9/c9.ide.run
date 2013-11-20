@@ -503,7 +503,8 @@ define(function(require, module, exports) {
                     return c9.port;
                 if (name == "ip")
                     return "0.0.0.0";
-                
+                if (name == "home")
+                    return c9.home;
                 return "$" + name;
             }
             function reverse(str){ 
