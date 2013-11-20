@@ -11,7 +11,7 @@
         <a:textbox skin="tbsimple" id="tbName" initial-message="Run Config Name" />
         <a:divider skin="c9-divider" />
         <a:label>Command:</a:label>
-        <a:textbox skin="tbsimple" id="tbCommand" initial-message="Example: ./server.js --help" style="flex:2"/>
+        <a:textbox skin="tbsimple" id="tbCommand" minwidth="150" initial-message="Example: ./server.js --help" style="flex:2"/>
         <a:button
             id       = "btnDebug"
             skin     = "c9-toolbarbutton-glossy"

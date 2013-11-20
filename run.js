@@ -176,7 +176,7 @@ define(function(require, module, exports) {
                 name = "output";
             
             (options instanceof Array ? options : [options]).forEach(function(a){
-                if (a.path)
+                if (a.path && a.path.charAt(0) === "/")
                     a.path = base + a.path;
             });
             
@@ -738,7 +738,7 @@ define(function(require, module, exports) {
             });
             
             if (!pid)
-                run(runner, options, callback);
+                run(runner, options, callback || function(){});
             else
                 checkState();
             

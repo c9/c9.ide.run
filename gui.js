@@ -32,6 +32,7 @@ define(function(require, module, exports) {
         var plugin  = new Plugin("Ajax.org", main.consumes);
         var emit    = plugin.getEmitter();
         
+        var counter = 0;
         var btnRun, lastRun, process;
         
         var loaded = false;
@@ -415,7 +416,19 @@ define(function(require, module, exports) {
                     runner = "auto";
                 
                 if (settings.getBool("user/runconfig/@showconsole")) {
-                    commands.exec("showoutput");
+                    // @todo use run config instead
+                    
+                    commands.exec("showoutput", null, {
+                        id     : "output" + counter++,
+                        runner : runner,
+                        run    : true,
+                        config : {
+                            runner  : runner.name || runner,
+                            command : path
+                        }
+                    });
+                    
+                    return; // @todo unless global
                 }
                 
                 var bDebug = settings.getBool("user/runconfig/@debug");

@@ -2,7 +2,7 @@ define(function(require, exports, module) {
     main.consumes = [
         "Editor", "editors", "util", "commands", "menus", "terminal",
         "settings", "ui", "proc", "tabManager", "run", "console", "run.gui",
-        "layout", "debugger", "settings", "dialog.question"
+        "layout", "debugger", "settings", "dialog.question", "c9"
     ];
     main.provides = ["output"];
     return main;
@@ -10,6 +10,7 @@ define(function(require, exports, module) {
     function main(options, imports, register) {
         var editors  = imports.editors;
         var ui       = imports.ui;
+        var c9       = imports.c9;
         var commands = imports.commands;
         var console  = imports.console;
         var menus    = imports.menus;
@@ -37,25 +38,31 @@ define(function(require, exports, module) {
             commands.addCommand({
                 name    : "showoutput",
                 group   : "Panels",
-                exec    : function (editor) {
+                exec    : function (editor, argv) {
+                    if (!argv) argv = false;
+                    var id = argv.id;
+                    
                     // Search for the output pane
-                    if (search()) return;
+                    if (search(id)) return;
                     
                     // If not found show the console
                     console.show();
                     
                     // Search again
-                    if (search()) return;
+                    if (search(id)) return;
                     
                     // Else open the output panel in the console
                     tabs.open({
                         editorType : "output", 
                         active     : true,
-                        pane        : console.getPanes()[0],
+                        pane       : console.getPanes()[0],
                         document   : {
                             title  : "Output",
                             output : {
-                                id : "output"
+                                id     : id || "output",
+                                config : argv.config,
+                                runner : argv.runner,
+                                run    : argv.run
                             }
                         }
                     }, function(){});
@@ -92,7 +99,12 @@ define(function(require, exports, module) {
             function runNow(session){
                 if (!session)
                     session = currentSession;
+                    
                 var runner = session.runner;
+                if (!runner) {
+                    session.runOnRunner = true;
+                    return;
+                }
                 
                 var path = tbCommand.value || session.config.command;
                 var args = path.split(" ");
@@ -113,19 +125,16 @@ define(function(require, exports, module) {
                     session.process = run.run(runner, {
                         path  : path,
                         cwd   : "",
-                        name  : "",
                         args  : args,
                         debug : bDebug
-                    }, function(err, pid){
+                    }, session.id, function(err, pid){
                         if (err) {
                             transformButton(session);
                             session.process = null;
                             return layout.showError(err);
                         }
                         
-                        var state = session.process.getState();
-                        state.debug = bDebug;
-                        settings.setJson("state/run/process", state); // @todo add identifier
+                        session.process.debug = bDebug;
                         
                         if (bDebug) {
                             debug.debug(session.process, function(err){
@@ -160,12 +169,12 @@ define(function(require, exports, module) {
                         btnRun.enable();
                         transformButton(session);
                     }
-                    
-                    // settings.set("state/run/process", ""); // @todo
                 }, plugin);
             }
             
             function transformButton(session){
+                btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
+                
                 if (session.process && session.process.running) {
                     btnRun.setAttribute("icon", "stop.png");
                     btnRun.setAttribute("caption", "Stop");
@@ -212,6 +221,15 @@ define(function(require, exports, module) {
                 });
             }
             
+            function saveConfig(){
+                if (!currentSession || !currentSession.config.name)
+                    return;
+                
+                var json = settings.getJson("project/run/configs");
+                json[currentSession.config.name] = currentSession.config;
+                settings.setJson("project/run/configs", json);
+            }
+            
             /***** Lifecycle *****/
             
             plugin.on("draw", function(e){
@@ -231,21 +249,31 @@ define(function(require, exports, module) {
                 
                 btnRun.on("click", function(){
                     var session = currentSession;
+                    if (!session) return;
+                    
                     if (session.process && session.process.running){
                         stop(function(){});
                     }
                     else {
-                        runNow();
+                        runNow(session);
                     }
                 });
                 
                 btnDebug.on("prop.value", function(e){
-                    currentSession.config.debug = e.value;
+                    if (currentSession) {
+                        currentSession.config.debug = e.value;
+                        saveConfig();
+                    }
                 });
                 tbCommand.on("afterchange", function(e){
-                    currentSession.config.command = e.value;
+                    if (currentSession) {
+                        currentSession.config.command = e.value;
+                        saveConfig();
+                    }
                 });
                 tbName.on("afterchange", function(e){
+                    if (!currentSession) return;
+                    
                     if (!e.value && currentSession.config.name) {
                         question("Remove this configuration?",
                             "You have cleared the name of this configuration.",
@@ -261,14 +289,8 @@ define(function(require, exports, module) {
                             });
                     }
                     else {
-                        var json = settings.getJson("project/run/configs");
-                        var cfg  = json[currentSession.config.name] 
-                            || currentSession.config;
-                        
-                        cfg.name = e.value;
-                        json[currentSession.config.name] = cfg;
-                        
-                        settings.setJson("project/run/configs", json);
+                        currentSession.config.name = e.value;
+                        saveConfig();
                     }
                 });
                 
@@ -299,13 +321,26 @@ define(function(require, exports, module) {
                 // @todo enable debugging by default if runner supports it
                 // @todo warn in runNow if debugger is already working and ask if the other should be stopped
                 // @todo warn on close of output, asking to save config
+                // @todo stop process when output window is closed
                 
                 if (!session.config)
                     session.config = {};
                 
                 session.setRunner = function(runner){
+                    if (!runner) {
+                        run.getRunner("Shell Command", function(err, runner){
+                            if (!err) session.setRunner(runner);
+                        });
+                        return;
+                    }
+                    
                     session.runner = runner;
                     session.config.runner = runner.caption;
+                    
+                    if (session.runOnRunner)
+                        runNow(session);
+                    
+                    saveConfig();
                     
                     if (session == currentSession) {
                         btnRunner.setAttribute("caption", "Runner: " 
@@ -356,6 +391,24 @@ define(function(require, exports, module) {
                     // session.terminal.element.style.visibility = "hidden";
                 };
                 
+                tab.on("beforeUnload", function(){
+                    if (!session.config.name) {
+                        question("Unsaved changes",
+                            "Would you like to save this as a run configuration?",
+                            "You can keep these settings in a run configuration "
+                            + "for easy access later. If you would like to do "
+                            + "this, choose Yes and fill in the name of the "
+                            + "run configuration prior to closing this tab.",
+                            function(){ // Yes
+                                // do nothing
+                            }, 
+                            function(){ // No
+                                tab.close();
+                            });
+                        return false;
+                    }
+                });
+                
                 if (e.state.hidden || e.state.run)
                     session.hide();
                 
@@ -384,13 +437,17 @@ define(function(require, exports, module) {
                     return;
                 
                 var state = e.state;
-                state.config = session.config;
+                state.config  = session.config;
+                
+                if (session.process && session.process.running) {
+                    state.running = session.process.getState();
+                    state.running.debug = session.process.debug;
+                }
             });
             
             function updateConfig(session){
                 var configs = settings.getJson("project/run/configs");
-                var cfg = configs[session.config.name];
-                if (!cfg) return;
+                var cfg = configs[session.config.name] || session.config;
                 
                 session.config = cfg;
                 updateRunner(session);
@@ -398,7 +455,22 @@ define(function(require, exports, module) {
             }
             
             function updateRunner(session){
+                session.runner = null;
                 
+                var runner = session.config.runner;
+                if (runner && runner != "auto") {
+                    run.getRunner(session.config.runner, function(err, result){
+                        session.setRunner(err ? null : result);
+                    });
+                }
+                else {
+                    var path = (session.config.command || "").split(" ", 1)[0];
+                    if (!path) return;
+                    
+                    run.detectRunner({ path: path }, function(err, runner){
+                        session.setRunner(err ? null : runner);
+                    });
+                }
             }
             
             function updateToolbar(session){
@@ -408,7 +480,7 @@ define(function(require, exports, module) {
                 
                 btnDebug.setAttribute("value", cfg.debug);
                 btnRunner.setAttribute("caption", "Runner: " 
-                    + (cfg.runner ? cfg.runner.caption : "Auto"));
+                    + (cfg.runner || "Auto"));
                 tbCommand.setAttribute("value", cfg.command);
                 tbName.setAttribute("value", cfg.name);
                 // btnEnv.setAttribute("value", );
@@ -421,6 +493,21 @@ define(function(require, exports, module) {
                 if (state.config) {
                     session.config = state.config;
                     updateConfig(session);
+                }
+                
+                if (state.running) {
+                    session.process = run.restoreProcess(state.running);
+                    decorateProcess(session);
+                    transformButton(session);
+                    
+                    if (state.running.debug) {
+                        process.on("back", function(){
+                            debug.debug(process, true, function(err){
+                                if (err)
+                                    return; // Either the debugger is not found or paused
+                            });
+                        });
+                    }
                 }
             });
             

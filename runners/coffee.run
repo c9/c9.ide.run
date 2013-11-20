@@ -1,5 +1,5 @@
 {
-    "caption" : "Coffee",
+    "caption" : "Coffee Script",
     "cmd": ["coffee", "$file"],
     "debug": ["--debug-brk=5454"],
     "selector": "source.coffee",
