@@ -343,8 +343,10 @@ define(function(require, exports, module) {
                     session.runner = runner;
                     session.config.runner = runner.caption;
                     
-                    if (session.runOnRunner)
+                    if (session.runOnRunner) {
                         runNow(session);
+                        delete session.runOnRunner;
+                    }
                     
                     saveConfig();
                     
@@ -390,11 +392,11 @@ define(function(require, exports, module) {
                 };
                     
                 session.show = function(v){ 
-                    // session.terminal.element.style.visibility = "visible";
+                    // plugin.ace.container.style.visibility = "visible";
                 };
                 
                 session.hide = function(v){ 
-                    // session.terminal.element.style.visibility = "hidden";
+                    // plugin.ace.container.style.visibility = "hidden";
                 };
                 
                 tab.on("beforeClose", function(){
@@ -414,6 +416,11 @@ define(function(require, exports, module) {
                             });
                         return false;
                     }
+                }, session);
+                
+                tab.on("unload", function(){
+                    if (session.process && session.process.running)
+                        session.process.stop(function(){});
                 });
                 
                 if (e.state.hidden || e.state.run)
@@ -457,8 +464,8 @@ define(function(require, exports, module) {
                 var cfg = configs[session.config.name] || session.config;
                 
                 session.config = cfg;
-                updateRunner(session);
                 updateToolbar(session);
+                updateRunner(session);
             }
             
             function updateRunner(session){
