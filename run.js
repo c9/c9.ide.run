@@ -609,7 +609,7 @@ define(function(require, module, exports) {
                 fs.readFile(WATCHFILE, function(err, data) {
                     // Process is running
                     if (!err && data && data.trim().length) {
-                        monitor(function(){ emit("back"); }, function(){})
+                        monitor(function(){ emit("back"); }, function(){});
                         return;
                     }
                     
