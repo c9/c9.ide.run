@@ -2,7 +2,7 @@ define(function(require, exports, module) {
     main.consumes = [
         "Editor", "editors", "util", "commands", "menus", "terminal",
         "settings", "ui", "proc", "tabManager", "run", "console", "run.gui",
-        "layout", "debugger", "settings", "dialog.question", "c9"
+        "layout", "debugger", "settings", "dialog.question", "c9", "preferences"
     ];
     main.provides = ["output"];
     return main;
@@ -16,7 +16,9 @@ define(function(require, exports, module) {
         var menus    = imports.menus;
         var layout   = imports.layout;
         var tabs     = imports.tabManager;
+        var util     = imports.util;
         var run      = imports.run;
+        var prefs    = imports.preferences;
         var runGui   = imports["run.gui"];
         var question = imports["dialog.question"].show;
         var Terminal = imports.terminal.Terminal;
@@ -25,11 +27,14 @@ define(function(require, exports, module) {
         
         var markup   = require("text!./output.xml");
         
-        var extensions = [];
-        
         // Set up the generic handle
-        var handle = editors.register("output", "Output", 
-                                       Output, extensions);
+        var handle     = editors.register("output", "Output", Output, []);
+        var handleEmit = handle.getEmitter();
+        
+        var defaults = {
+            "white" : ["#F8F8F8", "#333333", "#89c1ff", false], 
+            "dark"  : ["#003a58", "#FFFFFF", "#225477", true]
+        };
         
         handle.on("load", function(){
             menus.addItemByPath("View/Output",
@@ -66,6 +71,62 @@ define(function(require, exports, module) {
                             }
                         }
                     }, function(){});
+                }
+            }, handle);
+            
+            function setSettings(){
+                var cname  = ".output .c9terminal .c9terminalcontainer .terminal";
+                var sname  = ".output .c9terminal .c9terminalcontainer";
+                var fcolor = settings.get("user/output/@foregroundColor");
+                var bcolor = settings.get("user/output/@backgroundColor");
+                var scolor = settings.get("user/output/@selectionColor");
+                [
+                    [cname, "color", fcolor || "rgb(255,255,255)"],
+                    [sname, "backgroundColor", bcolor || "rgb(25, 34, 39)"],
+                    [cname + " .ace_selection", "backgroundColor", scolor || "rgb(81, 93, 119)"]
+                ].forEach(function(i){
+                    ui.setStyleRule(i[0], i[1], i[2]);
+                });
+                
+                handleEmit("settingsUpdate");
+            }
+            
+            settings.on("read", function(e) {
+                var skin = settings.get("user/general/@skin") || "dark";
+                
+                settings.setDefaults("user/output", [
+                    ["backgroundColor", defaults[skin][0]],
+                    ["foregroundColor", defaults[skin][1]],
+                    ["selectionColor", defaults[skin][2]]
+                ]);
+                
+                setSettings();
+            }, handle);
+
+            settings.on("user/output", setSettings);
+            
+            // Settings UI
+            
+            prefs.add({
+                "Editors" : {
+                    "Output" : {
+                        position : 130,
+                        "Text Color" : {
+                           type     : "colorbox",
+                           path     : "user/output/@foregroundColor",
+                           position : 10100
+                        },
+                        "Background Color" : {
+                           type     : "colorbox",
+                           path     : "user/output/@backgroundColor",
+                           position : 10200
+                        },
+                        "Selection Color" : {
+                           type     : "colorbox",
+                           path     : "user/output/@selectionColor",
+                           position : 10250
+                        }
+                    }
                 }
             }, handle);
         });
@@ -415,7 +476,7 @@ define(function(require, exports, module) {
                             ? "[Running] "
                             : "[Stopped] ")) 
                         + (session.config.name || session.config.command);
-                }
+                };
                     
                 session.show = function(v){ 
                     // plugin.ace.container.style.visibility = "visible";
@@ -459,6 +520,24 @@ define(function(require, exports, module) {
                     //         session.show();
                     //     });
                 }
+                
+                function setTabColor(){
+                    var bg    = settings.get("user/output/@backgroundColor");
+                    var shade = util.shadeColor(bg, 0.75);
+                    doc.tab.backgroundColor = shade.isLight ? bg : shade.color;
+                    
+                    if (shade.isLight) {
+                        doc.tab.className.remove("dark");
+                        plugin.container.className = "c9terminalcontainer";
+                    }
+                    else {
+                        doc.tab.className.add("dark");
+                        plugin.container.className = "c9terminalcontainer dark";
+                    }
+                }
+                setTabColor();
+                
+                handle.on("settingsUpdate", setTabColor, doc);
             });
             
             plugin.on("documentActivate", function(e){

@@ -19,7 +19,7 @@
 /*}*/
 
 .output .c9terminal .c9terminalcontainer.dark {
-    .gradient(~"linear-gradient(top, rgba(0, 0, 0, 0.29) 0, rgba(0, 0, 0, 0.1) 28px, rgba(0, 0, 0, 0.29) 28px, rgba(0, 0, 0, 0.11) 36px, rgba(0, 0, 0, 0.01) 41px, transparent 43px);");
+    .gradient(~"linear-gradient(top, rgba(0, 0, 0, 0.25) 0, rgba(0, 0, 0, 0.1) 28px, rgba(0, 0, 0, 0.29) 28px, rgba(0, 0, 0, 0.11) 36px, rgba(0, 0, 0, 0.01) 41px, transparent 43px);");
 }
 
 .output .ace_editor{
@@ -75,4 +75,15 @@
     border: 1px solid rgba(0, 0, 0, 0.69);
     .gradient(~"linear-gradient(top, rgba(38, 38, 39, 0.25) 0%, rgba(37, 37, 37, 0.25) 55%, rgba(25, 25, 25, 0.25) 55%, rgba(31, 31, 31, 0.25) 100%)");
     .box-shadow(~"inset 1px 1px rgba(30, 30, 30, 0.4), inset -1px -1px rgba(30, 30, 30, 0.4);");
+}
+
+/* Place Holder */
+.output .c9terminal .c9terminalcontainer{
+    text-indent: 0;
+}
+.output .c9terminal .c9terminalcontainer .terminal{
+    text-indent: 0;
+}
+.output .c9terminal .c9terminalcontainer .terminal  .ace_selection{
+    text-indent: 0;
 }
