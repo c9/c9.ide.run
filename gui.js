@@ -162,11 +162,11 @@ define(function(require, module, exports) {
             
             menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
             
-            var lastOpener;
+            var lastOpener, preventLoop;
             var mnuRunAs = new ui.menu({
                 id: "mnuRunAs",
                 "onprop.visible": function(e){
-                    if (e.value) {
+                    if (e.value && !preventLoop) {
                         run.listRunners(function(err, names){
                             var nodes = mnuRunAs.childNodes;
                             for (var i = nodes.length - 3; i >= 0; i--) {
@@ -180,6 +180,13 @@ define(function(require, module, exports) {
                                     value    : name
                                 }), c++, plugin);
                             });
+                            
+                            if (mnuRunAs.visible) {
+                                preventLoop = true;
+                                mnuRunAs.display(null, 
+                                    null, true, mnuRunAs.opener);
+                                preventLoop = false;
+                            }
                         });
                         
                         lastOpener = this.opener;
@@ -227,7 +234,7 @@ define(function(require, module, exports) {
                 "onprop.visible": function(e){
                     if (e.value) {
                         var nodes = mnuRunCfg.childNodes;
-                        for (var i = nodes.length - 3; i >= 0; i--) {
+                        for (var i = nodes.length - 4; i >= 0; i--) {
                             mnuRunCfg.removeChild(nodes[i]);
                         }
                         
@@ -248,6 +255,12 @@ define(function(require, module, exports) {
                         });
                         return;
                     }
+                    else if (e.value == "manage") {
+                        commands.exec("openpreferences", null, {
+                            pane: "project"
+                        });
+                        return;
+                    }
                     
                     openRunConfig(e.value);
                 }
@@ -264,6 +277,9 @@ define(function(require, module, exports) {
             menus.addItemByPath("Run/Run Configurations/~", new ui.divider(), c += 1000, plugin);
             menus.addItemByPath("Run/Run Configurations/New Run Configuration", new ui.item({
                 value : "new-run-config"
+            }), c += 100, plugin);
+            menus.addItemByPath("Run/Run Configurations/Manage...", new ui.item({
+                value : "manage"
             }), c += 100, plugin);
             
             c = 0;
