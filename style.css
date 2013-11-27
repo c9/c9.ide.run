@@ -11,7 +11,12 @@
 }
 .output .toolbar>*{
     margin-right: 3px;
+    /*opacity : 0.5;*/
+    /*.transition(opacity 0.1s linear);*/
 }
+/*.output .toolbar:hover>*{*/
+/*    opacity : 1;*/
+/*}*/
 
 .output .c9terminal .c9terminalcontainer.dark {
     .gradient(~"linear-gradient(top, rgba(0, 0, 0, 0.29) 0, rgba(0, 0, 0, 0.1) 28px, rgba(0, 0, 0, 0.29) 28px, rgba(0, 0, 0, 0.11) 36px, rgba(0, 0, 0, 0.01) 41px, transparent 43px);");

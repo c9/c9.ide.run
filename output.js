@@ -142,6 +142,8 @@ define(function(require, exports, module) {
                                     return; // Either the debugger is not found or paused
                             });
                         }
+                        
+                        session.updateTitle();
                     });
                     
                     decorateProcess(session);
@@ -163,12 +165,14 @@ define(function(require, exports, module) {
                 session.process.on("stopping", function(){
                     if (session == currentSession)
                         btnRun.disable();
+                    session.updateTitle();
                 }, plugin);
                 session.process.on("stopped", function(){
                     if (session == currentSession) {
                         btnRun.enable();
                         transformButton(session);
                     }
+                    session.updateTitle();
                 }, plugin);
             }
             
@@ -230,6 +234,19 @@ define(function(require, exports, module) {
                 var json = settings.getJson("project/run/configs") || {};
                 json[currentSession.config.name] = currentSession.config;
                 settings.setJson("project/run/configs", json);
+                
+                currentSession.updateTitle();
+            }
+            
+            function removeConfig(){
+                if (!currentSession || !currentSession.config.name)
+                    return;
+                
+                var json = settings.getJson("project/run/configs") || {};
+                delete json[currentSession.config.name];
+                settings.setJson("project/run/configs", json);
+                
+                currentSession.updateTitle();
             }
             
             /***** Lifecycle *****/
@@ -281,9 +298,8 @@ define(function(require, exports, module) {
                             "You have cleared the name of this configuration.",
                             "Would you like to remove this configuration from your project settings?",
                             function(){ // Yes
-                                var json = settings.getJson("project/run/configs") || {};
-                                delete json[currentSession.config.name];
-                                settings.setJson("project/run/configs", json);
+                                removeConfig();
+                                currentSession.config.name = "";
                             },
                             function(){ // No
                                 // Revert change
@@ -316,7 +332,7 @@ define(function(require, exports, module) {
             
             plugin.on("documentLoad", function(e){
                 var doc     = e.doc;
-                var tab    = e.doc.tab;
+                var tab     = e.doc.tab;
                 var session = doc.getSession();
                 
                 // @todo set session.path
@@ -390,6 +406,16 @@ define(function(require, exports, module) {
                     
                     return data;
                 };
+                
+                session.updateTitle = function(){
+                    tab.title   = 
+                    tab.tooltip = (!session.process
+                        ? "[Idle] "
+                        : (session.process.running
+                            ? "[Running] "
+                            : "[Stopped] ")) 
+                        + (session.config.name || session.config.command);
+                }
                     
                 session.show = function(v){ 
                     // plugin.ace.container.style.visibility = "visible";
@@ -523,6 +549,8 @@ define(function(require, exports, module) {
                         });
                     }
                 }
+                
+                session.updateTitle();
             });
             
             plugin.on("unload", function(){
