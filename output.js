@@ -377,8 +377,9 @@ define(function(require, exports, module) {
                         datagrid.execCommand("delete");
                         return;
                     }
-                    
-                    model.session.config.env[name] = e.node.value;
+                    if (!model.session.config.env)
+                        model.session.config.env = {};
+                    model.session.config.env[name] = e.value;
                     reloadModel();
                     saveConfig();
                 });
