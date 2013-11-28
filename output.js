@@ -561,6 +561,7 @@ define(function(require, exports, module) {
                             });
                     }
                     else {
+                        removeConfig();
                         currentSession.config.name = e.value;
                         saveConfig();
                     }
@@ -687,7 +688,7 @@ define(function(require, exports, module) {
                         : (session.process.running
                             ? "[Running] "
                             : "[Stopped] ")) 
-                        + (session.config.name || session.config.command);
+                        + (session.config.name || session.config.command || "");
                 };
                     
                 session.show = function(v){ 
