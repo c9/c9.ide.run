@@ -328,10 +328,12 @@ define(function(require, exports, module) {
                     caption : "Name",
                     value   : "name",
                     width   : "40%",
+                    editor  : "textbox"
                 }, {
                     caption : "Value",
                     value   : "value",
-                    width   : "60%"
+                    width   : "60%",
+                    editor  : "textbox"
                 }];
                 
                 mnuEnv.$setStyleClass(mnuEnv.$ext, "envcontainer");
@@ -386,11 +388,11 @@ define(function(require, exports, module) {
                     setTimeout(function(){ justEdited = false }, 500);
                 });
                 
-                datagrid.on("afterChoose", function(){
-                    var cursor = datagrid.selection.getCursor();
-                    if (cursor)
-                        datagrid.edit.startRename(cursor, 0);
-                });
+                // datagrid.on("afterChoose", function(){
+                //     var cursor = datagrid.selection.getCursor();
+                //     if (cursor)
+                //         datagrid.edit.startRename(cursor, 0);
+                // });
                 
                 // datagrid.edit.startRename(0);
                 // datagrid.execCommand("delete");
