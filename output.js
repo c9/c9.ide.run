@@ -202,7 +202,7 @@ define(function(require, exports, module) {
                     session.process = run.run(runner, {
                         path  : path,
                         cwd   : "",
-                        env   : session.config.env || [],
+                        env   : session.config.env || {},
                         args  : args,
                         debug : bDebug
                     }, session.id, function(err, pid){
