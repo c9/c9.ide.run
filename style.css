@@ -87,3 +87,11 @@
 .output .c9terminal .c9terminalcontainer .terminal  .ace_selection{
     text-indent: 0;
 }
+
+.envcontainer{
+    padding : 0;
+}
+.envcontainer .blackdg{
+    border-top: 1px solid #363636;
+    max-height : 300px;
+}

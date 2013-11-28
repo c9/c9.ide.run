@@ -27,6 +27,11 @@ define(function(require, exports, module) {
         
         var markup   = require("text!./output.xml");
         
+        var keys       = require("ace/lib/keys");
+        var Tree       = require("ace_tree/tree");
+        var TreeData   = require("ace_tree/data_provider");
+        var TreeEditor = require("ace_tree/edit");
+        
         // Set up the generic handle
         var handle     = editors.register("output", "Output", Output, []);
         var handleEmit = handle.getEmitter();
@@ -309,6 +314,110 @@ define(function(require, exports, module) {
                 
                 currentSession.updateTitle();
             }
+                
+            var model, datagrid, mnuEnv;
+            function drawEnv(){
+                if (model) return;
+                
+                model = new TreeData();
+                model.emptyMessage = "Type a new environment variable here...";
+                model.rowHeight    = 18;
+                
+                model.$sorted = false;
+                model.columns = [{
+                    caption : "Name",
+                    value   : "name",
+                    width   : "40%",
+                }, {
+                    caption : "Value",
+                    value   : "value",
+                    width   : "60%"
+                }];
+                
+                mnuEnv.$setStyleClass(mnuEnv.$ext, "envcontainer");
+                var div = mnuEnv.$ext.appendChild(document.createElement("div"));
+                
+                datagrid = new Tree(div);
+                datagrid.renderer.setTheme({cssClass: "blackdg"});
+                datagrid.setOption("maxLines", 200);
+                datagrid.setDataProvider(model);
+                datagrid.edit = new TreeEditor(datagrid);
+                
+                var justEdited = false;
+                
+                datagrid.container.addEventListener("keydown", function(e){
+                    var cursor = datagrid.selection.getCursor();
+                    var key = keys[e.keyCode] || "";
+                    if (key.length == 1 || key.substr(0, 3) == "num" && cursor && !justEdited)
+                        datagrid.edit.startRename(cursor, 0);
+                }, true);
+                
+                datagrid.container.addEventListener("keyup", function(e){
+                    var cursor = datagrid.selection.getCursor();
+                    if (e.keyCode == 13 && cursor && !justEdited)
+                        datagrid.edit.startRename(cursor, 0);
+                }, true);
+                
+                datagrid.on("delete", function(e){
+                    delete model.session.config.env[e.value];
+                    
+                    reloadModel();
+                    saveConfig();
+                });
+                
+                datagrid.on("rename", function(e){
+                    var name    = e.value;
+                    // var node    = e.node;
+                    // var value   = node.value;
+                    
+                    // Delete a watch by removing the expression
+                    if (!name) {
+                        datagrid.execCommand("delete");
+                        return;
+                    }
+                    
+                    model.session.config.env[name] = e.node.value;
+                    reloadModel();
+                    saveConfig();
+                });
+                
+                datagrid.on("rename", function(e){
+                    justEdited = true;
+                    setTimeout(function(){ justEdited = false }, 500);
+                });
+                
+                datagrid.on("afterChoose", function(){
+                    var cursor = datagrid.selection.getCursor();
+                    if (cursor)
+                        datagrid.edit.startRename(cursor, 0);
+                });
+                
+                // datagrid.edit.startRename(0);
+                // datagrid.execCommand("delete");
+            }
+            
+            function reloadModel(){
+                var env = [];
+                var cfg = model.session.config;
+                
+                for (var name in cfg.env) {
+                    env.push({
+                        name  : name, 
+                        value : cfg.env[name]
+                    });
+                }
+                
+                model.newEnvNode = model.newEnvNode || {
+                    name      : model.emptyMessage,
+                    className : "newenv",
+                    fullWidth : true,
+                    isNew     : true,
+                };
+                model.setRoot({
+                    items   : [].concat(env, model.newEnvNode),
+                    $sorted : true
+                });
+            }
             
             /***** Lifecycle *****/
             
@@ -387,8 +496,24 @@ define(function(require, exports, module) {
                     });
                     
                     // Set Button Caption
-                    btnRunner.setAttribute("caption", "Runner: " + value)
-                }
+                    btnRunner.setAttribute("caption", "Runner: " + value);
+                };
+                
+                mnuEnv = new ui.menu({ 
+                    htmlNode : document.body,
+                    width    : 250
+                });
+                btnEnv.setAttribute("submenu", mnuEnv);
+                mnuEnv.on("prop.visible", function(e){
+                    if (!e.value)
+                        return;
+                    
+                    drawEnv();
+                    datagrid.resize();
+                    
+                    model.session = currentSession;
+                    reloadModel();
+                });
             });
             
             plugin.on("documentLoad", function(e){
@@ -403,7 +528,7 @@ define(function(require, exports, module) {
                 // @todo stop process when output window is closed
                 
                 if (!session.config)
-                    session.config = {};
+                    session.config = { env : {} };
                 
                 session.run = function(){
                     runNow(session);
@@ -603,6 +728,8 @@ define(function(require, exports, module) {
                 tbCommand.setAttribute("value", cfg.command);
                 tbName.setAttribute("value", cfg.name);
                 // btnEnv.setAttribute("value", );
+                
+                btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
             }
             
             plugin.on("setState", function(e){

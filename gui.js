@@ -26,7 +26,7 @@ define(function(require, module, exports) {
         
         var cssString = require("text!./style.css");
         var basename  = require("path").basename;
-
+        
         /***** Initialization *****/
         
         var plugin  = new Plugin("Ajax.org", main.consumes);

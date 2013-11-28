@@ -1,6 +1,6 @@
 define(function(require, module, exports) {
     main.consumes = [
-        "Plugin", "proc", "settings", "fs", "c9",
+        "Plugin", "proc", "settings", "fs", "c9", "util",
         "tabManager", "preferences" //@todo move tabs and preferences to the ui part of run
     ];
     main.provides = ["run"];
@@ -11,6 +11,7 @@ define(function(require, module, exports) {
         var settings    = imports.settings;
         var prefs       = imports.preferences;
         var proc        = imports.proc;
+        var util        = imports.util;
         var tabs        = imports.tabManager;
         var fs          = imports.fs;
         var c9          = imports.c9;
@@ -343,7 +344,7 @@ define(function(require, module, exports) {
                         args : ["-c", args.join(" ")],
                         cols : 100,
                         rows : 5,
-                        env  : runner.env,
+                        env  : util.extend({}, options.env, runner.env),
                         cwd  : options.cwd || runner[0].working_dir 
                             || options.path && dirname(options.path) || "/"
                     }, function(err, pty){
