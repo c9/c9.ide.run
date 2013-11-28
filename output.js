@@ -368,7 +368,16 @@ define(function(require, exports, module) {
                 });
                 
                 datagrid.on("rename", function(e){
-                    var node  = e.node;
+                    var node = e.node;
+                    var name, value;
+                    if (e.column.value == "name" || node.isNew) {
+                        name  = e.value;
+                        value = node.value || "";
+                    }
+                    else {
+                        name  = node.name;
+                        value = e.value;
+                    }
                     
                     // Delete a watch by removing the expression
                     if (!name) {
@@ -376,10 +385,7 @@ define(function(require, exports, module) {
                         return;
                     }
                     
-                    if (e.column.value == "name" || node.isNew)
-                        model.session.config.env[e.value] = "";
-                    else
-                        model.session.config.env[node.name] = e.value;
+                    model.session.config.env[name] = value;
                         
                     reloadModel();
                     saveConfig();
@@ -389,12 +395,6 @@ define(function(require, exports, module) {
                     justEdited = true;
                     setTimeout(function(){ justEdited = false }, 500);
                 });
-                
-                // datagrid.on("afterChoose", function(){
-                //     var cursor = datagrid.selection.getCursor();
-                //     if (cursor)
-                //         datagrid.edit.startRename(cursor, 0);
-                // });
                 
                 // datagrid.edit.startRename(0);
                 // datagrid.execCommand("delete");
