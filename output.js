@@ -384,12 +384,12 @@ define(function(require, exports, module) {
                         value = e.value;
                     }
                     
-                    // Delete a watch by removing the expression
-                    if (!name) {
-                        datagrid.execCommand("delete");
+                    if (name === node.name && value == node.value)
                         return;
-                    }
-                    
+
+                    if (!node.isNew || !name)
+                        delete model.session.config.env[node.name];
+                        
                     model.session.config.env[name] = value;
                         
                     reloadModel();
@@ -419,6 +419,7 @@ define(function(require, exports, module) {
             function reloadModel(){
                 var env = [];
                 var cfg = model.session.config;
+                var sel = model.selection.getCursor();
                 
                 for (var name in cfg.env) {
                     env.push({
@@ -426,7 +427,9 @@ define(function(require, exports, module) {
                         value : cfg.env[name]
                     });
                 }
-                
+                env.sort(function(a, b) {
+                    return TreeData.alphanumCompare(a.name, b.name);
+                });
                 model.newEnvNode = model.newEnvNode || {
                     name      : model.emptyMessage,
                     className : "newenv",
@@ -437,6 +440,10 @@ define(function(require, exports, module) {
                     items   : [].concat(env, model.newEnvNode),
                     $sorted : true
                 });
+                
+                // restore selection
+                if (sel && sel.name)
+                    model.selection.setSelection(findNode(sel.name));
             }
             
             /***** Lifecycle *****/
