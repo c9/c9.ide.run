@@ -359,14 +359,14 @@ define(function(require, exports, module) {
                 
                 var justEdited = false;
                 
-                datagrid.container.addEventListener("keydown", function(e){
+                datagrid.textInput.getElement().addEventListener("keydown", function(e){
                     var cursor = datagrid.selection.getCursor();
                     var key = keys[e.keyCode] || "";
                     if (key.length == 1 || key.substr(0, 3) == "num" && cursor && !justEdited)
                         datagrid.edit.startRename(cursor, 0);
                 }, true);
                 
-                datagrid.container.addEventListener("keyup", function(e){
+                datagrid.textInput.getElement().addEventListener("keyup", function(e){
                     var cursor = datagrid.selection.getCursor();
                     if (e.keyCode == 13 && cursor && !justEdited)
                         datagrid.edit.startRename(cursor, 0);
@@ -411,6 +411,8 @@ define(function(require, exports, module) {
                     
                     if (node.isNew)
                         datagrid.edit.startRename(findNode(name), 1);
+                    else
+                        model.selection.setSelection(findNode(name));
                 });
                 
                 datagrid.on("rename", function(e){
@@ -424,7 +426,7 @@ define(function(require, exports, module) {
             
             function findNode(name){
                 var f;
-                model.root.children.every(function(n){
+                model.root.children.some(function(n){
                     return n.name == name && (f = n);
                 });
                 return f;
