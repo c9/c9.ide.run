@@ -20,7 +20,7 @@ define(function(require, exports, module) {
         var run      = imports.run;
         var prefs    = imports.preferences;
         var runGui   = imports["run.gui"];
-        var question = imports["dialog.question"].show;
+        var question = imports["dialog.question"];
         var Terminal = imports.terminal.Terminal;
         var debug    = imports.debugger;
         var settings = imports.settings;
@@ -50,16 +50,17 @@ define(function(require, exports, module) {
                 group   : "Panels",
                 exec    : function (editor, argv) {
                     if (!argv) argv = false;
-                    var id = argv.id;
+                    var id  = argv.id;
+                    var cmd = argv.config && argv.config.command;
                     
                     // Search for the output pane
-                    if (search(id)) return;
+                    if (search(id, cmd, argv)) return;
                     
                     // If not found show the console
                     console.show();
                     
                     // Search again
-                    if (search(id)) return;
+                    if (search(id, cmd, argv)) return;
                     
                     // Else open the output panel in the console
                     tabs.open({
@@ -102,7 +103,8 @@ define(function(require, exports, module) {
                 settings.setDefaults("user/output", [
                     ["backgroundColor", defaults[skin][0]],
                     ["foregroundColor", defaults[skin][1]],
-                    ["selectionColor", defaults[skin][2]]
+                    ["selectionColor", defaults[skin][2]],
+                    ["nosavequestion", "false"]
                 ]);
                 
                 setSettings();
@@ -130,6 +132,11 @@ define(function(require, exports, module) {
                            type     : "colorbox",
                            path     : "user/output/@selectionColor",
                            position : 10250
+                        },
+                        "Warn Before Closing Unnamed Configuration" : {
+                           type     : "checkbox",
+                           path     : "user/output/@nosavequestion",
+                           position : 10300
                         }
                     }
                 }
@@ -137,14 +144,18 @@ define(function(require, exports, module) {
         });
         
         //Search through pages
-        function search(id){
+        function search(id, cmd, argv){
             if (!id) id = "output";
-            var pages = tabs.getTabs(), session;
-            for (var i = 0; i < pages.length; i++) {
-                if (pages[i].editorType == "output"
-                  && (session = pages[i].document.getSession())
-                  && session.id == id) {
-                    tabs.focusTab(pages[i]);
+            var tablist = tabs.getTabs(), session;
+            for (var i = 0; i < tablist.length; i++) {
+                if (tablist[i].editorType == "output"
+                  && (session = tablist[i].document.getSession())
+                  && (session.id == id || cmd && session.config 
+                  && (session.config.command || "").indexOf(cmd) === 0)) {
+                    if (argv && argv.run)
+                        tablist[i].editor.run(tablist[i].document.getSession());
+                      
+                    tabs.focusTab(tablist[i]);
                     return true;
                 }
             }
@@ -444,6 +455,49 @@ define(function(require, exports, module) {
                 });
             }
             
+            function updateConfig(session){
+                var configs = settings.getJson("project/run/configs");
+                var cfg = configs[session.config.name] || session.config;
+                
+                session.config = cfg;
+                updateToolbar(session);
+                updateRunner(session);
+            }
+            
+            function updateRunner(session){
+                session.runner = null;
+                
+                var runner = session.config.runner;
+                if (runner && runner != "auto") {
+                    run.getRunner(session.config.runner, function(err, result){
+                        session.setRunner(err ? null : result);
+                    });
+                }
+                else {
+                    var path = (session.config.command || "").split(" ", 1)[0];
+                    if (!path) return;
+                    
+                    run.detectRunner({ path: path }, function(err, runner){
+                        session.setRunner(err ? null : runner);
+                    });
+                }
+            }
+            
+            function updateToolbar(session){
+                transformButton(session);
+                
+                var cfg = session.config;
+                
+                btnDebug.setAttribute("value", cfg.debug);
+                btnRunner.setAttribute("caption", "Runner: " 
+                    + (cfg.runner || "Auto"));
+                tbCommand.setAttribute("value", cfg.command);
+                tbName.setAttribute("value", cfg.name);
+                // btnEnv.setAttribute("value", );
+                
+                btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
+            }
+            
             /***** Lifecycle *****/
             
             plugin.on("draw", function(e){
@@ -489,7 +543,7 @@ define(function(require, exports, module) {
                     if (!currentSession) return;
                     
                     if (!e.value && currentSession.config.name) {
-                        question("Remove this configuration?",
+                        question.show("Remove this configuration?",
                             "You have cleared the name of this configuration.",
                             "Would you like to remove this configuration from your project settings?",
                             function(){ // Yes
@@ -640,8 +694,10 @@ define(function(require, exports, module) {
                 };
                 
                 tab.on("beforeClose", function(){
-                    if (!session.config.name && session.config.command && !tab.meta.$ignore) {
-                        question("Unsaved changes",
+                    if (!settings.getBool("user/output/nosavequestion") 
+                      && (!session.config.name && session.config.command 
+                      && !tab.meta.$ignore)) {
+                        question.show("Unsaved changes",
                             "Would you like to save this as a run configuration?",
                             "You can keep these settings in a run configuration "
                             + "for easy access later. If you would like to do "
@@ -653,7 +709,11 @@ define(function(require, exports, module) {
                             function(){ // No
                                 tab.meta.$ignore = true;
                                 tab.close();
-                            });
+                                
+                                if (question.dontAsk)
+                                    settings.set("user/output/nosavequestion", "true");
+                            },
+                            { showDontAsk: true });
                         return false;
                     }
                 }, session);
@@ -665,14 +725,6 @@ define(function(require, exports, module) {
                 
                 if (e.state.hidden || e.state.run)
                     session.hide();
-                
-                if (e.state.run) {
-                    runNow(session);
-                    // run.run(e.state.run.runner, e.state.run.options, 
-                    //     session.id, function(err, pid){
-                    //         session.show();
-                    //     });
-                }
                 
                 function setTabColor(){
                     var bg    = settings.get("user/output/@backgroundColor");
@@ -717,49 +769,6 @@ define(function(require, exports, module) {
                 }
             });
             
-            function updateConfig(session){
-                var configs = settings.getJson("project/run/configs");
-                var cfg = configs[session.config.name] || session.config;
-                
-                session.config = cfg;
-                updateToolbar(session);
-                updateRunner(session);
-            }
-            
-            function updateRunner(session){
-                session.runner = null;
-                
-                var runner = session.config.runner;
-                if (runner && runner != "auto") {
-                    run.getRunner(session.config.runner, function(err, result){
-                        session.setRunner(err ? null : result);
-                    });
-                }
-                else {
-                    var path = (session.config.command || "").split(" ", 1)[0];
-                    if (!path) return;
-                    
-                    run.detectRunner({ path: path }, function(err, runner){
-                        session.setRunner(err ? null : runner);
-                    });
-                }
-            }
-            
-            function updateToolbar(session){
-                transformButton(session);
-                
-                var cfg = session.config;
-                
-                btnDebug.setAttribute("value", cfg.debug);
-                btnRunner.setAttribute("caption", "Runner: " 
-                    + (cfg.runner || "Auto"));
-                tbCommand.setAttribute("value", cfg.command);
-                tbName.setAttribute("value", cfg.name);
-                // btnEnv.setAttribute("value", );
-                
-                btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
-            }
-            
             plugin.on("setState", function(e){
                 var session = e.doc.getSession();
                 var state   = e.state;
@@ -784,11 +793,21 @@ define(function(require, exports, module) {
                     }
                 }
                 
+                if (state.run)
+                    runNow(session);
+                
                 session.updateTitle();
             });
             
             plugin.on("unload", function(){
                 
+            });
+            
+            plugin.freezePublicAPI({
+                /**
+                 * @param {Session} session
+                 */
+                run: runNow
             });
             
             return plugin;
