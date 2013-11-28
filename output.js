@@ -368,9 +368,7 @@ define(function(require, exports, module) {
                 });
                 
                 datagrid.on("rename", function(e){
-                    var name    = e.value;
-                    // var node    = e.node;
-                    // var value   = node.value;
+                    var node  = e.node;
                     
                     // Delete a watch by removing the expression
                     if (!name) {
@@ -378,7 +376,11 @@ define(function(require, exports, module) {
                         return;
                     }
                     
-                    model.session.config.env[name] = e.node.value;
+                    if (e.column.value == "name" || node.isNew)
+                        model.session.config.env[e.value] = "";
+                    else
+                        model.session.config.env[node.name] = e.value;
+                        
                     reloadModel();
                     saveConfig();
                 });
