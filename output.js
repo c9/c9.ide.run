@@ -397,16 +397,14 @@ define(function(require, exports, module) {
                         value = e.value;
                     }
                     
-                    // Delete a watch by removing the expression
-                    if (!name) {
-                        datagrid.execCommand("delete");
+                    if (name === node.name && value === node.value)
                         return;
-                    }
-                    
-                    if (!node.isNew)
-                        delete config.env[node.name]
-                    
-                    config.env[name] = value;
+
+                    if (!node.isNew || !name)
+                        delete config.env[node.name];
+                        
+                    if (name)
+                        config.env[name] = value;
                         
                     reloadModel();
                     saveConfig();
@@ -435,6 +433,7 @@ define(function(require, exports, module) {
             function reloadModel(){
                 var env = [];
                 var cfg = model.session.config;
+                var sel = model.selection.getCursor();
                 
                 for (var name in cfg.env) {
                     env.push({
@@ -442,7 +441,9 @@ define(function(require, exports, module) {
                         value : cfg.env[name]
                     });
                 }
-                
+                env.sort(function(a, b) {
+                    return TreeData.alphanumCompare(a.name, b.name);
+                });
                 model.newEnvNode = model.newEnvNode || {
                     name      : model.emptyMessage,
                     className : "newenv",
@@ -453,6 +454,10 @@ define(function(require, exports, module) {
                     items   : [].concat(env, model.newEnvNode),
                     $sorted : true
                 });
+                
+                // restore selection
+                if (sel && sel.name)
+                    model.selection.setSelection(findNode(sel.name));
             }
             
             function updateConfig(session){
