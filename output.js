@@ -373,8 +373,10 @@ define(function(require, exports, module) {
                 datagrid.on("rename", function(e){
                     if (!e.column) return;
                     
-                    var node = e.node;
+                    var node   = e.node;
+                    var config = model.session.config;
                     var name, value;
+                    
                     if (e.column.value == "name" || node.isNew) {
                         name  = e.value;
                         value = node.value || "";
@@ -384,13 +386,14 @@ define(function(require, exports, module) {
                         value = e.value;
                     }
                     
-                    if (name === node.name && value == node.value)
+                    if (name === node.name && value === node.value)
                         return;
 
                     if (!node.isNew || !name)
-                        delete model.session.config.env[node.name];
+                        delete config.env[node.name];
                         
-                    model.session.config.env[name] = value;
+                    if (name)
+                        config.env[name] = value;
                         
                     reloadModel();
                     saveConfig();
