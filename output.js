@@ -516,6 +516,9 @@ define(function(require, exports, module) {
                     datagrid.resize();
                     
                     model.session = currentSession;
+                    if (!model.session.config.env)
+                        model.session.config.env = {};
+                        
                     reloadModel();
                 });
             });
