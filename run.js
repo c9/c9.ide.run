@@ -292,7 +292,12 @@ define(function(require, module, exports) {
                         
                     // Set the PATH variable if needed
                     if (runner.path)
-                        cmd += "PATH=" + runner.path + " ; ";
+                        cmd += "export PATH=" + runner.path + " ; ";
+                        
+                    var env = util.extend({}, options[idx].env, runner.env);
+                    for (var name in env) {
+                        cmd += "export " + name + "=" + env[name] + " ; ";
+                    }
     
                     // Open a pty session with tmux on the output buffer
                     // @todo eventually this might be better in the output plugin
@@ -344,7 +349,6 @@ define(function(require, module, exports) {
                         args : ["-c", args.join(" ")],
                         cols : 100,
                         rows : 5,
-                        env  : util.extend({}, options.env, runner.env),
                         cwd  : options.cwd || runner[0].working_dir 
                             || options.path && dirname(options.path) || "/"
                     }, function(err, pty){
