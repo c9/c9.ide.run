@@ -249,7 +249,7 @@ define(function(require, module, exports) {
                     if (running == STARTED || running == STARTING)
                         checkState();
                 }
-                else {
+                else if (running == STARTED || running == STARTING) {
                     emit("away");
                 }
             });
