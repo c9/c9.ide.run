@@ -252,7 +252,7 @@ define(function(require, module, exports) {
                 "onitemclick": function(e){
                     if (e.value == "new-run-config") {
                         commands.exec("showoutput", null, {
-                            id : "output" + counter++
+                            id : getOutputId()
                         });
                         return;
                     }
@@ -452,6 +452,10 @@ define(function(require, module, exports) {
             return false;
         }
         
+        function getOutputId(){
+            return "output" + Math.round(Math.random()*100000) + counter++;
+        }
+        
         function openRunConfig(cfg){
             var found = false;
             tabs.getTabs().some(function(tab){
@@ -470,7 +474,7 @@ define(function(require, module, exports) {
             }
             
             commands.exec("showoutput", null, {
-                id     : "output" + counter++,
+                id     : getOutputId(),
                 run    : true,
                 config : cfg
             });
@@ -495,7 +499,7 @@ define(function(require, module, exports) {
                     // @todo use run config instead
                     
                     commands.exec("showoutput", null, {
-                        id     : "output" + counter++,
+                        id     : getOutputId(),
                         runner : runner,
                         run    : true,
                         config : {

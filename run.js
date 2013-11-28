@@ -383,7 +383,7 @@ define(function(require, module, exports) {
                 proc.execFile("ps", {
                     args: [c9.platform == "darwin" ? "-axf" : "axf"]
                 }, function(err, stdout, stderr){
-                    var match = stdout.match(PIDMATCH);
+                    var match = stdout && stdout.match(PIDMATCH);
                     if (!match) {
                         // Process has already ended
                         cleanup();
