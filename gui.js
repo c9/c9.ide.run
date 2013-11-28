@@ -181,7 +181,8 @@ define(function(require, module, exports) {
                                 }), c++, plugin);
                             });
                             
-                            if (mnuRunAs.visible) {
+                            if (mnuRunAs.visible && mnuRunAs.opener 
+                              && mnuRunAs.opener.localName == "button") {
                                 preventLoop = true;
                                 mnuRunAs.display(null, 
                                     null, true, mnuRunAs.opener);
