@@ -379,6 +379,8 @@ define(function(require, exports, module) {
                     
                     reloadModel();
                     saveConfig();
+                    
+                    mnuEnv.resize();
                 });
                 
                 datagrid.on("rename", function(e){
@@ -413,6 +415,8 @@ define(function(require, exports, module) {
                         datagrid.edit.startRename(findNode(name), 1);
                     else
                         model.selection.setSelection(findNode(name));
+                    
+                    mnuEnv.resize();
                 });
                 
                 datagrid.on("rename", function(e){
@@ -420,8 +424,15 @@ define(function(require, exports, module) {
                     setTimeout(function(){ justEdited = false }, 500);
                 });
                 
-                // datagrid.edit.startRename(0);
-                // datagrid.execCommand("delete");
+                mnuEnv.resize = function(){
+                    if (!mnuEnv.visible) return;
+                    
+                    setTimeout(function(){
+                        mnuEnv.reopen = true;
+                        mnuEnv.display(null, null, true, mnuEnv.opener);
+                        mnuEnv.reopen = false;
+                    }, 10);
+                }
             }
             
             function findNode(name){
@@ -590,8 +601,9 @@ define(function(require, exports, module) {
                     width    : 250
                 });
                 btnEnv.setAttribute("submenu", mnuEnv);
+                
                 mnuEnv.on("prop.visible", function(e){
-                    if (!e.value)
+                    if (!e.value || mnuEnv.reopen)
                         return;
                     
                     drawEnv();
@@ -602,6 +614,8 @@ define(function(require, exports, module) {
                         model.session.config.env = {};
                         
                     reloadModel();
+                    
+                    mnuEnv.resize();
                 });
             });
             

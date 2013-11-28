@@ -549,7 +549,7 @@ define(function(require, module, exports) {
                 return cmd;
             }
             
-            function cleanup(){
+            function cleanup(callback){
                 if (running < 1)
                     return;
     
@@ -564,6 +564,8 @@ define(function(require, module, exports) {
                         runner  = null;
                         running = STOPPED;
                         emit("stopped");
+                        
+                        callback && callback();
                     });
                 });
             }
@@ -575,7 +577,17 @@ define(function(require, module, exports) {
                 if (!pid) {
                     // If there's no PID yet, wait until we get one and then stop
                     if (running === STARTING) {
+                        // Make sure the process times out
+                        var timer = setTimeout(function(){
+                            cleanup(function(){
+                                callback(new Error("Could not get PID from process. "
+                                    + "The process seemed to not be running anymore."));
+                            });
+                        }, 2000);
+                        
                         plugin.on("started", function(e){
+                            clearTimeout(timer);
+                            
                             if (e.pid > 0)
                                 stop(callback);
                             else
@@ -583,10 +595,11 @@ define(function(require, module, exports) {
                         });
                     }
                     else {
-                        cleanup();
-                        callback(new Error("Could not get PID from running "
-                            + "process. Process might still be running in the "
-                            + "background."));
+                        cleanup(function(){
+                            callback(new Error("Could not get PID from running "
+                                + "process. Process might still be running in the "
+                                + "background."));
+                        });
                     }
                     return;
                 }
@@ -595,17 +608,16 @@ define(function(require, module, exports) {
                 proc.execFile("kill", {args:[pid]}, function(err, e){
                     // Clean up here to make sure runner is in correct state
                     // when the callback is called
-                    cleanup();
-    
-                    // When killing the process file won't be rewritten
-                    if (!err) {
-                        
-                        fs.writeFile(WATCHFILE, "", "utf8", function(err){
+                    cleanup(function(){
+                        // When killing the process file won't be rewritten
+                        if (!err) {
+                            fs.writeFile(WATCHFILE, "", "utf8", function(err){
+                                callback(err, e);
+                            });
+                        }
+                        else
                             callback(err, e);
-                        });
-                    }
-                    else
-                        callback(err, e);
+                    });
                 });
             }
             

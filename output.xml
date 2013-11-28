@@ -6,11 +6,12 @@
             caption  = "Run"
             width    = "54"
             icon     = "run.png"
-            visible  = "true" />
+            visible  = "true" 
+            style    = "min-width:54px" />
         <!--<a:button skin="c9-toolbarbutton-glossy" id="btnConsoleClear" class="clear" icon="console_clear.png" />-->
-        <a:textbox skin="tbsimple" id="tbName" initial-message="Run Config Name" />
+        <a:textbox skin="tbsimple" id="tbName" initial-message="Run Config Name" style="min-width:40px"/>
         <a:divider skin="c9-divider" />
-        <a:label>Command:</a:label>
+        <a:label style="min-width:64px">Command:</a:label>
         <a:textbox skin="tbsimple" id="tbCommand" minwidth="150" initial-message="Example: ./server.js --help" style="flex:2"/>
         <a:button
             id       = "btnDebug"
@@ -18,8 +19,9 @@
             icon     = "bug.png"
             state    = "true"
             class    = "bug"
-            tooltip  = "Run in Debug Mode" />
-        <a:button skin="c9-toolbarbutton-glossy" id="btnRunner" caption="Runner: Auto" />
-        <a:button skin="c9-toolbarbutton-glossy" id="btnEnv" caption="Environment" />
+            tooltip  = "Run in Debug Mode"
+            style    = "min-width:23px"/>
+        <a:button skin="c9-toolbarbutton-glossy" id="btnRunner" caption="Runner: Auto" style="min-width:30px"/>
+        <a:button skin="c9-toolbarbutton-glossy" id="btnEnv" caption="Environment" style="min-width:30px"/>
     </div>
 </a:application>
