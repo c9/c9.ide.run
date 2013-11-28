@@ -191,6 +191,7 @@ define(function(require, exports, module) {
                     session.process = run.run(runner, {
                         path  : path,
                         cwd   : "",
+                        env   : session.config.env || [],
                         args  : args,
                         debug : bDebug
                     }, session.id, function(err, pid){
@@ -361,13 +362,17 @@ define(function(require, exports, module) {
                 }, true);
                 
                 datagrid.on("delete", function(e){
-                    delete model.session.config.env[e.value];
+                    datagrid.selection.getSelectedNodes().forEach(function(n){
+                        delete model.session.config.env[n.name];
+                    });
                     
                     reloadModel();
                     saveConfig();
                 });
                 
                 datagrid.on("rename", function(e){
+                    if (!e.column) return;
+                    
                     var node = e.node;
                     var name, value;
                     if (e.column.value == "name" || node.isNew) {
@@ -389,6 +394,9 @@ define(function(require, exports, module) {
                         
                     reloadModel();
                     saveConfig();
+                    
+                    if (node.isNew)
+                        datagrid.edit.startRename(findNode(name), 1);
                 });
                 
                 datagrid.on("rename", function(e){
@@ -398,6 +406,14 @@ define(function(require, exports, module) {
                 
                 // datagrid.edit.startRename(0);
                 // datagrid.execCommand("delete");
+            }
+            
+            function findNode(name){
+                var f;
+                model.root.children.every(function(n){
+                    return n.name == name && (f = n);
+                });
+                return f;
             }
             
             function reloadModel(){
