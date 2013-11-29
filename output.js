@@ -104,7 +104,8 @@ define(function(require, exports, module) {
                     ["backgroundColor", defaults[skin][0]],
                     ["foregroundColor", defaults[skin][1]],
                     ["selectionColor", defaults[skin][2]],
-                    ["nosavequestion", "false"]
+                    ["nosavequestion", "false"],
+                    ["keepOutput", "false"]
                 ]);
                 
                 setSettings();
@@ -136,6 +137,11 @@ define(function(require, exports, module) {
                         "Warn Before Closing Unnamed Configuration" : {
                            type     : "checkbox",
                            path     : "user/output/@nosavequestion",
+                           position : 10300
+                        },
+                        "Preserve log between runs" : {
+                           type     : "checkbox",
+                           path     : "user/output/@keepOutput",
                            position : 10300
                         }
                     }
@@ -182,6 +188,14 @@ define(function(require, exports, module) {
                     session.runOnRunner = true;
                     return;
                 }
+                
+                var term = session.terminal.aceSession.term;
+                term.$resetScreenOnStateChange = false;
+                
+                if (settings.getBool("user/output/@keepOutput"))
+                    term.clearScreen(2);
+                else
+                    term.reset();
                 
                 var path = tbCommand.value || session.config.command;
                 var args = path.split(" ");
