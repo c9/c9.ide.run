@@ -338,7 +338,9 @@ define(function(require, module, exports) {
                     // Note that the following line is absolutely necessary. 
                     // It keeps the output visible for the user.
                     "\\;", "set-option", "remain-on-exit", "on", 
-                    "\\;", "set-window-option", "-g", "aggressive-resize", "on"
+                    "\\;", "set-window-option", "-g", "aggressive-resize", "on",
+                    "\\;", "set-option", "-g", "prefix", "C-b"
+                    
                 ];
                 // if (options.detach !== false)
                 //     args.push("\\;", "detach-client");
