@@ -712,13 +712,20 @@ define(function(require, exports, module) {
                 };
                 
                 session.updateTitle = function(){
+                    var process = session.process;
+                    
                     tab.title   = 
-                    tab.tooltip = (!session.process
+                    tab.tooltip = (!process
                         ? "[Idle] "
-                        : (session.process.running
+                        : (process.running
                             ? "[Running] "
                             : "[Stopped] ")) 
                         + (session.config.name || session.config.command || "");
+                    
+                    if (process && process.running)
+                        tab.className.add("loading");
+                    else
+                        tab.className.remove("loading");
                 };
                     
                 session.show = function(v){ 
