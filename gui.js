@@ -143,14 +143,10 @@ define(function(require, module, exports) {
             }), c += 100, plugin);
             menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
             
-            menus.addItemByPath("Run/Run in Debug Mode", new ui.item({
-                type    : "check",
-                checked : "[{settings.model}::user/runconfig/@debug]"
-            }), c += 100, plugin);
-            menus.addItemByPath("Run/Enable Source Maps", new ui.item({
-                type    : "check",
-                checked : "[{settings.model}::project/debug/@sourcemaps]"
-            }), c += 100, plugin);
+            // menus.addItemByPath("Run/Enable Source Maps", new ui.item({
+            //     type    : "check",
+            //     checked : "[{settings.model}::project/debug/@sourcemaps]"
+            // }), c += 100, plugin);
             menus.addItemByPath("Run/Show Debugger at Break", new ui.item({
                 type    : "check",
                 checked : "[{settings.model}::user/debug/@autoshow]"
@@ -361,7 +357,7 @@ define(function(require, module, exports) {
                                 if (err)
                                     return; // Either the debugger is not found or paused
                             });
-                        })
+                        });
                     }
                 }
             }, plugin);
