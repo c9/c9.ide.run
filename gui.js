@@ -315,7 +315,12 @@ define(function(require, module, exports) {
                            path     : "user/runconfig/@saveallbeforerun",
                            position : 100
                         }
-                    },
+                    }
+                }
+            }, plugin);
+            
+            prefs.add({
+                "Project" : {
                     "Run Configurations" : {
                         position : 200,
                         "Run Configurations" : {
@@ -328,7 +333,9 @@ define(function(require, module, exports) {
                                 anchors    : "80 0 0 0",
                                 edge       : "10 10 10 10",
                                 childNodes : [
-                                    
+                                    new ui.label({
+                                        caption: "Coming Soon!"
+                                    })
                                 ]
                             })
                         }
