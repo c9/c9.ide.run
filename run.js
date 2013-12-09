@@ -552,8 +552,24 @@ define(function(require, module, exports) {
             }
             
             function cleanup(callback){
-                if (running < 1)
+                function finish(){
+                    pid     = 0;
+                    runner  = null;
+                    running = STOPPED;
+                    emit("stopped");
+                    
+                    callback && callback();
+                }
+                
+                if (running < 1) {
+                    setTimeout(function(){
+                        if (running != 0)
+                            finish();
+                        else
+                            callback && callback();
+                    }, 2000);
                     return;
+                }
     
                 if (running > 0) {
                     running = STOPPING;
@@ -561,14 +577,7 @@ define(function(require, module, exports) {
                 }
                 
                 fs.rmfile(PIDFILE, function(){
-                    fs.rmfile(WATCHFILE, function(){
-                        pid     = 0;
-                        runner  = null;
-                        running = STOPPED;
-                        emit("stopped");
-                        
-                        callback && callback();
-                    });
+                    fs.rmfile(WATCHFILE, finish);
                 });
             }
             
@@ -641,7 +650,7 @@ define(function(require, module, exports) {
                 return {
                     pid     : pid,
                     name    : procName,
-                    running : running,
+                    running : running >= 0 ? running : 0,
                     runner  : runner
                 };
             }
