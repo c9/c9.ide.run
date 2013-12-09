@@ -43,7 +43,7 @@ define(function(require, exports, module) {
         
         handle.on("load", function(){
             menus.addItemByPath("View/Output",
-              new apf.item({ command: "showoutput" }), 150, handle);
+              new ui.item({ command: "showoutput" }), 150, handle);
             
             commands.addCommand({
                 name    : "showoutput",
@@ -226,7 +226,7 @@ define(function(require, exports, module) {
                             return layout.showError(err);
                         }
                         
-                        session.process.debug = bDebug;
+                        session.process.meta.debug = bDebug;
                         
                         if (bDebug) {
                             debug.debug(session.process, function(err){
@@ -808,7 +808,7 @@ define(function(require, exports, module) {
                 
                 if (session.process && session.process.running) {
                     state.running = session.process.getState();
-                    state.running.debug = session.process.debug;
+                    state.running.debug = session.process.meta.debug;
                 }
             });
             
@@ -827,8 +827,8 @@ define(function(require, exports, module) {
                     transformButton(session);
                     
                     if (state.running.debug) {
-                        process.on("back", function(){
-                            debug.debug(process, true, function(err){
+                        session.process.on("back", function(){
+                            debug.debug(session.process, true, function(err){
                                 if (err)
                                     return; // Either the debugger is not found or paused
                             });
