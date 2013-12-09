@@ -807,7 +807,7 @@ define(function(require, exports, module) {
                 state.config  = session.config;
                 
                 if (session.process && session.process.running) {
-                    state.running = session.process.getState();
+                    state.running       = session.process.getState();
                     state.running.debug = session.process.meta.debug;
                 }
             });
@@ -827,6 +827,7 @@ define(function(require, exports, module) {
                     transformButton(session);
                     
                     if (state.running.debug) {
+                        session.process.meta.debug = true;
                         session.process.on("back", function(){
                             debug.debug(session.process, true, function(err){
                                 if (err)
