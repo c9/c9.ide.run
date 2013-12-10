@@ -425,7 +425,7 @@ define(function(require, exports, module) {
                     reloadModel();
                     saveConfig();
                     
-                    if (node.isNew)
+                    if (node.isNew && findNode(name))
                         datagrid.edit.startRename(findNode(name), 1);
                     else
                         model.selection.setSelection(findNode(name));
@@ -442,9 +442,11 @@ define(function(require, exports, module) {
                     if (!mnuEnv.visible) return;
                     
                     setTimeout(function(){
-                        mnuEnv.reopen = true;
-                        mnuEnv.display(null, null, true, mnuEnv.opener);
-                        mnuEnv.reopen = false;
+                        if (mnuEnv.opener) {
+                            mnuEnv.reopen = true;
+                            mnuEnv.display(null, null, true, mnuEnv.opener);
+                            mnuEnv.reopen = false;
+                        }
                     }, 10);
                 }
             }
