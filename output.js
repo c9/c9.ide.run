@@ -42,9 +42,6 @@ define(function(require, exports, module) {
         };
         
         handle.on("load", function(){
-            menus.addItemByPath("View/Output",
-              new ui.item({ command: "showoutput" }), 150, handle);
-            
             commands.addCommand({
                 name    : "showoutput",
                 group   : "Panels",
@@ -52,6 +49,9 @@ define(function(require, exports, module) {
                     if (!argv) argv = false;
                     var id  = argv.id;
                     var cmd = argv.config && argv.config.command;
+                    
+                    if (id === undefined)
+                        id = getOutputId();
                     
                     // Search for the output pane
                     if (search(id, cmd, argv)) return;
@@ -167,9 +167,15 @@ define(function(require, exports, module) {
             }
         }
         
+        function getOutputId(){
+            return "output" + Math.round(Math.random()*100000) + counter++;
+        }
+        
         handle.search = search;
         
         /***** Initialization *****/
+        
+        var counter = 0;
         
         function Output(){
             var plugin = new Terminal(true);
