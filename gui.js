@@ -32,7 +32,6 @@ define(function(require, module, exports) {
         var plugin  = new Plugin("Ajax.org", main.consumes);
         var emit    = plugin.getEmitter();
         
-        var counter = 0;
         var btnRun, lastRun, process, mnuRunCfg;
         
         var loaded = false;
@@ -247,9 +246,7 @@ define(function(require, module, exports) {
                 },
                 "onitemclick": function(e){
                     if (e.value == "new-run-config") {
-                        commands.exec("showoutput", null, {
-                            id : getOutputId()
-                        });
+                        commands.exec("showoutput", null, {});
                         return;
                     }
                     else if (e.value == "manage") {
@@ -455,10 +452,6 @@ define(function(require, module, exports) {
             return false;
         }
         
-        function getOutputId(){
-            return "output" + Math.round(Math.random()*100000) + counter++;
-        }
-        
         function openRunConfig(cfg){
             var found = false;
             tabs.getTabs().some(function(tab){
@@ -477,7 +470,6 @@ define(function(require, module, exports) {
             }
             
             commands.exec("showoutput", null, {
-                id     : getOutputId(),
                 run    : true,
                 config : cfg
             });
@@ -502,7 +494,6 @@ define(function(require, module, exports) {
                     // @todo use run config instead
                     
                     commands.exec("showoutput", null, {
-                        id     : getOutputId(),
                         runner : runner,
                         run    : true,
                         config : {

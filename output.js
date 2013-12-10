@@ -42,9 +42,6 @@ define(function(require, exports, module) {
         };
         
         handle.on("load", function(){
-            menus.addItemByPath("View/Output",
-              new apf.item({ command: "showoutput" }), 150, handle);
-            
             commands.addCommand({
                 name    : "showoutput",
                 group   : "Panels",
@@ -52,6 +49,9 @@ define(function(require, exports, module) {
                     if (!argv) argv = false;
                     var id  = argv.id;
                     var cmd = argv.config && argv.config.command;
+                    
+                    if (id === undefined)
+                        id = getOutputId();
                     
                     // Search for the output pane
                     if (search(id, cmd, argv)) return;
@@ -167,9 +167,15 @@ define(function(require, exports, module) {
             }
         }
         
+        function getOutputId(){
+            return "output" + Math.round(Math.random()*100000) + counter++;
+        }
+        
         handle.search = search;
         
         /***** Initialization *****/
+        
+        var counter = 0;
         
         function Output(){
             var plugin = new Terminal(true);
@@ -226,7 +232,7 @@ define(function(require, exports, module) {
                             return layout.showError(err);
                         }
                         
-                        session.process.debug = bDebug;
+                        session.process.meta.debug = bDebug;
                         
                         if (bDebug) {
                             debug.debug(session.process, function(err){
@@ -716,8 +722,8 @@ define(function(require, exports, module) {
                 session.updateTitle = function(){
                     var process = session.process;
                     
-                    tab.title   = 
-                    tab.tooltip = (!process
+                    doc.title   = 
+                    doc.tooltip = (!process
                         ? "[Idle] "
                         : (process.running
                             ? "[Running] "
@@ -809,8 +815,8 @@ define(function(require, exports, module) {
                 state.config  = session.config;
                 
                 if (session.process && session.process.running) {
-                    state.running = session.process.getState();
-                    state.running.debug = session.process.debug;
+                    state.running       = session.process.getState();
+                    state.running.debug = session.process.meta.debug;
                 }
             });
             
@@ -829,8 +835,9 @@ define(function(require, exports, module) {
                     transformButton(session);
                     
                     if (state.running.debug) {
-                        process.on("back", function(){
-                            debug.debug(process, true, function(err){
+                        session.process.meta.debug = true;
+                        session.process.on("back", function(){
+                            debug.debug(session.process, true, function(err){
                                 if (err)
                                     return; // Either the debugger is not found or paused
                             });
