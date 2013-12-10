@@ -18,7 +18,7 @@
 /*    opacity : 1;*/
 /*}*/
 
-.output .c9terminal .c9terminalcontainer.dark {
+.editor_tab .output .c9terminal .c9terminalcontainer.dark {
     .gradient(~"linear-gradient(top, rgba(0, 0, 0, 0.25) 0, rgba(0, 0, 0, 0.1) 28px, rgba(0, 0, 0, 0.29) 28px, rgba(0, 0, 0, 0.11) 36px, rgba(0, 0, 0, 0.01) 41px, transparent 43px);");
 }
 
