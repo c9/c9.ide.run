@@ -720,8 +720,8 @@ define(function(require, exports, module) {
                 session.updateTitle = function(){
                     var process = session.process;
                     
-                    tab.title   = 
-                    tab.tooltip = (!process
+                    doc.title   = 
+                    doc.tooltip = (!process
                         ? "[Idle] "
                         : (process.running
                             ? "[Running] "
