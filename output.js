@@ -698,7 +698,7 @@ define(function(require, exports, module) {
                         /\[exited\]\r/.test(data) ||
                         /Set option: remain-on-exit \-\> on/.test(data)
                     ) {
-                        tab.className.add("loading");
+                        tab.className.add("running");
                         return;
                     }
                     
@@ -713,7 +713,7 @@ define(function(require, exports, module) {
                               .replace(/Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
                               .replace(/Pane is dead/g, "[Process stopped]");
                         }
-                        tab.className.remove("loading");
+                        tab.className.remove("running");
                     }
                     
                     return data;
@@ -731,9 +731,9 @@ define(function(require, exports, module) {
                         + (session.config.name || session.config.command || "");
                     
                     if (process && process.running)
-                        tab.className.add("loading");
+                        tab.className.add("running");
                     else
-                        tab.className.remove("loading");
+                        tab.className.remove("running");
                 };
                     
                 session.show = function(v){ 
