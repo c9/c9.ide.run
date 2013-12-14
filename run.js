@@ -327,7 +327,7 @@ define(function(require, module, exports) {
                 // @todo deal with escaped double quotes 
                 var args = [
                     TMUX, "kill-session", "-t", procName, ";",
-                    TMUX, "new", "-s", procName, '"' + cmd.replace(/"/g, '\\"') + '"',
+                    TMUX, "new", "-s", bashQuoute(cmd),
                     "\\;", "set-option", "-g", "status", "off",
                     "\\;", "set-option", "destroy-unattached", "off",
                     //"\\;", "set-option", "mouse-resize-pane", "on",
@@ -543,6 +543,7 @@ define(function(require, module, exports) {
                                 });
                         }
                         
+                        // TODO quotes
                         // Assume just a name
                         return nchar + getVariable(nacco, options.path, options.args);
                     }
@@ -771,6 +772,10 @@ define(function(require, module, exports) {
                 checkState();
             
             return plugin;
+        }
+        
+        function bashQuoute(str) {
+            return "'" + str.replace(/'/g, "'\\''") + "'";
         }
         
         /***** Lifecycle *****/
