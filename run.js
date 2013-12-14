@@ -327,7 +327,7 @@ define(function(require, module, exports) {
                 // @todo deal with escaped double quotes 
                 var args = [
                     TMUX, "kill-session", "-t", procName, ";",
-                    TMUX, "new", "-s", bashQuoute(cmd),
+                    TMUX, "new", "-s", procName, bashQuoute(cmd),
                     "\\;", "set-option", "-g", "status", "off",
                     "\\;", "set-option", "destroy-unattached", "off",
                     //"\\;", "set-option", "mouse-resize-pane", "on",
