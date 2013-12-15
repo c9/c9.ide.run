@@ -577,6 +577,9 @@ define(function(require, exports, module) {
                     if (currentSession) {
                         currentSession.config.command = e.value;
                         saveConfig();
+                        
+                        if (!currentSession.runner)
+                            updateRunner(currentSession);
                     }
                 });
                 tbName.on("afterchange", function(e){
