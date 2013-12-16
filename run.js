@@ -326,8 +326,9 @@ define(function(require, module, exports) {
                 
                 // @todo deal with escaped double quotes 
                 var args = [
+                    "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.c9/local/lib", ";",
                     TMUX, "kill-session", "-t", procName, ";",
-                    TMUX, "new", "-s", procName, bashQuoute(cmd),
+                    TMUX, "new", "-s", procName, bashQuote(cmd),
                     "\\;", "set-option", "-g", "status", "off",
                     "\\;", "set-option", "destroy-unattached", "off",
                     //"\\;", "set-option", "mouse-resize-pane", "on",
@@ -774,7 +775,7 @@ define(function(require, module, exports) {
             return plugin;
         }
         
-        function bashQuoute(str) {
+        function bashQuote(str) {
             return "'" + str.replace(/'/g, "'\\''") + "'";
         }
         
