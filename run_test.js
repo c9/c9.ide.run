@@ -100,7 +100,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 "commands", "menus", "layout", "watcher", 
                 "save", "preferences", "anims", "clipboard",
                 
-                "auth.bootstrap", "dialog.alert", "dialog.question", "dialog.filesave", "dialog.fileoverwrite"
+                "auth.bootstrap", "info", "dialog.alert", "dialog.question", 
+                "dialog.filesave", "dialog.fileoverwrite"
             ],
             setup    : expect.html.mocked
         },
@@ -113,7 +114,6 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
     
     function main(options, imports, register) {
         var run      = imports.run;
-        var proc     = imports.proc;
         var fs       = imports.fs;
         var tabs     = imports.tabManager;
         var cnsl     = imports.console;

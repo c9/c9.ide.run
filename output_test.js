@@ -78,7 +78,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             consumes : ["apf", "ui", "Plugin"],
             provides : [
                 "commands", "menus", "commands", "layout", "watcher", 
-                "save", "anims", "clipboard", "dialog.alert", "auth.bootstrap"
+                "save", "anims", "clipboard", "dialog.alert", "auth.bootstrap",
+                "info"
             ],
             setup    : expect.html.mocked
         },
