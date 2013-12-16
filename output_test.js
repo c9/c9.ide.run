@@ -34,6 +34,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.ide.editors/editors",
         "plugins/c9.ide.editors/editor",
         "plugins/c9.ide.editors/tabmanager",
+        "plugins/c9.ide.ui/focus",
         {
             packagePath: "plugins/c9.ide.console/console",
             testing : 2
