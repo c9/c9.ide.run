@@ -24,7 +24,6 @@ define(function(require, module, exports) {
         var prefs       = imports.preferences;
         var ace         = imports.ace;
         
-        var cssString = require("text!./style.css");
         var basename  = require("path").basename;
         
         /***** Initialization *****/
@@ -418,9 +417,6 @@ define(function(require, module, exports) {
             if (drawn) return;
             drawn = true;
     
-            // Import CSS
-            ui.insertCss(cssString, plugin);
-            
             // Menus
             btnRun = ui.insertByIndex(layout.findParent(plugin), 
               new ui.button({

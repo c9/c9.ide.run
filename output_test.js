@@ -80,12 +80,12 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             provides : [
                 "commands", "menus", "commands", "layout", "watcher", 
                 "save", "anims", "clipboard", "dialog.alert", "auth.bootstrap",
-                "info"
+                "info", "debugger", "dialog.question", "run.gui"
             ],
             setup    : expect.html.mocked
         },
         {
-            consumes : ["tabManager", "proc", "output", "fs"],
+            consumes : ["tabManager", "proc", "output", "fs", "ext"],
             provides : [],
             setup    : main
         }
@@ -95,6 +95,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         var tabs     = imports.tabManager;
         var output   = imports.output;
         var fs       = imports.fs;
+        var ext      = imports.ext;
         
         expect.html.setConstructor(function(tab){
             if (typeof tab == "object")
@@ -105,7 +106,6 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             before(function(done){
                 apf.config.setProperty("allow-select", false);
                 apf.config.setProperty("allow-blur", false);
-                tabs.getPanes()[0].focus();
                 
                 bar.$ext.style.background = "rgba(220, 220, 220, 0.93)";
                 bar.$ext.style.position = "fixed";
@@ -115,7 +115,10 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 bar.$ext.style.height = "33%";
       
                 document.body.style.marginBottom = "33%";
-                done();
+                tabs.on("ready", function(){
+                    tabs.getPanes()[0].focus();
+                    done();
+                })
             });
             
             this.timeout(10000);
@@ -131,13 +134,13 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         document   : {
                             title : "Output",
                             output : {
-                                id : "output",
-                                run : {
-                                    runner  : "auto",
-                                    options : {
-                                        path : "/helloworld.js"
-                                    }
-                                }
+                                id: "testoutput",
+                                config : {
+                                    command : "/helloworld.js",
+                                    debug: false
+                                },
+                                runner : "auto",
+                                run    : true
                             }
                         }
                         
@@ -145,7 +148,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         var ace = tabs.focussedTab.editor.ace;
                         ace.session.term.once('afterWrite', function(){
                             ace.renderer.on('afterRender', function(){
-                                if (tab.className.names.indexOf("loading") == -1
+                                if (tab.className.names.indexOf("running") == -1
                                   && ace.getValue().match(/Hello\s*World/)) {
                                     expect.html(ace.container).text(/Hello\s*World/);
                                     done();
@@ -158,8 +161,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             
             if (!onload.remain){
                 after(function(done){
-                    tabs.unload();
-                    output.unload();
+                    ext.unloadAllPlugins();
                     
                     document.body.style.marginBottom = "";
                     done();

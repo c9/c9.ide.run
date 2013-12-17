@@ -42,6 +42,9 @@ define(function(require, exports, module) {
         };
         
         handle.on("load", function(){
+            // Import CSS
+            ui.insertCss(require("text!./style.css"), handle);
+            
             commands.addCommand({
                 name    : "showoutput",
                 group   : "Panels",
