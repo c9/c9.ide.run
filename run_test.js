@@ -16,7 +16,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             local       : false,
             hostname    : "dev.javruben.c9.io",
             davPrefix   : "/",
-            platform    : navigator.appVersion.indexOf("Mac OS X") > -1 ? "darwin" : "linux"
+            platform    : "linux" //"darwin"
         },
         
         "plugins/c9.core/ext",
@@ -31,7 +31,12 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                     {
                         type : "tab",
                         editorType : "output",
-                        document : { title : "Output" },
+                        document : { 
+                            title : "Output",
+                            "output" : {
+                                id : "testoutput1"
+                            }
+                        },
                         active : "true"
                     },
                     {
@@ -40,7 +45,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         document : {
                             title : "Output2",
                             "output" : {
-                                id : "output2"
+                                id : "testoutput2"
                             }
                         }
                     }
@@ -102,7 +107,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 "save", "preferences", "anims", "clipboard",
                 
                 "auth.bootstrap", "info", "dialog.alert", "dialog.question", 
-                "dialog.filesave", "dialog.fileoverwrite"
+                "dialog.filesave", "dialog.fileoverwrite", "run.gui", "debugger"
             ],
             setup    : expect.html.mocked
         },
@@ -204,7 +209,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             
                             var process = run.run(runner, {
                                 path: "/helloworld.js"
-                            }, function(err, pid){
+                            }, "testoutput1", function(err, pid){
                                 if (err) throw err.message;
 
                                 expect(parseInt(pid, 10)).to.ok;
@@ -257,7 +262,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             
                             var process = run.run(runner, {
                                 path: "/helloworld.js"
-                            }, function(err, pid){
+                            }, "testoutput1", function(err, pid){
                                 if (err) throw err.message;
                                 
                                 expect(parseInt(pid, 10), "Invalid PID").to.ok.to.gt(0);
@@ -305,7 +310,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         
                         expect(runner).to.ok;
                         
-                        var process = run.run(runner, {}, "output2", function(err, pid){
+                        var process = run.run(runner, {}, "testoutput2", function(err, pid){
                             if (err) throw err.message;
                             
                             expect(parseInt(pid, 10)).to.ok.to.gt(0);
@@ -333,7 +338,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             process.off("stopping", c2);
                             process.off("stopped", c1);
                             
-                            waitForOutput(/Python/, function(){
+                            waitForOutput(/copyright/, function(){
                                 count++;
                                 countEvents(count, 3, done);
                             });
@@ -360,7 +365,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             if (err) throw err.message;
                             var process = run.run("auto", {
                                 path: "/helloworld.js"
-                            }, "output2", function(err, pid){
+                            }, "testoutput2", function(err, pid){
                                 if (err) throw err.message;
 
                                 expect(parseInt(pid, 10))
