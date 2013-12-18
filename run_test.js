@@ -52,7 +52,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 ]
             }) + "</console></state></settings>"
         },
-        "plugins/c9.ide.api/api.js",
+        "plugins/c9.core/api.js",
         {
             packagePath  : "plugins/c9.ide.ui/ui",
             staticPrefix : "plugins/c9.ide.ui"
