@@ -142,7 +142,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         var maxTries = 3, retries = 0;
         function waitForOutput(match, callback){
             setTimeout(function(){
-                if (retries < maxTries && !getHtmlElement(tabs.focussedTab).innerText.match(match)) {
+                if (retries < maxTries && !getHtmlElement(tabs.focussedTab).textContent.match(match)) {
                     retries++;
                     return waitForOutput(match, callback);
                 }
