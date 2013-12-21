@@ -24,7 +24,8 @@ define(function(require, module, exports) {
         var prefs       = imports.preferences;
         var ace         = imports.ace;
         
-        var basename  = require("path").basename;
+        var basename    = require("path").basename;
+        var uCaseFirst  = require("c9/string").uCaseFirst;
         
         /***** Initialization *****/
         
@@ -170,7 +171,7 @@ define(function(require, module, exports) {
                             var c = 300;
                             names.forEach(function(name){
                                 menus.addItemToMenu(mnuRunAs, new ui.item({
-                                    caption  : name.uCaseFirst(),
+                                    caption  : uCaseFirst(name),
                                     value    : name
                                 }), c++, plugin);
                             });
