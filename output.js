@@ -123,7 +123,7 @@ define(function(require, exports, module) {
                     settings.set("user/terminal/@foregroundColor", defaults[skin][1]);
                     settings.set("user/terminal/@selectionColor", defaults[skin][2]);
                 }
-            });
+            }, handle);
             
             // Settings UI
             
