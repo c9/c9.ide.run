@@ -37,7 +37,7 @@ define(function(require, exports, module) {
         var handleEmit = handle.getEmitter();
         
         var defaults = {
-            "white" : ["#F8F8F8", "#333333", "#89c1ff", false], 
+            "light" : ["#F8F8F8", "#333333", "#89c1ff", false], 
             "dark"  : ["#003a58", "#FFFFFF", "#225477", true]
         };
         
@@ -115,6 +115,15 @@ define(function(require, exports, module) {
             }, handle);
 
             settings.on("user/output", setSettings);
+            
+            layout.on("themeChange", function(e){
+                if (e.defaults) {
+                    var skin = e.theme;
+                    settings.set("user/terminal/@backgroundColor", defaults[skin][0]);
+                    settings.set("user/terminal/@foregroundColor", defaults[skin][1]);
+                    settings.set("user/terminal/@selectionColor", defaults[skin][2]);
+                }
+            });
             
             // Settings UI
             
