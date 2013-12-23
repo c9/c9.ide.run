@@ -119,9 +119,9 @@ define(function(require, exports, module) {
             layout.on("themeChange", function(e){
                 if (e.defaults) {
                     var skin = e.theme;
-                    settings.set("user/terminal/@backgroundColor", defaults[skin][0]);
-                    settings.set("user/terminal/@foregroundColor", defaults[skin][1]);
-                    settings.set("user/terminal/@selectionColor", defaults[skin][2]);
+                    settings.set("user/output/@backgroundColor", defaults[skin][0]);
+                    settings.set("user/output/@foregroundColor", defaults[skin][1]);
+                    settings.set("user/output/@selectionColor", defaults[skin][2]);
                 }
             }, handle);
             
