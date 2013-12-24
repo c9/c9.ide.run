@@ -615,6 +615,9 @@ define(function(require, module, exports) {
                     }
                     return;
                 }
+                
+                running = STOPPING;
+                emit("stopping");
     
                 // Kill the pty session
                 proc.execFile("kill", {args:[pid]}, function(err, e){

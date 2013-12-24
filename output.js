@@ -192,7 +192,7 @@ define(function(require, exports, module) {
         function Output(){
             var plugin = new Terminal(true);
             
-            var btnRun, currentSession, btnRunner, btnDebug;
+            var btnRun, currentSession, btnRunner, btnDebug, btnRestart;
             var tbName, tbCommand, btnEnv;
             
             /***** Methods *****/
@@ -295,6 +295,8 @@ define(function(require, exports, module) {
                     btnRun.setAttribute("tooltip", "");
                     btnRun.setAttribute("class", "running");
                     btnRun.enable();
+                    
+                    btnRestart.show();
                 }
                 else {
                     var path = (tbCommand.value || "").split(" ", 1)[0];
@@ -302,6 +304,8 @@ define(function(require, exports, module) {
                     btnRun.setAttribute("icon", "run.png");
                     btnRun.setAttribute("caption", "Run");
                     btnRun.setAttribute("class", "stopped");
+                    
+                    btnRestart.hide();
                     
                     return path;
                 }
@@ -560,12 +564,13 @@ define(function(require, exports, module) {
                 e.htmlNode.className += " output";
                 
                 // Decorate UI
-                btnRun    = plugin.getElement("btnRun");
-                btnDebug  = plugin.getElement("btnDebug");
-                btnRunner = plugin.getElement("btnRunner");
-                tbCommand = plugin.getElement("tbCommand");
-                tbName    = plugin.getElement("tbName");
-                btnEnv    = plugin.getElement("btnEnv");
+                btnRun     = plugin.getElement("btnRun");
+                btnRestart = plugin.getElement("btnRestart");
+                btnDebug   = plugin.getElement("btnDebug");
+                btnRunner  = plugin.getElement("btnRunner");
+                tbCommand  = plugin.getElement("tbCommand");
+                tbName     = plugin.getElement("tbName");
+                btnEnv     = plugin.getElement("btnEnv");
                 
                 btnRun.on("click", function(){
                     var session = currentSession;
@@ -577,6 +582,14 @@ define(function(require, exports, module) {
                     else {
                         runNow(session);
                     }
+                });
+                
+                btnRestart.on("click", function(){
+                    var session = currentSession;
+                    if (!session) return;
+                    
+                    if (session.process && session.process.running > 0)
+                        stop(function(){ runNow(session); });
                 });
                 
                 btnDebug.on("prop.value", function(e){
@@ -730,7 +743,7 @@ define(function(require, exports, module) {
                         }
                         tab.className.remove("running");
                         
-                        if (session.process && session.process.running)
+                        if (session.process && session.process.running > 0)
                             session.process.checkState();
                     }
                     
