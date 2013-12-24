@@ -729,6 +729,9 @@ define(function(require, exports, module) {
                               .replace(/Pane is dead/g, "[Process stopped]");
                         }
                         tab.className.remove("running");
+                        
+                        if (session.process && session.process.running)
+                            session.process.checkState();
                     }
                     
                     return data;

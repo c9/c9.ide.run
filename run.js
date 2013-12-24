@@ -634,16 +634,17 @@ define(function(require, module, exports) {
             }
             
             function checkState(){
-                // Check the watch file
-                fs.readFile(WATCHFILE, function(err, data) {
-                    // Process is running
-                    if (!err && data && data.trim().length) {
-                        monitor(function(){ emit("back"); }, function(){});
-                        return;
+                if (!running) return;
+                
+                var originalPid = pid;
+                track(function(err, pid){
+                    // Process has exited
+                    if (err || pid == -1 || pid != originalPid) {
+                        cleanup();
                     }
-                    
-                    // Process is stopped
-                    cleanup();
+                    else {
+                        monitor(function(){ emit("back"); }, function(){});
+                    }
                 });
             }
             
@@ -749,6 +750,11 @@ define(function(require, module, exports) {
                  * @return {Object}
                  */
                 getState : getState,
+                
+                /**
+                 * Validates whether the process is still running
+                 */
+                checkState : checkState,
                 
                 /**
                  * Detach from the currently running process. This is only 
