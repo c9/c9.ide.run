@@ -265,21 +265,28 @@ define(function(require, exports, module) {
             
             function decorateProcess(session){
                 session.process.on("away", function(){
-                    if (session == currentSession)
+                    if (session == currentSession) {
                         btnRun.disable();
+                        btnRestart.disable();
+                    }
                 });
                 session.process.on("back", function(){
-                    if (session == currentSession)
+                    if (session == currentSession) {
                         btnRun.enable();
+                        btnRestart.enable();
+                    }
                 });
                 session.process.on("stopping", function(){
-                    if (session == currentSession)
+                    if (session == currentSession) {
                         btnRun.disable();
+                        btnRestart.disable();
+                    }
                     session.updateTitle();
                 }, plugin);
                 session.process.on("stopped", function(){
                     if (session == currentSession) {
                         btnRun.enable();
+                        btnRestart.enable();
                         transformButton(session);
                     }
                     session.updateTitle();
@@ -297,6 +304,7 @@ define(function(require, exports, module) {
                     btnRun.enable();
                     
                     btnRestart.show();
+                    btnRestart.enable();
                 }
                 else {
                     var path = (tbCommand.value || "").split(" ", 1)[0];
