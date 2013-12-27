@@ -751,7 +751,7 @@ define(function(require, exports, module) {
                         }
                         tab.className.remove("running");
                         
-                        if (session.process && session.process.running > 0)
+                        if (session.process && session.process.running > 1)
                             session.process.checkState();
                     }
                     
