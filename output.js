@@ -734,7 +734,8 @@ define(function(require, exports, module) {
                         /\[exited\]\r/.test(data) ||
                         /Set option: remain-on-exit \-\> on/.test(data)
                     ) {
-                        tab.className.add("running");
+                        tab.className.add(session.process 
+                            && session.process.running > 0 ? "running" : "loading");
                         return;
                     }
                     
@@ -749,7 +750,8 @@ define(function(require, exports, module) {
                               .replace(/Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
                               .replace(/Pane is dead/g, "[Process stopped]");
                         }
-                        tab.className.remove("running");
+                        tab.className.remove(session.process 
+                            && session.process.running > 0 ? "running" : "loading");
                         
                         if (session.process && session.process.running > 1)
                             session.process.checkState();
