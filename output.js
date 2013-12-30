@@ -215,8 +215,10 @@ define(function(require, exports, module) {
                 else
                     term.reset();
                 
-                var path = tbCommand.value || session.config.command;
-                var args = path.split(" ");
+                var path   = tbCommand.value || session.config.command;
+                var bDebug = btnDebug.value;
+                var args   = path.split(" ");
+                
                 path = args.shift();
                 
                 if (session.process && session.process.running)
@@ -225,11 +227,15 @@ define(function(require, exports, module) {
                     done();
                 
                 function done(){
+                    if (bDebug)
+                        debug.checkAttached(start);
+                    else
+                        start();
+                }
+                
+                function start(){
                     if (!runner)
                         runner = "auto";
-                    
-                    var bDebug = btnDebug.value;
-                    // settings.getBool("user/runconfig/@debug");
                     
                     session.process = run.run(runner, {
                         path  : path,

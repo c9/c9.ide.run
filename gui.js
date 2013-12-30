@@ -503,31 +503,37 @@ define(function(require, module, exports) {
                 }
                 
                 var bDebug = settings.getBool("user/runconfig/@debug");
+                if (bDebug)
+                    debug.checkAttached(start);
+                else
+                    start();
                 
-                process = run.run(runner, {
-                    path  : path,
-                    debug : bDebug
-                }, function(err, pid){
-                    if (err) {
-                        transformButton();
-                        process = null;
-                        return layout.showError(err);
-                    }
+                function start(){
+                    process = run.run(runner, {
+                        path  : path,
+                        debug : bDebug
+                    }, function(err, pid){
+                        if (err) {
+                            transformButton();
+                            process = null;
+                            return layout.showError(err);
+                        }
+                        
+                        var state = process.getState();
+                        state.debug = bDebug;
+                        settings.setJson("state/run/process", state);
+                        
+                        if (bDebug) {
+                            debug.debug(process, function(err){
+                                if (err)
+                                    return; // Either the debugger is not found or paused
+                            });
+                        }
+                    });
                     
-                    var state = process.getState();
-                    state.debug = bDebug;
-                    settings.setJson("state/run/process", state);
-                    
-                    if (bDebug) {
-                        debug.debug(process, function(err){
-                            if (err)
-                                return; // Either the debugger is not found or paused
-                        });
-                    }
-                });
-                
-                decorateProcess();
-                transformButton("stop");
+                    decorateProcess();
+                    transformButton("stop");
+                }
             }
             
             lastRun = [runner, path];
