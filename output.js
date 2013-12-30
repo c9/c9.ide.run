@@ -682,6 +682,10 @@ define(function(require, exports, module) {
                     
                     mnuEnv.resize();
                 });
+                
+                c9.on("stateChange", function(){
+                    updateToolbar(currentSession);
+                }, plugin);
             });
             
             plugin.on("documentLoad", function(e){
