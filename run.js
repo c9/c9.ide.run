@@ -636,17 +636,24 @@ define(function(require, module, exports) {
                 });
             }
             
+            var checking;
             function checkState(){
-                if (!running) return;
+                if (!running || checking) return;
+                
+                checking = true;
                 
                 var originalPid = pid;
                 track(function(err, pid){
                     // Process has exited
                     if (err || pid == -1 || pid != originalPid) {
-                        cleanup();
+                        cleanup(function(){
+                            checking = false;
+                        });
                     }
                     else {
-                        monitor(function(){ emit("back"); }, function(){});
+                        monitor(function(){ emit("back"); }, function(){
+                            checking = false;
+                        });
                     }
                 });
             }
