@@ -272,9 +272,9 @@ define(function(require, module, exports) {
             menus.addItemByPath("Run/Run Configurations/New Run Configuration", new ui.item({
                 value : "new-run-config"
             }), c += 100, plugin);
-            menus.addItemByPath("Run/Run Configurations/Manage...", new ui.item({
-                value : "manage"
-            }), c += 100, plugin);
+            // menus.addItemByPath("Run/Run Configurations/Manage...", new ui.item({
+            //     value : "manage"
+            // }), c += 100, plugin);
             
             c = 0;
             menus.addItemByPath("Run/Run With/~", new ui.divider(), c += 1000, plugin);
