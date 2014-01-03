@@ -139,7 +139,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                     + count + " of " + expected);
         }
         
-        var maxTries = 10, retries = 0;
+        var maxTries = 15, retries = 0;
         function waitForOutput(match, callback){
             setTimeout(function(){
                 if (retries < maxTries && !getHtmlElement(tabs.focussedTab).textContent.match(match)) {
@@ -226,7 +226,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             process.on("stopping", c2);
                             
                             process.on("stopped", function c1(){
-                                setTimeout(function(){
+                                waitForOutput(/Hello\sWorld/, function(){
                                     expect(process.running).is.equal(run.STOPPED);
                                     expect(foundPid, "found-pid").to.ok;
                                     
@@ -235,12 +235,10 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                     process.off("stopped", c1);
                                     count++;
                                     
-                                    waitForOutput(/Hello\sWorld/, function(){
-                                        fs.rmfile("/helloworld.js", function(){
-                                            countEvents(count, 3, done);
-                                        });
+                                    fs.rmfile("/helloworld.js", function(){
+                                        countEvents(count, 3, done);
                                     });
-                                }, 500);
+                                });
                             });
                             
                             //expect(process.running).to.equal(run.STOPPED);
@@ -269,11 +267,13 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 expect(parseInt(pid, 10), "Invalid PID").to.ok.to.gt(0);
                                 expect(process.running).to.equal(run.STARTED);
                                 
-                                setTimeout(function(){
+                                // setTimeout(function(){
+                                waitForOutput(/Hello\sWorld[\s\S]*Hello\sWorld/, function(){
                                     process.stop(function(err, e){
                                         if (err) throw err.message;
                                     });
-                                }, 4000);
+                                });
+                                // }, 4000);
                             });
                             
                             expect(process.running).to.equal(run.STARTING);
@@ -290,10 +290,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 process.off("stopped", c1);
                                 count++;
                                 
-                                waitForOutput(/Hello\sWorld[\s\S]*Hello\sWorld/, function(){
-                                    fs.rmfile("/helloworld.js", function(){
-                                        countEvents(count, 3, done);
-                                    });
+                                fs.rmfile("/helloworld.js", function(){
+                                    countEvents(count, 3, done);
                                 });
                             });
                         });
@@ -317,7 +315,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             expect(parseInt(pid, 10)).to.ok.to.gt(0);
                             expect(process.running).to.equal(run.STARTED);
                             
-                            setTimeout(function(){
+                            waitForOutput(/copyright/, function(){
                                 var output = outputTab2.editor;
                                 
                                 output.write("print 1\n");
@@ -325,7 +323,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 setTimeout(function(){
                                     output.write(String.fromCharCode(4));
                                 }, 1000);
-                            }, 1000);
+                            });
                         });
                         
                         function c2(){ count++; }
@@ -339,10 +337,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             process.off("stopping", c2);
                             process.off("stopped", c1);
                             
-                            waitForOutput(/copyright/, function(){
-                                count++;
-                                countEvents(count, 3, done);
-                            });
+                            count++;
+                            countEvents(count, 3, done);
                         });
                         
                         expect(process.running).to.equal(run.STARTING);
@@ -383,7 +379,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             process.on("stopping", c2);
                             
                             process.on("stopped", function c1(){
-                                setTimeout(function(){
+                                waitForOutput(/Hello\sWorld/, function(){
                                     expect(process.running).is.equal(run.STOPPED);
                                     expect(foundPid, "found-pid").to.ok;
                                     
@@ -392,10 +388,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                     process.off("stopped", c1);
                                     count++;
     
-                                    waitForOutput(/Hello\sWorld/, function(){
-                                        fs.rmfile("/helloworld.js", function(){
-                                            countEvents(count, 3, done);
-                                        });
+                                    fs.rmfile("/helloworld.js", function(){
+                                        countEvents(count, 3, done);
                                     });
                                 });
                             });
