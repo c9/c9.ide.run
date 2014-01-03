@@ -273,7 +273,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                     process.stop(function(err, e){
                                         if (err) throw err.message;
                                     });
-                                }, 1000);
+                                }, 4000);
                             });
                             
                             expect(process.running).to.equal(run.STARTING);
