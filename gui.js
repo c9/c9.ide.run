@@ -2,7 +2,7 @@ define(function(require, module, exports) {
     main.consumes = [
         "c9", "Plugin", "run", "settings", "menus", "tabbehavior", "ace", 
         "commands", "layout", "tabManager", "preferences", "ui", "fs", 
-        "layout", "debugger", "tree"
+        "layout", "debugger", "tree", "dialog.error"
     ];
     main.provides = ["run.gui"];
     return main;
@@ -23,6 +23,7 @@ define(function(require, module, exports) {
         var debug       = imports.debugger;
         var prefs       = imports.preferences;
         var ace         = imports.ace;
+        var showError   = imports["dialog.error"].show;
         
         var basename    = require("path").basename;
         var uCaseFirst  = require("c9/string").uCaseFirst;
@@ -217,7 +218,7 @@ define(function(require, module, exports) {
                     
                     run.getRunner(e.value, function(err, runner){
                         if (err)
-                            return layout.showError(err);
+                            return showError(err);
                         
                         runNow(runner);
                     });
@@ -516,7 +517,7 @@ define(function(require, module, exports) {
                         if (err) {
                             transformButton();
                             process = null;
-                            return layout.showError(err);
+                            return showError(err);
                         }
                         
                         var state = process.getState();
@@ -617,7 +618,7 @@ define(function(require, module, exports) {
             if (process)
                 process.stop(function(err){
                     if (err) {
-                        layout.showError(err.message || err);
+                        showError(err.message || err);
                         transformButton();
                     }
                     
