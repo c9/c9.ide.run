@@ -37,7 +37,7 @@ define(function(require, exports, module) {
         var handleEmit = handle.getEmitter();
         
         var defaults = {
-            "light" : ["#F8F8F8", "#333333", "#89c1ff", false], 
+            "light" : ["#eef7ff", "#333333", "#89c1ff", false], 
             "dark"  : ["#003a58", "#FFFFFF", "#225477", true]
         };
         
