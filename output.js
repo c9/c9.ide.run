@@ -1,31 +1,32 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "Editor", "editors", "util", "commands", "menus", "terminal",
+        "Editor", "editors", "util", "commands", "terminal",
         "settings", "ui", "proc", "tabManager", "run", "console", "run.gui",
-        "layout", "debugger", "settings", "dialog.question", "c9", "preferences"
+        "layout", "debugger", "settings", "dialog.question", "c9", "preferences",
+        "dialog.error"
     ];
     main.provides = ["output"];
     return main;
     
     function main(options, imports, register) {
-        var editors  = imports.editors;
-        var ui       = imports.ui;
-        var c9       = imports.c9;
-        var commands = imports.commands;
-        var console  = imports.console;
-        var menus    = imports.menus;
-        var layout   = imports.layout;
-        var tabs     = imports.tabManager;
-        var util     = imports.util;
-        var run      = imports.run;
-        var prefs    = imports.preferences;
-        var runGui   = imports["run.gui"];
-        var question = imports["dialog.question"];
-        var Terminal = imports.terminal.Terminal;
-        var debug    = imports.debugger;
-        var settings = imports.settings;
+        var editors   = imports.editors;
+        var ui        = imports.ui;
+        var c9        = imports.c9;
+        var commands  = imports.commands;
+        var console   = imports.console;
+        var layout    = imports.layout;
+        var tabs      = imports.tabManager;
+        var util      = imports.util;
+        var run       = imports.run;
+        var prefs     = imports.preferences;
+        var runGui    = imports["run.gui"];
+        var question  = imports["dialog.question"];
+        var showError = imports["dialog.error"].show;
+        var Terminal  = imports.terminal.Terminal;
+        var debug     = imports.debugger;
+        var settings  = imports.settings;
         
-        var markup   = require("text!./output.xml");
+        var markup    = require("text!./output.xml");
         
         var keys       = require("ace/lib/keys");
         var Tree       = require("ace_tree/tree");
@@ -247,7 +248,7 @@ define(function(require, exports, module) {
                         if (err) {
                             transformButton(session);
                             session.process = null;
-                            return layout.showError(err);
+                            return showError(err);
                         }
                         
                         session.process.meta.debug = bDebug;
@@ -333,7 +334,7 @@ define(function(require, exports, module) {
                 if (process)
                     process.stop(function(err){
                         if (err) {
-                            layout.showError(err.message || err);
+                            showError(err.message || err);
                         }
                         else {
                             debug.stop();
@@ -652,7 +653,7 @@ define(function(require, exports, module) {
                     // Start this run config with the new runner
                     run.getRunner(value, function(err, result){
                         if (err)
-                            return layout.showError(err);
+                            return showError(err);
                         
                         currentSession.setRunner(result);
                     });
