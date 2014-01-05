@@ -1,6 +1,6 @@
 define(function(require, module, exports) {
     main.consumes = [
-        "Plugin", "proc", "settings", "fs", "c9", "util",
+        "Plugin", "proc", "settings", "fs", "c9", "util", "http",
         "tabManager", "preferences" //@todo move tabs and preferences to the ui part of run
     ];
     main.provides = ["run"];
@@ -11,6 +11,7 @@ define(function(require, module, exports) {
         var settings    = imports.settings;
         var prefs       = imports.preferences;
         var proc        = imports.proc;
+        var http        = imports.http;
         var util        = imports.util;
         var tabs        = imports.tabManager;
         var fs          = imports.fs;
@@ -30,8 +31,9 @@ define(function(require, module, exports) {
         var STARTING = 1;
         var STARTED  = 2;
         
-        var TMUX = options.tmux || "~/.c9/bin/tmux";
-        var BASH = "bash";
+        var STATIC = options.staticPrefix;
+        var TMUX   = options.tmux || "~/.c9/bin/tmux";
+        var BASH   = "bash";
         
         var runners   = options.runners;
         var testing   = options.testing;
@@ -309,13 +311,18 @@ define(function(require, module, exports) {
                     cwd  : options.cwd || runner[0].working_dir 
                         || options.path && dirname(options.path) || "/"
                 }, function(err, pty){
-                    // If error - install run.sh - retry
                     if (err) {
-                        debugger;
-                        if (err.code == "ENOENT") {
-                            // @todo install run.sh
-                            return;
-                        }
+                        // If error - install run.sh - retry
+                        if (err.code == "ENOENT")
+                            return installRunSH(function(err){
+                                if (err) 
+                                    return callback(err);
+                                
+                                // Reset state to be able to reenter
+                                running = STOPPED;
+                                
+                                run(srunner, options, callback);
+                            });
                         
                         return callback(err);
                     }
@@ -339,6 +346,7 @@ define(function(require, module, exports) {
                     // Else if detached
                     else {
                         var fail = function(){ 
+                            cleanup();
                             callback(new Error("Unspecified Error"));
                         };
                         
@@ -364,6 +372,21 @@ define(function(require, module, exports) {
                         });
                         pty.on("exit", fail);
                     }
+                });
+            }
+            
+            function installRunSH(retry){
+                http.request(STATIC + "/run.sh", function(err, data){
+                    if (err) return retry(err);
+                    
+                    fs.writeFile("~/.c9/bin/run.sh", data, function(err){
+                        if (err) 
+                            return retry(err);
+                        
+                        proc.execFile(BASH, { args: ["-c", "chmod +x ~/.c9/bin/run.sh"] }, function(err){
+                            retry(err);
+                        });
+                    });
                 });
             }
             
