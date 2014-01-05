@@ -309,7 +309,8 @@ define(function(require, module, exports) {
                     cols : 100,
                     rows : 5,
                     cwd  : options.cwd || runner[0].working_dir 
-                        || options.path && dirname(options.path) || "/"
+                        || options.path && dirname(options.path) || "/",
+                    validatePath : true
                 }, function(err, pty){
                     if (err) {
                         // If error - install run.sh - retry
