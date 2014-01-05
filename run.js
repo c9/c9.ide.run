@@ -600,10 +600,11 @@ define(function(require, module, exports) {
                 proc.execFile("~/.c9/bin/run.sh", {
                     args : ["pid", procName]
                 }, function(err, stdout, stderr){
-                    if (stdout == -1)
-                        pid = stdout;
-                    else if (stdout)
-                        pid = parseInt(stdout.match(/PID:\s+(\d+)/)[1], 10);
+                    var data = stdout.match(/PID:\s+([\-\d]+)/)[1];
+                    if (data == -1)
+                        pid = data;
+                    else if (data)
+                        pid = parseInt(data, 10);
                     
                     // Process has exited
                     if (err || pid == -1 || pid != originalPid) {
