@@ -355,7 +355,7 @@ define(function(require, module, exports) {
                             }
                             else {
                                 // Parse PID
-                                pid = parseInt(data.split(" ", 1)[0], 10);
+                                pid = parseInt(data.trim().split(" ", 1)[0], 10);
                                 callback(null, pid);
                             }
                             
@@ -580,7 +580,7 @@ define(function(require, module, exports) {
                     if (stdout == -1)
                         pid = stdout;
                     else if (stdout)
-                        pid = parseInt(stdout.split(" ", 2)[1], 10);
+                        pid = parseInt(stdout.match(/PID:\s+(\d+)/)[1], 10);
                     
                     // Process has exited
                     if (err || pid == -1 || pid != originalPid) {
