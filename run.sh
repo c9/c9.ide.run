@@ -19,16 +19,6 @@ if [ $TMUX == "pid" ]; then
     exit 0
 fi
 
-# Try to figure out the os and arch for binary fetching
-# uname="$(uname -a)"
-# os=""
-# case "$uname" in
-#     Linux\ *) os=linux ;;
-#     Darwin\ *) os=darwin ;;
-#     SunOS\ *) os=sunos ;;
-#     FreeBSD\ *) os=freebsd ;;
-# esac
-
 # This is needed for 32 bit tmux
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.c9/local/lib
 
@@ -48,15 +38,6 @@ $TMUX new -s $NAME "$CMD; ([ -e $WATCHFILE ] && rm $WATCHFILE)" \
     \; set-window-option -g aggressive-resize on \
     \; set-option -g prefix C-b \
     \; $DETACH
-
-# Find the PID
-# if [ $os = "darwin" ]; then
-#     PID=`ps -axf | grep $WATCHFILE`
-# else
-#     PID=`ps axf | grep $WATCHFILE`
-# fi
-# PID=`pgrep -f $WATCHFILE`
-
 
 # Return the pid
 PID=`ps ax | grep $WATCHFILE | grep rm || echo -1`
