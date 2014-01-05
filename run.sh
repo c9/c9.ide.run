@@ -1,4 +1,4 @@
-# set -e
+set -e
 
 TMUX=$1
 NAME=$2
@@ -28,6 +28,9 @@ $TMUX kill-session -t $NAME
 # Write the watch file
 echo "-1" > $WATCHFILE
 
+# Somehow tmux doesnt give a good exit code
+set +e
+
 # Start a new session
 $TMUX new -s $NAME "$CMD; ([ -e $WATCHFILE ] && rm $WATCHFILE)" \
     \; set-option -g status off \
@@ -38,6 +41,8 @@ $TMUX new -s $NAME "$CMD; ([ -e $WATCHFILE ] && rm $WATCHFILE)" \
     \; set-window-option -g aggressive-resize on \
     \; set-option -g prefix C-b \
     \; $DETACH
+    
+set -e
 
 # Return the pid
 PID=`ps ax | grep $WATCHFILE | grep rm || echo -1`
