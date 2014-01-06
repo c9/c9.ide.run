@@ -1,22 +1,21 @@
-set -e
+# set -e
 
 TMUX=$1
 NAME=$2
 CMD=$3
 DETACH=$4
-TESTING=$5
-
-if [ $TESTING ]; then
-    BASE=$TESTING
-else
-    BASE="$HOME/.c9/"
-fi
+BASE="$HOME/.c9/"
 
 WATCHFILE="$BASE.run_$NAME.watch"
 
-if [ $TMUX == "pid" ]; then
+if [ "$TMUX" = "pid" ]; then
     ps ax | grep $WATCHFILE | grep rm || echo -1
     exit 0
+fi
+
+if [ ! -x $TMUX ]; then
+    echo "Could not find tmux" >&2
+    exit 100
 fi
 
 # This is needed for 32 bit tmux
@@ -27,9 +26,6 @@ $TMUX kill-session -t $NAME
     
 # Write the watch file
 echo "-1" > $WATCHFILE
-
-# Somehow tmux doesnt give a good exit code
-set +e
 
 # Start a new session
 $TMUX new -s $NAME "$CMD; ([ -e $WATCHFILE ] && rm $WATCHFILE)" \
@@ -42,8 +38,6 @@ $TMUX new -s $NAME "$CMD; ([ -e $WATCHFILE ] && rm $WATCHFILE)" \
     \; set-option -g prefix C-b \
     \; $DETACH
     
-set -e
-
 # Return the pid
 PID=`ps ax | grep $WATCHFILE | grep rm || echo -1`
 echo "PID: $PID"

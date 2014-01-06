@@ -224,9 +224,7 @@ define(function(require, module, exports) {
                 procName = procName.name;
             }
             
-            var WATCHFILE = testing
-                ? "/.run_" + procName + ".watch"
-                : "~/.c9/.run_" + procName + ".watch";
+            var WATCHFILE = "~/.c9/.run_" + procName + ".watch";
             
             // Deal with connection issues
             c9.on("stateChange", function(e){
@@ -310,7 +308,8 @@ define(function(require, module, exports) {
                     rows : 5,
                     cwd  : options.cwd || runner[0].working_dir 
                         || options.path && dirname(options.path) || "/",
-                    validatePath : true
+                    validatePath : true,
+                    resolveArgs  : testing
                 }, function(err, pty){
                     if (err) {
                         // If error - install run.sh - retry
@@ -368,8 +367,8 @@ define(function(require, module, exports) {
                                 callback(null, pid);
                             }
                             
-                            pty.off("data", detectPid);
                             pty.off("exit", fail);
+                            pty.off("data", detectPid);
                         });
                         pty.on("exit", fail);
                     }
