@@ -317,7 +317,7 @@ define(function(require, module, exports) {
                     }
                 }
             }, plugin);
-            
+
             prefs.add({
                 "Project" : {
                     "Run Configurations" : {
@@ -341,7 +341,20 @@ define(function(require, module, exports) {
                     }
                 }
             }, plugin);
-            
+
+            prefs.add({
+                "Project" : {
+                    "Run & Debug" : {
+                        position : 300,
+                        "Runner Path in Workspace" : {
+                            type : "textbox",
+                            path : "project/run/@path",
+                            position : 1000
+                        }
+                    }
+                }
+            }, plugin);
+
             // settings
             settings.on("read", function(e){
                 settings.setDefaults("user/runconfig", [
@@ -395,7 +408,7 @@ define(function(require, module, exports) {
                 else {
                     btnRun.disable();
                     btnRun.setAttribute("caption", "Run");
-                    btnRun.setAttribute("tooltip", "")
+                    btnRun.setAttribute("tooltip", "");
                 }
             }, plugin);
             

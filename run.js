@@ -1,7 +1,6 @@
 define(function(require, module, exports) {
     main.consumes = [
-        "Plugin", "proc", "settings", "fs", "c9", "util", "http",
-        "tabManager", "preferences" //@todo move tabs and preferences to the ui part of run
+        "Plugin", "proc", "settings", "fs", "c9", "util", "http", "info"
     ];
     main.provides = ["run"];
     return main;
@@ -9,14 +8,13 @@ define(function(require, module, exports) {
     function main(options, imports, register) {
         var Plugin      = imports.Plugin;
         var settings    = imports.settings;
-        var prefs       = imports.preferences;
         var proc        = imports.proc;
         var http        = imports.http;
         var util        = imports.util;
-        var tabs        = imports.tabManager;
         var fs          = imports.fs;
         var c9          = imports.c9;
-        
+        var info        = imports.info;
+
         var basename    = require("path").basename;
         var dirname     = require("path").dirname;
         
@@ -38,6 +36,7 @@ define(function(require, module, exports) {
         var runners   = options.runners;
         var testing   = options.testing;
         var base      = options.base;
+        var workspace = info.getWorkspace();
         var processes = [];
         
         var loaded = false;
@@ -52,25 +51,6 @@ define(function(require, module, exports) {
                     ["path", "~/.c9/runners"]
                 ]);
             }, handle);
-            
-            settings.on("write", function(e){
-                
-            }, handle);
-            
-            // Preferences
-            prefs.add({
-                "Project" : {
-                    "Run & Debug" : {
-                        position : 300,
-                        "Runner Path in Workspace" : {
-                            type : "textbox",
-                            path : "project/run/@path",
-                            position : 1000
-                        }
-                    }
-                }
-            }, handle);
-
             // @todo Could consider adding a watcher to ~/.c9/runners
         }
         
@@ -423,8 +403,8 @@ define(function(require, module, exports) {
             }
             
             function getVariable(name, path, args){
-                var fnme, idx, ppath;
-                
+                var fnme, idx;
+
                 if (name == "file") 
                     return (path || "") 
                         + (args && args.length ? " "  + args.join(" ") : "");
@@ -446,16 +426,14 @@ define(function(require, module, exports) {
                 }
                 if (name == "packages")
                     return "~/.c9/packages";
-                if (name == "project" || 
-                    name == "project_path" || 
-                    name == "project_name" ||
-                    name == "project_extension" ||
-                    name == "project_base_name"
-                ) {
-                    ppath = tabs.focussedTab && tabs.focussedTab.path;
-                    if (!ppath) return "";
-                    return getVariable(name.replace("project", "name"), ppath);
-                }
+                if (name == "project_path")
+                    return base;
+                if (name == "project_id")
+                    return workspace.id;
+                if (name == "project_name")
+                    return workspace.name;
+                if (name == "project_contents")
+                    return workspace.contents;
                 if (name == "hostname")
                     return c9.hostname;
                 if (name == "port")
