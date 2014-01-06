@@ -2,7 +2,7 @@ define(function(require, module, exports) {
     main.consumes = [
         "c9", "Plugin", "run", "settings", "menus", "tabbehavior", "ace", 
         "commands", "layout", "tabManager", "preferences", "ui", "fs", 
-        "layout", "debugger", "tree", "dialog.error"
+        "layout", "debugger", "tree", "dialog.error", "util"
     ];
     main.provides = ["run.gui"];
     return main;
@@ -13,6 +13,7 @@ define(function(require, module, exports) {
         var menus       = imports.menus;
         var commands    = imports.commands;
         var run         = imports.run;
+        var util        = imports.util;
         var c9          = imports.c9;
         var ui          = imports.ui;
         var fs          = imports.fs;
@@ -496,7 +497,7 @@ define(function(require, module, exports) {
                         run    : true,
                         config : {
                             runner  : runner.name || runner,
-                            command : path
+                            command : util.escapeShell(path)
                         }
                     });
                     

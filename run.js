@@ -309,7 +309,7 @@ define(function(require, module, exports) {
                     cwd  : options.cwd || runner[0].working_dir 
                         || options.path && dirname(options.path) || "/",
                     validatePath : true,
-                    resolveArgs  : testing
+                    testing      : testing
                 }, function(err, pty){
                     if (err) {
                         // If error - install run.sh - retry
