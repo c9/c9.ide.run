@@ -413,7 +413,7 @@ define(function(require, module, exports) {
                     if (tab.document.getSession()) return;
                     
                     var state = tab.document.getState();
-                    if (state.output.running.debug) {
+                    if ((state.output.running || false).debug) {
                         // Get editor and create it if it's not in the current pane
                         tab.pane.createEditor(tab.editorType, function(err, editor){
                             editor.loadDocument(tab.document);
