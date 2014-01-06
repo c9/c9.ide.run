@@ -210,7 +210,7 @@ define(function(require, module, exports) {
                                     newfile: true
                                 },
                                 ace : {
-                                    customSyntax : "json"
+                                    customSyntax : "javascript"
                                 }
                             }
                         }, function(){});
