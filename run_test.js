@@ -169,7 +169,10 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 bar.$ext.style.height = "150px";
       
                 document.body.style.marginBottom = "150px";
-                done();
+                
+                fs.unlink("~/.c9/bin/run.sh", function(){
+                    done();
+                });
             });
             
             describe("listRunners()", function(){
