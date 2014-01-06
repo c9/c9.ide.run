@@ -14,7 +14,7 @@ if [ "$TMUX" = "pid" ]; then
 fi
 
 if [ ! -x $TMUX ]; then
-    echo "Could not find tmux" >&2
+    echo "Could not find executable tmux at $TMUX" >&2
     exit 100
 fi
 
