@@ -2,7 +2,7 @@ define(function(require, module, exports) {
     main.consumes = [
         "c9", "Plugin", "run", "settings", "menus", "tabbehavior", "ace", 
         "commands", "layout", "tabManager", "preferences", "ui", "fs", 
-        "layout", "debugger", "tree", "dialog.error", "util"
+        "layout", "debugger", "tree", "dialog.error", "util", "console"
     ];
     main.provides = ["run.gui"];
     return main;
@@ -23,6 +23,7 @@ define(function(require, module, exports) {
         var tabbehavior = imports.tabbehavior;
         var debug       = imports.debugger;
         var prefs       = imports.preferences;
+        var c9console   = imports.console;
         var ace         = imports.ace;
         var showError   = imports["dialog.error"].show;
         
@@ -405,6 +406,23 @@ define(function(require, module, exports) {
                     btnRun.setAttribute("tooltip", "");
                 }
             }, plugin);
+            
+            var activateOutput = function(plugin){
+                plugin.getTabs().forEach(function(tab){
+                    if (tab.editorType != "output") return;
+                    if (tab.document.getSession()) return;
+                    
+                    var state = tab.document.getState();
+                    if (state.output.running.debug) {
+                        // Get editor and create it if it's not in the current pane
+                        tab.pane.createEditor(tab.editorType, function(err, editor){
+                            editor.loadDocument(tab.document);
+                        });
+                    }
+                });
+            };
+            tabs.on("ready", activateOutput.bind(this, tabs));
+            c9console.on("ready", activateOutput.bind(this, c9console));
     
             ace.getElement("menu", function(menu){
                 menus.addItemToMenu(menu, new ui.item({
