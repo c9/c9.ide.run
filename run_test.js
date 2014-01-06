@@ -77,10 +77,11 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.vfs.client/endpoint",
         "plugins/c9.ide.auth/auth",
         {
-            packagePath : "plugins/c9.ide.run/run",
-            testing     : true,
-            base        : baseProc,
-            runners     : {
+            packagePath  : "plugins/c9.ide.run/run",
+            testing      : true,
+            base         : baseProc,
+            staticPrefix : "plugins/c9.ide.run",
+            runners      : {
                 "node" : {
                     "caption" : "Node.js (current)",
                     "cmd": ["node", "${debug?--debug-brk=15454}", "$file"],
