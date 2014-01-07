@@ -19,7 +19,7 @@ if [ ! -x $TMUX ]; then
 fi
 
 # This is needed for 32 bit tmux
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.c9/local/lib
+export LD_LIBRARY_PATH=~/.c9/local/lib:$LD_LIBRARY_PATH
 
 # Kill any existing session
 $TMUX kill-session -t $NAME

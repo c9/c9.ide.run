@@ -589,6 +589,7 @@ define(function(require, module, exports) {
                     }
                     else {
                         monitor(function(){
+                            emit("back");
                             checking = false;
                         });
                     }
