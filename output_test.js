@@ -45,10 +45,11 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.ide.terminal/terminal",
         "plugins/c9.ide.run/output",
         {
-            packagePath : "plugins/c9.ide.run/run",
-            testing     : true,
-            base        : baseProc,
-            runners     : {
+            packagePath  : "plugins/c9.ide.run/run",
+            testing      : true,
+            base         : baseProc,
+            staticPrefix : "plugins/c9.ide.run",
+            runners      : {
                 "node" : {
                     "caption" : "Node.js (current)",
                     "cmd": ["node", "${debug?--debug-brk=15454}", "$file"],
@@ -81,7 +82,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             provides : [
                 "commands", "menus", "commands", "layout", "watcher", 
                 "save", "anims", "clipboard", "dialog.alert", "auth.bootstrap",
-                "info", "debugger", "dialog.question", "run.gui"
+                "info", "debugger", "dialog.question", "run.gui", "dialog.error"
             ],
             setup    : expect.html.mocked
         },

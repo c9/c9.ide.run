@@ -2,7 +2,7 @@ define(function(require, module, exports) {
     main.consumes = [
         "c9", "Plugin", "run", "settings", "menus", "tabbehavior", "ace", 
         "commands", "layout", "tabManager", "preferences", "ui", "fs", 
-        "layout", "debugger", "tree"
+        "layout", "debugger", "tree", "dialog.error", "util", "console"
     ];
     main.provides = ["run.gui"];
     return main;
@@ -13,6 +13,7 @@ define(function(require, module, exports) {
         var menus       = imports.menus;
         var commands    = imports.commands;
         var run         = imports.run;
+        var util        = imports.util;
         var c9          = imports.c9;
         var ui          = imports.ui;
         var fs          = imports.fs;
@@ -22,7 +23,9 @@ define(function(require, module, exports) {
         var tabbehavior = imports.tabbehavior;
         var debug       = imports.debugger;
         var prefs       = imports.preferences;
+        var c9console   = imports.console;
         var ace         = imports.ace;
+        var showError   = imports["dialog.error"].show;
         
         var Tree        = require("ace_tree/tree");
         var TreeData    = require("./runcfgdp");
@@ -198,7 +201,9 @@ define(function(require, module, exports) {
                             path   : settings.get("project/run/@path") 
                               + "/New Runner",
                             active : true,
-                            value  : '{\n'
+                            value  : '// Create a custom Cloud9 runner - similar to the Sublime build system\n'
+                              + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
+                              + '{\n'
                               + '    "caption" : "",\n'
                               + '    "cmd" : ["ls"],\n'
                               + '    "hint" : "",\n'
@@ -209,7 +214,7 @@ define(function(require, module, exports) {
                                     newfile: true
                                 },
                                 ace : {
-                                    customType : "json"
+                                    customSyntax : "javascript"
                                 }
                             }
                         }, function(){});
@@ -221,7 +226,7 @@ define(function(require, module, exports) {
                     
                     run.getRunner(e.value, function(err, runner){
                         if (err)
-                            return layout.showError(err);
+                            return showError(err);
                         
                         runNow(runner);
                     });
@@ -276,9 +281,9 @@ define(function(require, module, exports) {
             menus.addItemByPath("Run/Run Configurations/New Run Configuration", new ui.item({
                 value : "new-run-config"
             }), c += 100, plugin);
-            menus.addItemByPath("Run/Run Configurations/Manage...", new ui.item({
-                value : "manage"
-            }), c += 100, plugin);
+            // menus.addItemByPath("Run/Run Configurations/Manage...", new ui.item({
+            //     value : "manage"
+            // }), c += 100, plugin);
             
             c = 0;
             menus.addItemByPath("Run/Run With/~", new ui.divider(), c += 1000, plugin);
@@ -322,6 +327,14 @@ define(function(require, module, exports) {
             
             prefs.add({
                 "Project" : {
+                    "Run & Debug" : {
+                        position : 300,
+                        "Runner Path in Workspace" : {
+                            type : "textbox",
+                            path : "project/run/@path",
+                            position : 1000
+                        }
+                    },
                     "Run Configurations" : {
                         position : 200,
                         "Run Configurations" : {
@@ -465,7 +478,7 @@ define(function(require, module, exports) {
                 else {
                     btnRun.disable();
                     btnRun.setAttribute("caption", "Run");
-                    btnRun.setAttribute("tooltip", "")
+                    btnRun.setAttribute("tooltip", "");
                 }
             }, plugin);
             
@@ -475,6 +488,23 @@ define(function(require, module, exports) {
                     btnRun.setAttribute("tooltip", "");
                 }
             }, plugin);
+            
+            var activateOutput = function(plugin){
+                plugin.getTabs().forEach(function(tab){
+                    if (tab.editorType != "output") return;
+                    if (tab.document.getSession()) return;
+                    
+                    var state = tab.document.getState();
+                    if ((state.output.running || false).debug) {
+                        // Get editor and create it if it's not in the current pane
+                        tab.pane.createEditor(tab.editorType, function(err, editor){
+                            editor.loadDocument(tab.document);
+                        });
+                    }
+                });
+            };
+            tabs.on("ready", activateOutput.bind(this, tabs));
+            c9console.on("ready", activateOutput.bind(this, c9console));
     
             ace.getElement("menu", function(menu){
                 menus.addItemToMenu(menu, new ui.item({
@@ -588,7 +618,7 @@ define(function(require, module, exports) {
                         run    : true,
                         config : {
                             runner  : runner.name || runner,
-                            command : path
+                            command : util.escapeShell(path)
                         }
                     });
                     
@@ -596,31 +626,37 @@ define(function(require, module, exports) {
                 }
                 
                 var bDebug = settings.getBool("user/runconfig/@debug");
+                if (bDebug)
+                    debug.checkAttached(start);
+                else
+                    start();
                 
-                process = run.run(runner, {
-                    path  : path,
-                    debug : bDebug
-                }, function(err, pid){
-                    if (err) {
-                        transformButton();
-                        process = null;
-                        return layout.showError(err);
-                    }
+                function start(){
+                    process = run.run(runner, {
+                        path  : path,
+                        debug : bDebug
+                    }, function(err, pid){
+                        if (err) {
+                            transformButton();
+                            process = null;
+                            return showError(err);
+                        }
+                        
+                        var state = process.getState();
+                        state.debug = bDebug;
+                        settings.setJson("state/run/process", state);
+                        
+                        if (bDebug) {
+                            debug.debug(process, function(err){
+                                if (err)
+                                    return; // Either the debugger is not found or paused
+                            });
+                        }
+                    });
                     
-                    var state = process.getState();
-                    state.debug = bDebug;
-                    settings.setJson("state/run/process", state);
-                    
-                    if (bDebug) {
-                        debug.debug(process, function(err){
-                            if (err)
-                                return; // Either the debugger is not found or paused
-                        });
-                    }
-                });
-                
-                decorateProcess();
-                transformButton("stop");
+                    decorateProcess();
+                    transformButton("stop");
+                }
             }
             
             lastRun = [runner, path];
@@ -704,7 +740,7 @@ define(function(require, module, exports) {
             if (process)
                 process.stop(function(err){
                     if (err) {
-                        layout.showError(err.message || err);
+                        showError(err.message || err);
                         transformButton();
                     }
                     

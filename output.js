@@ -1,31 +1,32 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "Editor", "editors", "util", "commands", "menus", "terminal",
+        "Editor", "editors", "util", "commands", "terminal",
         "settings", "ui", "proc", "tabManager", "run", "console", "run.gui",
-        "layout", "debugger", "settings", "dialog.question", "c9", "preferences"
+        "layout", "debugger", "settings", "dialog.question", "c9", "preferences",
+        "dialog.error"
     ];
     main.provides = ["output"];
     return main;
     
     function main(options, imports, register) {
-        var editors  = imports.editors;
-        var ui       = imports.ui;
-        var c9       = imports.c9;
-        var commands = imports.commands;
-        var console  = imports.console;
-        var menus    = imports.menus;
-        var layout   = imports.layout;
-        var tabs     = imports.tabManager;
-        var util     = imports.util;
-        var run      = imports.run;
-        var prefs    = imports.preferences;
-        var runGui   = imports["run.gui"];
-        var question = imports["dialog.question"];
-        var Terminal = imports.terminal.Terminal;
-        var debug    = imports.debugger;
-        var settings = imports.settings;
+        var editors   = imports.editors;
+        var ui        = imports.ui;
+        var c9        = imports.c9;
+        var commands  = imports.commands;
+        var console   = imports.console;
+        var layout    = imports.layout;
+        var tabs      = imports.tabManager;
+        var util      = imports.util;
+        var run       = imports.run;
+        var prefs     = imports.preferences;
+        var runGui    = imports["run.gui"];
+        var question  = imports["dialog.question"];
+        var showError = imports["dialog.error"].show;
+        var Terminal  = imports.terminal.Terminal;
+        var debug     = imports.debugger;
+        var settings  = imports.settings;
         
-        var markup   = require("text!./output.xml");
+        var markup    = require("text!./output.xml");
         
         var keys       = require("ace/lib/keys");
         var Tree       = require("ace_tree/tree");
@@ -37,7 +38,7 @@ define(function(require, exports, module) {
         var handleEmit = handle.getEmitter();
         
         var defaults = {
-            "light" : ["#F8F8F8", "#333333", "#89c1ff", false], 
+            "light" : ["#eef7ff", "#333333", "#89c1ff", false], 
             "dark"  : ["#003a58", "#FFFFFF", "#225477", true]
         };
         
@@ -192,7 +193,7 @@ define(function(require, exports, module) {
         function Output(){
             var plugin = new Terminal(true);
             
-            var btnRun, currentSession, btnRunner, btnDebug;
+            var btnRun, currentSession, btnRunner, btnDebug, btnRestart;
             var tbName, tbCommand, btnEnv;
             
             /***** Methods *****/
@@ -215,8 +216,10 @@ define(function(require, exports, module) {
                 else
                     term.reset();
                 
-                var path = tbCommand.value || session.config.command;
-                var args = path.split(" ");
+                var path   = tbCommand.value || session.config.command;
+                var bDebug = btnDebug.value;
+                var args   = path.split(" ");
+                
                 path = args.shift();
                 
                 if (session.process && session.process.running)
@@ -225,11 +228,15 @@ define(function(require, exports, module) {
                     done();
                 
                 function done(){
+                    if (bDebug)
+                        debug.checkAttached(start);
+                    else
+                        start();
+                }
+                
+                function start(){
                     if (!runner)
                         runner = "auto";
-                    
-                    var bDebug = btnDebug.value;
-                    // settings.getBool("user/runconfig/@debug");
                     
                     session.process = run.run(runner, {
                         path  : path,
@@ -241,7 +248,7 @@ define(function(require, exports, module) {
                         if (err) {
                             transformButton(session);
                             session.process = null;
-                            return layout.showError(err);
+                            return showError(err);
                         }
                         
                         session.process.meta.debug = bDebug;
@@ -265,21 +272,28 @@ define(function(require, exports, module) {
             
             function decorateProcess(session){
                 session.process.on("away", function(){
-                    if (session == currentSession)
+                    if (session == currentSession) {
                         btnRun.disable();
+                        btnRestart.disable();
+                    }
                 });
                 session.process.on("back", function(){
-                    if (session == currentSession)
+                    if (session == currentSession) {
                         btnRun.enable();
+                        btnRestart.enable();
+                    }
                 });
                 session.process.on("stopping", function(){
-                    if (session == currentSession)
+                    if (session == currentSession) {
                         btnRun.disable();
+                        btnRestart.disable();
+                    }
                     session.updateTitle();
                 }, plugin);
                 session.process.on("stopped", function(){
                     if (session == currentSession) {
                         btnRun.enable();
+                        btnRestart.enable();
                         transformButton(session);
                     }
                     session.updateTitle();
@@ -295,6 +309,9 @@ define(function(require, exports, module) {
                     btnRun.setAttribute("tooltip", "");
                     btnRun.setAttribute("class", "running");
                     btnRun.enable();
+                    
+                    btnRestart.show();
+                    btnRestart.enable();
                 }
                 else {
                     var path = (tbCommand.value || "").split(" ", 1)[0];
@@ -302,6 +319,8 @@ define(function(require, exports, module) {
                     btnRun.setAttribute("icon", "run.png");
                     btnRun.setAttribute("caption", "Run");
                     btnRun.setAttribute("class", "stopped");
+                    
+                    btnRestart.hide();
                     
                     return path;
                 }
@@ -315,7 +334,7 @@ define(function(require, exports, module) {
                 if (process)
                     process.stop(function(err){
                         if (err) {
-                            layout.showError(err.message || err);
+                            showError(err.message || err);
                         }
                         else {
                             debug.stop();
@@ -560,12 +579,13 @@ define(function(require, exports, module) {
                 e.htmlNode.className += " output";
                 
                 // Decorate UI
-                btnRun    = plugin.getElement("btnRun");
-                btnDebug  = plugin.getElement("btnDebug");
-                btnRunner = plugin.getElement("btnRunner");
-                tbCommand = plugin.getElement("tbCommand");
-                tbName    = plugin.getElement("tbName");
-                btnEnv    = plugin.getElement("btnEnv");
+                btnRun     = plugin.getElement("btnRun");
+                btnRestart = plugin.getElement("btnRestart");
+                btnDebug   = plugin.getElement("btnDebug");
+                btnRunner  = plugin.getElement("btnRunner");
+                tbCommand  = plugin.getElement("tbCommand");
+                tbName     = plugin.getElement("tbName");
+                btnEnv     = plugin.getElement("btnEnv");
                 
                 btnRun.on("click", function(){
                     var session = currentSession;
@@ -577,6 +597,14 @@ define(function(require, exports, module) {
                     else {
                         runNow(session);
                     }
+                });
+                
+                btnRestart.on("click", function(){
+                    var session = currentSession;
+                    if (!session) return;
+                    
+                    if (session.process && session.process.running > 0)
+                        stop(function(){ runNow(session); });
                 });
                 
                 btnDebug.on("prop.value", function(e){
@@ -625,7 +653,7 @@ define(function(require, exports, module) {
                     // Start this run config with the new runner
                     run.getRunner(value, function(err, result){
                         if (err)
-                            return layout.showError(err);
+                            return showError(err);
                         
                         currentSession.setRunner(result);
                     });
@@ -655,6 +683,10 @@ define(function(require, exports, module) {
                     
                     mnuEnv.resize();
                 });
+                
+                c9.on("stateChange", function(){
+                    updateToolbar(currentSession);
+                }, plugin);
             });
             
             plugin.on("documentLoad", function(e){
@@ -713,7 +745,8 @@ define(function(require, exports, module) {
                         /\[exited\]\r/.test(data) ||
                         /Set option: remain-on-exit \-\> on/.test(data)
                     ) {
-                        tab.className.add("running");
+                        tab.className.add(session.process 
+                            && session.process.running > 0 ? "running" : "loading");
                         return;
                     }
                     
@@ -728,7 +761,11 @@ define(function(require, exports, module) {
                               .replace(/Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
                               .replace(/Pane is dead/g, "[Process stopped]");
                         }
-                        tab.className.remove("running");
+                        tab.className.remove(session.process 
+                            && session.process.running > 0 ? "running" : "loading");
+                        
+                        if (session.process && session.process.running > 1)
+                            session.process.checkState();
                     }
                     
                     return data;

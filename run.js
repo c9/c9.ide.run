@@ -1,7 +1,6 @@
 define(function(require, module, exports) {
     main.consumes = [
-        "Plugin", "proc", "settings", "fs", "c9", "util",
-        "tabManager", "preferences" //@todo move tabs and preferences to the ui part of run
+        "Plugin", "proc", "settings", "fs", "c9", "util", "http", "info"
     ];
     main.provides = ["run"];
     return main;
@@ -9,13 +8,13 @@ define(function(require, module, exports) {
     function main(options, imports, register) {
         var Plugin      = imports.Plugin;
         var settings    = imports.settings;
-        var prefs       = imports.preferences;
         var proc        = imports.proc;
+        var http        = imports.http;
         var util        = imports.util;
-        var tabs        = imports.tabManager;
         var fs          = imports.fs;
         var c9          = imports.c9;
-        
+        var info        = imports.info;
+
         var basename    = require("path").basename;
         var dirname     = require("path").dirname;
         
@@ -24,17 +23,20 @@ define(function(require, module, exports) {
         var handle     = new Plugin("Ajax.org", main.consumes);
         var handleEmit = handle.getEmitter();
         
+        var CLEANING = -2;
         var STOPPING = -1;
         var STOPPED  = 0;
         var STARTING = 1;
         var STARTED  = 2;
         
-        var TMUX = options.tmux || "~/.c9/bin/tmux";
-        var BASH = "bash";
+        var STATIC = options.staticPrefix;
+        var TMUX   = options.tmux || "~/.c9/bin/tmux";
+        var BASH   = "bash";
         
         var runners   = options.runners;
         var testing   = options.testing;
         var base      = options.base;
+        var workspace = info.getWorkspace();
         var processes = [];
         
         var loaded = false;
@@ -49,25 +51,6 @@ define(function(require, module, exports) {
                     ["path", "~/.c9/runners"]
                 ]);
             }, handle);
-            
-            settings.on("write", function(e){
-                
-            }, handle);
-            
-            // Preferences
-            prefs.add({
-                "Project" : {
-                    "Run & Debug" : {
-                        position : 300,
-                        "Runner Path in Workspace" : {
-                            type : "textbox",
-                            path : "project/run/@path",
-                            position : 1000
-                        }
-                    }
-                }
-            }, handle);
-
             // @todo Could consider adding a watcher to ~/.c9/runners
         }
         
@@ -221,27 +204,7 @@ define(function(require, module, exports) {
                 procName = procName.name;
             }
             
-            var PIDFILE, PIDMATCH, WATCHFILE;
-            if (testing) {
-                PIDFILE   = "/.run_" + procName + ".pid";
-                WATCHFILE = "/.run_" + procName + ".watch";
-                PIDMATCH  = new RegExp("^"
-                    + (c9.platform == "darwin" ? "\\s*\\d+" : "")
-                    + "\\s*(\\d+)\\s.*echo > "
-                    + base.replace(/\//g, "\\/") + "\\/\\.run_" + procName 
-                    + "\\.watch", "m");
-            }
-            else {
-                PIDFILE   = "~/.c9/.run_" + procName + ".pid";
-                WATCHFILE = "~/.c9/.run_" + procName + ".watch";
-                PIDMATCH  = new RegExp("^"
-                    + (c9.platform == "darwin" ? "\\s*\\d+" : "")
-                    + "\\s*(\\d+)\\s.*echo > "
-                    + "~\\/\\.c9\\/\\.run_" + procName + "\\.watch", "m");
-            }
-            var WATCHFILE_PREFIXED = (testing ? base : "") + WATCHFILE;
-            var TRUNCATE = "; ([ -e " + WATCHFILE_PREFIXED + " ] "
-                + "&& echo > " + WATCHFILE_PREFIXED + ")";
+            var WATCHFILE = "~/.c9/.run_" + procName + ".watch";
             
             // Deal with connection issues
             c9.on("stateChange", function(e){
@@ -252,7 +215,7 @@ define(function(require, module, exports) {
                 else if (running == STARTED || running == STARTING) {
                     emit("away");
                 }
-            });
+            }, plugin);
     
             /***** Methods *****/
             
@@ -314,165 +277,134 @@ define(function(require, module, exports) {
                 // The rest of the options are singular. Choosing the first option object for this.
                 options = options[0];
     
-                // Add a command to clear the pid file when done
-                cmd += TRUNCATE;
-                
-                // This is fairly complex. We need to kill the session and then
-                // immediately start the new session before any other session
-                // has reconnected and created a new one. To do this we execute
-                // both commands through bash.
-                // (@fabian, @luca, @harutyun. Please help with this one, I believe
-                // this can be fixed by going through a small bash script.)
-                
                 // @todo deal with escaped double quotes 
-                var args = [
-                    TMUX, "kill-session", "-t", procName, ";",
-                    TMUX, "new", "-s", procName, bashQuoute(cmd),
-                    "\\;", "set-option", "-g", "status", "off",
-                    "\\;", "set-option", "destroy-unattached", "off",
-                    //"\\;", "set-option", "mouse-resize-pane", "on",
-                    "\\;", "set-option", "mouse-select-pane", "on",
-                    //"\\;", "set-option", "mouse-select-window", "on",
-                    //"\\;", "set-option", "mouse-utf8", "on",
-                    "\\;", "set-option", "set-titles", "on",
-                    // Note that the following line is absolutely necessary. 
-                    // It keeps the output visible for the user.
-                    "\\;", "set-option", "remain-on-exit", "on", 
-                    "\\;", "set-window-option", "-g", "aggressive-resize", "on",
-                    "\\;", "set-option", "-g", "prefix", "C-b"
-                    
-                ];
-                // if (options.detach !== false)
-                //     args.push("\\;", "detach-client");
+                // cmd = bashQuote(cmd);
                 
-                monitor(function(track){
-                    // Create new session
-                    proc.pty(BASH, {
-                        args : ["-c", args.join(" ")],
-                        cols : 100,
-                        rows : 5,
-                        cwd  : options.cwd || runner[0].working_dir 
-                            || options.path && dirname(options.path) || "/"
-                    }, function(err, pty){
-                        // Handle a possible error
-                        if (err)
-                            return callback(err);
+                // Execute run.sh
+                proc.pty("~/.c9/bin/run.sh", {
+                    args : [TMUX, procName, cmd, 
+                             options.detach !== false ? "detach" : ""],
+                    cols : 100,
+                    rows : 5,
+                    cwd  : options.cwd || runner[0].working_dir 
+                        || options.path && dirname(options.path) || "/",
+                    validatePath : true,
+                    testing      : testing
+                }, function(err, pty){
+                    if (err) {
+                        // If error - install run.sh - retry
+                        if (err.code == "ENOENT")
+                            return installRunSH(function(err){
+                                if (err) 
+                                    return callback(err);
+                                
+                                // Reset state to be able to reenter
+                                running = STOPPED;
+                                
+                                run(srunner, options, callback);
+                            });
                         
-                        // Set process variable for later use
-                        process = pty;
-                        
-                        // Running
-                        running = STARTED;
-                        emit("started", { pty: pty });
-                        
-                        if (options.detach === false) {
-                            pty.on("data", function(data){ emit("data", data); });
-                            pty.on("exit", function(){ emit("detach"); });
-                        }
-                        else {
-                            pty.write(String.fromCharCode(2) + "d");
-                        }
-                        
-                        // Track the PID file
-                        track(callback);
-                    });
-                }, callback);
-            }
-            
-            var hasMonitor;
-            function track(callback){
-                // Find PID of process that just got started
-                proc.execFile("ps", {
-                    args: [c9.platform == "darwin" ? "-axf" : "axf"]
-                }, function(err, stdout, stderr){
-                    var match = stdout && stdout.match(PIDMATCH);
-                    if (!match) {
-                        // Process has already ended
-                        cleanup();
-                        
-                        // Lets tell the callback
-                        callback(null, -1);
-                        
-                        return;
+                        return callback(err);
                     }
                     
-                    for (var i = match.length - 1; i >= 0; i--) {
-                        if (match[i].indexOf("tmux") == -1) {
-                            pid = match[i].trim().split(" ", 1)[0];
-                            break;
-                        }
+                    // Set process variable for later use
+                    process = pty;
+                    
+                    // Execute Monitor
+                    monitor();
+                    
+                    // Running
+                    running = STARTED;
+                    emit("started", { pty: pty });
+                    
+                    // if not detached
+                    if (options.detach === false) {
+                        // Hook data and exit events
+                        pty.on("data", function(data){ emit("data", data); });
+                        pty.on("exit", function(){ emit("detach"); });
                     }
-                    
-                    // Send the PID to the callback
-                    callback(null, pid);
-                    
-                    // Store the PID in the settings
-                    settings.set("user/run/@pid", pid);
-                    
-                    // Store the PID on disk, if the process is still running
-                    if (running)
-                        fs.writeFile(PIDFILE, pid, "utf8", function(){});
+                    // Else if detached
+                    else {
+                        var fail = function(){ 
+                            cleanup();
+                            callback(new Error("Unspecified Error"));
+                        };
+                        
+                        // Hook data event
+                        pty.on("data", function detectPid(data){
+                            if (!data.match(/PID: (.*)/))
+                                return;
+                            
+                            data = RegExp.$1;
+                            
+                            if (parseInt(data, 10) == -1) {
+                                // The process already exited
+                                callback(null, -1);
+                            }
+                            else {
+                                // Parse PID
+                                pid = parseInt(data.trim().split(" ", 1)[0], 10);
+                                callback(null, pid);
+                            }
+                            
+                            pty.off("exit", fail);
+                            pty.off("data", detectPid);
+                        });
+                        pty.on("exit", fail);
+                    }
                 });
             }
             
-            function monitor(exec, callback){
-                if (hasMonitor) {
-                    exec(track);
-                }
-                else {
-                    // Clear the PID file and make sure it exists
-                    fs.writeFile(WATCHFILE, "-1", "utf8", function(err){
-                        if (err)
-                            return callback(err);
+            function installRunSH(retry){
+                http.request(STATIC + "/run.sh", function(err, data){
+                    if (err) return retry(err);
+                    
+                    fs.writeFile("~/.c9/bin/run.sh", data, function(err){
+                        if (err) 
+                            return retry(err);
                         
-                        // Set watcher
-                        fs.watch(WATCHFILE, function(err, event, filename){
-                            if (err) {
-                                // If the process is running write the WATCHFILE  
-                                // again and restart the monitor
-                                if (hasMonitor && running > 0) {
-                                    hasMonitor = false;
-                                    monitor(exec, callback);
-                                }
-                                // Else tell the callback starting the monitor failed
-                                else {
-                                    cleanup();
-                                    return callback(err);
-                                }
-                            }
-                            
-                            if (event == "init") {
-                                hasMonitor = true;
-                                return exec(track);
-                            }
-                            
-                            fs.readFile(WATCHFILE, "utf8", function(err, data) {
-                                if (err) {
-                                    // If the process is running write the WATCHFILE  
-                                    // again and restart the monitor
-                                    if (running > 0) {
-                                        hasMonitor = false;
-                                        monitor(exec, callback);
-                                    }
-                                    
-                                    // Else do nothing - the process is done
-                                    return;
-                                }
-                                
-                                if (data && data.trim().length)
-                                    return;
-                                
-                                // Process is stopped
-                                cleanup();
-                            });
+                        proc.execFile(BASH, { args: ["-c", "chmod +x ~/.c9/bin/run.sh"] }, function(err){
+                            retry(err);
                         });
                     });
-                }
+                });
+            }
+            
+            function monitor(callback){
+                // Set watcher
+                fs.watch(WATCHFILE, function watch(err, event, filename){
+                    if (err) {
+                        if (err.code == "ENOENT") {
+                            // The watch file is already gone. Lets stop the process
+                            return cleanup(callback);
+                        }
+                        else {
+                            // Retry when comes online
+                            
+                            callback && callback();
+                        }
+                    }
+                    
+                    if (event == "init")
+                        return callback && callback();
+                    
+                    // Process has exited
+                    if (event == "delete") {
+                        // Process is stopped
+                        cleanup();
+                    }
+                    // Process is restarted
+                    else {
+                        // Unwatch the proces - whoever restarted it will add
+                        // another monitor
+                        fs.unwatch(WATCHFILE, watch);
+                    }
+                });
             }
             
             function getVariable(name, path, args){
-                var fnme, idx, ppath;
-                
+                var fnme, idx;
+
                 if (name == "file") 
                     return (path || "") 
                         + (args && args.length ? " "  + args.join(" ") : "");
@@ -494,16 +426,14 @@ define(function(require, module, exports) {
                 }
                 if (name == "packages")
                     return "~/.c9/packages";
-                if (name == "project" || 
-                    name == "project_path" || 
-                    name == "project_name" ||
-                    name == "project_extension" ||
-                    name == "project_base_name"
-                ) {
-                    ppath = tabs.focussedTab && tabs.focussedTab.path;
-                    if (!ppath) return "";
-                    return getVariable(name.replace("project", "name"), ppath);
-                }
+                if (name == "project_path")
+                    return base;
+                if (name == "project_id")
+                    return workspace.id;
+                if (name == "project_name")
+                    return workspace.name;
+                if (name == "project_contents")
+                    return workspace.contents;
                 if (name == "hostname")
                     return c9.hostname;
                 if (name == "port")
@@ -562,9 +492,9 @@ define(function(require, module, exports) {
                     callback && callback();
                 }
                 
-                if (running < 1) {
+                if (running == CLEANING || running == STOPPED) {
                     setTimeout(function(){
-                        if (running != 0)
+                        if (running !== 0)
                             finish();
                         else
                             callback && callback();
@@ -577,9 +507,9 @@ define(function(require, module, exports) {
                     emit("stopping");
                 }
                 
-                fs.rmfile(PIDFILE, function(){
-                    fs.rmfile(WATCHFILE, finish);
-                });
+                running = CLEANING;
+                
+                fs.rmfile(WATCHFILE, finish);
             }
             
             function stop(callback){
@@ -615,6 +545,9 @@ define(function(require, module, exports) {
                     }
                     return;
                 }
+                
+                running = STOPPING;
+                emit("stopping");
     
                 // Kill the pty session
                 proc.execFile("kill", {args:[pid]}, function(err, e){
@@ -633,17 +566,33 @@ define(function(require, module, exports) {
                 });
             }
             
+            var checking;
             function checkState(){
-                // Check the watch file
-                fs.readFile(WATCHFILE, function(err, data) {
-                    // Process is running
-                    if (!err && data && data.trim().length) {
-                        monitor(function(){ emit("back"); }, function(){});
-                        return;
-                    }
+                if (!running || checking) return;
+                
+                checking = true;
+                
+                var originalPid = pid;
+                
+                // Execute run.sh
+                proc.execFile("~/.c9/bin/run.sh", {
+                    args : ["pid", procName]
+                }, function(err, stdout, stderr){
+                    if (stdout && stdout.match(/PID:\s+([\-\d]+)/))
+                        pid = parseInt(RegExp.$1, 10);
                     
-                    // Process is stopped
-                    cleanup();
+                    // Process has exited
+                    if (err || pid == -1 || pid != originalPid) {
+                        cleanup(function(){
+                            checking = false;
+                        });
+                    }
+                    else {
+                        monitor(function(){
+                            emit("back");
+                            checking = false;
+                        });
+                    }
                 });
             }
             
@@ -677,6 +626,11 @@ define(function(require, module, exports) {
              * @class run.Process
              */
             plugin.freezePublicAPI({
+                /**
+                 * @property {-2} CLEANING  Indicates the process run state is 
+                 * being cleaned up. To be tested against the `runner` property.
+                 */
+                CLEANING : CLEANING,
                 /**
                  * @property {-1} STOPPING  Indicates the process is being 
                  * killed. To be tested against the `runner` property.
@@ -751,6 +705,11 @@ define(function(require, module, exports) {
                 getState : getState,
                 
                 /**
+                 * Validates whether the process is still running
+                 */
+                checkState : checkState,
+                
+                /**
                  * Detach from the currently running process. This is only 
                  * relevant if options.detach was set to false when starting 
                  * the process.
@@ -774,7 +733,7 @@ define(function(require, module, exports) {
             return plugin;
         }
         
-        function bashQuoute(str) {
+        function bashQuote(str) {
             return "'" + str.replace(/'/g, "'\\''") + "'";
         }
         
@@ -884,6 +843,11 @@ define(function(require, module, exports) {
          * @singleton
          */
         handle.freezePublicAPI({
+            /**
+             * @property {-2} CLEANING  Indicates the process run state is 
+             * being cleaned up. To be tested against the `runner` property.
+             */
+            CLEANING : CLEANING,
             /**
              * Indicates the process is being killed. To be tested against 
              * the `running` property.
