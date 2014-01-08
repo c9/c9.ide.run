@@ -24,6 +24,9 @@ define(function(require, module, exports) {
         var prefs       = imports.preferences;
         var ace         = imports.ace;
         
+        var Tree        = require("ace_tree/tree");
+        var TreeData    = require("./runcfgdp");
+        
         var basename    = require("path").basename;
         var uCaseFirst  = require("c9/string").uCaseFirst;
         
@@ -33,6 +36,7 @@ define(function(require, module, exports) {
         var emit    = plugin.getEmitter();
         
         var btnRun, lastRun, process, mnuRunCfg;
+        var model, datagrid;
         
         var loaded = false;
         function load(){
@@ -322,22 +326,86 @@ define(function(require, module, exports) {
                         position : 200,
                         "Run Configurations" : {
                             type     : "custom",
+                            name     : "runcfg",
                             title    : "Run Configurations",
                             position : 120,
-                            node     : new ui.hsplitbox({
-                                height     : 200,
-                                padding    : 5,
-                                anchors    : "80 0 0 0",
-                                edge       : "10 10 10 10",
-                                childNodes : [
-                                    new ui.label({
-                                        caption: "Coming Soon!"
-                                    })
-                                ]
+                            node     : new ui.bar({
+                                style  : "padding:10px"
                             })
                         }
                     }
                 }
+            }, plugin);
+            
+            plugin.getElement("runcfg", function(hbox){
+                model = new TreeData();
+                model.emptyMessage = "No run configurations";
+                
+                model.columns = [{
+                    caption : "Name",
+                    value   : "name",
+                    width   : "30%",
+                }, {
+                    caption : "Command",
+                    value   : "command",
+                    width   : "30%",
+                }, {
+                    caption : "Debug",
+                    value   : "debug",
+                    width   : "10%"
+                }, {
+                    caption : "Runner",
+                    value   : "runner",
+                    width   : "30%"
+                }];
+                
+                var container = hbox.$ext.appendChild(document.createElement("div"));
+                container.style.border = "1px solid rgb(37, 37, 37)";
+                container.style.width  = "500px";
+                container.style.marginBottom  = "30px";
+                
+                datagrid = new Tree(container);
+                datagrid.setTheme({cssClass: "blackdg"});
+                datagrid.setOption("maxLines", 200);
+                datagrid.setDataProvider(model);
+                
+                datagrid.on("afterChoose", function(){
+                    var nodes = datagrid.selection.getSelectedNodes();
+                    var cfgs  = settings.getJson("project/run/configs");
+                    nodes.forEach(function (node) {
+                        commands.exec("showoutput", null, {
+                            config: cfgs[node.name]
+                        });
+                    });
+                });
+                
+                datagrid.on("delete", function(e){
+                    var nodes = datagrid.selection.getSelectedNodes();
+                    nodes.forEach(function (node) {
+                        removeConfig(node.name);
+                    });
+                });
+                
+                new ui.button({
+                    htmlNode : container.parentNode,
+                    caption  : "Remove Selected Configs",
+                    skin     : "c9-toolbarbutton-glossy",
+                    style    : "width:160px;position:absolute;left:10px;bottom:10px",
+                    onclick  : function(){
+                        datagrid.execCommand("delete");
+                    }
+                });
+                new ui.button({
+                    htmlNode : container.parentNode,
+                    caption  : "Add New Config",
+                    skin     : "c9-toolbarbutton-glossy",
+                    style    : "width:105px;position:absolute;left:175px;bottom:10px",
+                    onclick  : function(){
+                        commands.exec("showoutput", null, {});
+                    }
+                });
+                
+                reloadModel();
             }, plugin);
             
             // settings
@@ -364,6 +432,10 @@ define(function(require, module, exports) {
                         });
                     }
                 }
+            }, plugin);
+            
+            settings.on("project/run/configs", function(){
+                reloadModel();
             }, plugin);
     
             tabs.on("focus", function(e){
@@ -436,6 +508,27 @@ define(function(require, module, exports) {
             });
             
             emit("draw");
+        }
+        
+        /***** Helper Methods *****/
+        
+        function removeConfig(name){
+            var cfgs  = settings.getJson("project/run/configs");
+            if (!cfgs) return;
+            
+            delete cfgs[name];
+            settings.setJson("project/run/configs", cfgs);
+        }
+        
+        function reloadModel(){
+            if (!model) return;
+            
+            var cfgs  = settings.getJson("project/run/configs") || {};
+            var nodes = Object.keys(cfgs).map(function(name){
+                return cfgs[name];
+            }).sort();
+            
+            model.setRoot({children : nodes});
         }
         
         /***** Methods *****/
