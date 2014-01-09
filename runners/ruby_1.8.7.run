@@ -3,7 +3,7 @@
     "cmd": ["ruby", "$file"],
     "env": {
         "GEM_HOME": "$home/lib/ruby/gems",
-        "GEM_PATH": "$home/lib/ruby/gems:/usr/lib/ruby/gems/1.8"
+        "GEM_PATH": "$home/lib/ruby/gems:/usr/libexec/openshift/cartridges/c9-0.1/root/lib/ruby/gems"
     },
     "info": "Your code is running at \\033[01;34m$hostname\\033[00m.\n\\033[01;31mImportant:\\033[00m use \\033[01;32mENV['PORT']\\033[00m as the port and \\033[01;32mENV['IP']\\033[00m as the host in your scripts!\n"
 }
