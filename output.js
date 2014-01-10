@@ -629,6 +629,10 @@ define(function(require, exports, module) {
                             updateRunner(currentSession);
                     }
                 });
+                tbCommand.$ext.addEventListener("keydown", function(e) {
+                    if (e.keyCode === 13)
+                        currentSession && runNow(currentSession);
+                });
                 tbName.on("afterchange", function(e){
                     if (!currentSession) return;
                     
