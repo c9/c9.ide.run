@@ -8,6 +8,9 @@ define(function(require, exports, module) {
     main.provides = ["output"];
     return main;
     
+    // On line 894 trigger connect to output or connect after process is started
+    // add special case in terminal.js to not auto connect when isOutput
+    
     function main(options, imports, register) {
         var editors   = imports.editors;
         var ui        = imports.ui;
@@ -208,13 +211,15 @@ define(function(require, exports, module) {
                     return;
                 }
                 
-                var term = session.terminal.aceSession.term;
-                term.$resetScreenOnStateChange = false;
-                
-                if (settings.getBool("user/output/@keepOutput"))
-                    term.clearScreen(2);
-                else
-                    term.reset();
+                if (session.terminal) {
+                    var term = session.terminal.aceSession.term;
+                    term.$resetScreenOnStateChange = false;
+                    
+                    if (settings.getBool("user/output/@keepOutput"))
+                        term.clearScreen(2);
+                    else
+                        term.reset();
+                }
                 
                 var path   = tbCommand.value || session.config.command;
                 var bDebug = btnDebug.value;
@@ -245,6 +250,8 @@ define(function(require, exports, module) {
                         args  : args,
                         debug : bDebug
                     }, session.id, function(err, pid){
+                        session.connect();
+                        
                         if (err) {
                             transformButton(session);
                             session.process = null;
@@ -694,12 +701,6 @@ define(function(require, exports, module) {
                 var tab     = e.doc.tab;
                 var session = doc.getSession();
                 
-                // @todo set session.path
-                // @todo enable debugging by default if runner supports it
-                // @todo warn in runNow if debugger is already working and ask if the other should be stopped
-                // @todo warn on close of output, asking to save config
-                // @todo stop process when output window is closed
-                
                 if (!session.config)
                     session.config = { env : {} };
                 
@@ -899,6 +900,8 @@ define(function(require, exports, module) {
                 
                 if (state.run)
                     runNow(session);
+                else
+                    session.connect();
                 
                 session.updateTitle();
             });

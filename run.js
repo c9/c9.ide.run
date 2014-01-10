@@ -205,7 +205,7 @@ define(function(require, module, exports) {
             }
             
             var WATCHFILE = "~/.c9/.run_" + procName + ".watch";
-            
+
             // Deal with connection issues
             c9.on("stateChange", function(e){
                 if (e.state & c9.PROCESS) {
@@ -306,7 +306,7 @@ define(function(require, module, exports) {
                         
                         return callback(err);
                     }
-                    
+
                     // Set process variable for later use
                     process = pty;
                     
