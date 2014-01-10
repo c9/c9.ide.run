@@ -264,8 +264,7 @@ define(function(require, module, exports) {
                     }
     
                     // Open a pty session with tmux on the output buffer
-                    // @todo eventually this might be better in the output plugin
-                    // The basic command to run
+                    // @todo add argument escaping
                     cmd += (options[idx].debug 
                       && runner["cmd-debug"] || runner.cmd).join(" ");
                     
