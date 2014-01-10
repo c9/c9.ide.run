@@ -258,6 +258,7 @@ define(function(require, module, exports) {
                         cmd += "export PATH=" + runner.path + " ; ";
                         
                     var env = util.extend({}, options[idx].env, runner.env);
+                    env["C9_HOSTNAME"] = c9.hostname;
                     for (var name in env) {
                         cmd += "export " + name + "=" + env[name] + " ; ";
                     }
