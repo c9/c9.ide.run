@@ -891,9 +891,9 @@ define(function(require, exports, module) {
                     decorateProcess(session);
                     transformButton(session);
                     
-                    if (state.running.debug) {
+                    if (state.running.debug && session.process.running > 0) {
                         session.process.meta.debug = true;
-                        session.process.on("back", function(){
+                        session.process.once("back", function(){
                             debug.debug(session.process, true, function(err){
                                 if (err)
                                     return; // Either the debugger is not found or paused

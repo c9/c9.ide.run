@@ -628,27 +628,27 @@ define(function(require, module, exports) {
             plugin.freezePublicAPI({
                 /**
                  * @property {-2} CLEANING  Indicates the process run state is 
-                 * being cleaned up. To be tested against the `runner` property.
+                 * being cleaned up. To be tested against the `running` property.
                  */
                 CLEANING : CLEANING,
                 /**
                  * @property {-1} STOPPING  Indicates the process is being 
-                 * killed. To be tested against the `runner` property.
+                 * killed. To be tested against the `running` property.
                  */
                 STOPPING : STOPPING,
                 /**
                  * @property  {0} STOPPED  Indicates the process is not running. 
-                 * To be tested against the `runner` property.
+                 * To be tested against the `running` property.
                  */
                 STOPPED  : STOPPED,
                 /**
                  * @property {1} STARTING  Indicates the process is getting 
-                 * started. To be tested against the `runner` property.
+                 * started. To be tested against the `running` property.
                  */
                 STARTING : STARTING,
                 /**
                  * @property  {2} STARTED  Indicates the process is running. 
-                 * To be tested against the `runner` property.
+                 * To be tested against the `running` property.
                  */
                 STARTED  : STARTED,
                 
