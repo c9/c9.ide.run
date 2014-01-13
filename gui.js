@@ -436,8 +436,8 @@ define(function(require, module, exports) {
                     decorateProcess();
                     transformButton("stop");
                     
-                    if (state.debug) {
-                        process.on("back", function(){
+                    if (state.debug && process.running > 0) {
+                        process.once("back", function(){
                             debug.debug(process, true, function(err){
                                 if (err)
                                     return; // Either the debugger is not found or paused
