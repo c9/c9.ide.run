@@ -552,7 +552,10 @@ define(function(require, exports, module) {
                     });
                 }
                 else {
-                    var path = (session.config.command || "").split(" ", 1)[0];
+                    var split = (session.config.command || "").split(/([^\\] )+/, 1);
+                    var path  = split.length > 1
+                        ? split[0] + RegExp.$1
+                        : split[0];
                     if (!path) return;
                     
                     run.detectRunner({ path: path }, function(err, runner){
