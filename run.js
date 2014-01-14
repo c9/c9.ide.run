@@ -276,6 +276,10 @@ define(function(require, module, exports) {
                 
                 // The rest of the options are singular. Choosing the first option object for this.
                 options = options[0];
+                
+                var cwd = options.cwd || runner[0].working_dir 
+                        || options.path && dirname(options.path) || "/";
+                cwd = insertVariables(cwd, options);
     
                 // @todo deal with escaped double quotes 
                 // cmd = bashQuote(cmd);
@@ -286,8 +290,7 @@ define(function(require, module, exports) {
                              options.detach !== false ? "detach" : ""],
                     cols : 100,
                     rows : 5,
-                    cwd  : options.cwd || runner[0].working_dir 
-                        || options.path && dirname(options.path) || "/",
+                    cwd  : cwd,
                     validatePath : true,
                     testing      : testing
                 }, function(err, pty){
@@ -450,7 +453,7 @@ define(function(require, module, exports) {
             function insertVariables(cmd, options){
                 cmd = cmd.replace(/(^|[^\\])\$([\w_]+)|(^|[^\\])\$\{([^}]+)\}/g, 
                 function(m, char, name, nchar, nacco){
-                    if (char)
+                    if (char || !nchar)
                         return char + getVariable(name, options.path, options.args);
                     else if (nchar) {
                         
