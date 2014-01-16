@@ -120,13 +120,11 @@ define(function(require, exports, module) {
 
             settings.on("user/output", setSettings);
             
-            layout.on("themeChange", function(e){
-                if (e.defaults) {
-                    var skin = e.theme;
-                    settings.set("user/output/@backgroundColor", defaults[skin][0]);
-                    settings.set("user/output/@foregroundColor", defaults[skin][1]);
-                    settings.set("user/output/@selectionColor", defaults[skin][2]);
-                }
+            layout.on("themeDefaults", function(e){
+                var skin = e.theme;
+                settings.set("user/output/@backgroundColor", defaults[skin][0]);
+                settings.set("user/output/@foregroundColor", defaults[skin][1]);
+                settings.set("user/output/@selectionColor", defaults[skin][2]);
             }, handle);
             
             // Settings UI
