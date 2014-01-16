@@ -824,9 +824,12 @@ define(function(require, exports, module) {
                     }
                 }, session);
                 
-                tab.on("unload", function(){
-                    if (session.process && session.process.running)
+                // Preferred before to be before the state is serialized
+                tab.on("beforeUnload", function(){
+                    if (session.process && session.process.running) {
                         session.process.stop(function(){});
+                        tab.className.remove("running");
+                    }
                 });
                 
                 if (e.state.hidden || e.state.run)
