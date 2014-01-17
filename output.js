@@ -308,7 +308,7 @@ define(function(require, exports, module) {
             function transformButton(session){
                 btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
                 
-                if (session.process && session.process.running) {
+                if (session && session.process && session.process.running) {
                     btnRun.setAttribute("icon", "stop.png");
                     btnRun.setAttribute("caption", "Stop");
                     btnRun.setAttribute("tooltip", "");
