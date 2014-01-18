@@ -1,5 +1,5 @@
 {
-    "caption" : "Ruby On Rails (ruby 1.9.3)",
+    "caption" : "Ruby On Rails (Rails 4.0 + Ruby 1.9.3)",
     "cmd": ["rails", "s", "-p", "$PORT", "-b", "$IP"],
     "env": {
         "GEM_HOME": "$home/lib/ruby/gems",
@@ -8,5 +8,6 @@
         "LD_LIBRARY_PATH": "/opt/rh/ruby193/root/usr/lib64",
         "MANPATH": "/opt/rh/ruby193/root/usr/share/man"
     },
+    "working_dir": "$project_path",
     "info": "Your code is running at \\033[01;34m$hostname\\033[00m.\n\\033[01;31mImportant:\\033[00m use \\033[01;32mENV['PORT']\\033[00m as the port and \\033[01;32mENV['IP']\\033[00m as the host in your scripts!\n"
 }

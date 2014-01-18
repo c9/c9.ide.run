@@ -597,8 +597,8 @@ define(function(require, module, exports) {
         
         function runNow(runner, path){
             if (!path) {
-                path = findTabToRun();
-                if (!path) return;
+                path = findTabToRun() || "";
+                // if (!path) return;
             }
             
             if (process && process.running)
@@ -617,7 +617,7 @@ define(function(require, module, exports) {
                         runner : runner,
                         run    : true,
                         config : {
-                            runner  : runner.name || runner,
+                            runner  : runner.caption || runner,
                             command : util.escapeShell(path)
                         }
                     });
