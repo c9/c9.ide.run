@@ -33,11 +33,12 @@ define(function(require, module, exports) {
         var TMUX   = options.tmux || "~/.c9/bin/tmux";
         var BASH   = "bash";
         
-        var runners   = options.runners;
-        var testing   = options.testing;
-        var base      = options.base;
-        var workspace = info.getWorkspace();
-        var processes = [];
+        var runners    = options.runners;
+        var testing    = options.testing;
+        var runnerPath = options.runnerPath || "/.c9/runners";
+        var base       = options.base;
+        var workspace  = info.getWorkspace();
+        var processes  = [];
         
         var loaded = false;
         function load(){
@@ -48,7 +49,7 @@ define(function(require, module, exports) {
             settings.on("read", function(e){
                 // Defaults
                 settings.setDefaults("project/run", [
-                    ["path", "~/.c9/runners"]
+                    ["path", runnerPath]
                 ]);
             }, handle);
             // @todo Could consider adding a watcher to ~/.c9/runners
