@@ -585,7 +585,7 @@ define(function(require, module, exports) {
                         pid = parseInt(RegExp.$1, 10);
                     
                     // Process has exited
-                    if (err || pid == -1 || pid != originalPid) {
+                    if (err || pid == -1 || pid != originalPid || !pid) {
                         cleanup(function(){
                             checking = false;
                         });

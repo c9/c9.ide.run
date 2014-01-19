@@ -220,7 +220,7 @@ define(function(require, exports, module) {
                 }
                 
                 var path   = tbCommand.value || session.config.command;
-                var bDebug = btnDebug.value;
+                var bDebug = btnDebug.visible && btnDebug.value;
                 var args   = path.split(" ");
                 
                 path = args.shift();
@@ -563,7 +563,8 @@ define(function(require, exports, module) {
                 transformButton(session);
                 
                 var cfg = session.config;
-                
+                btnDebug.setAttribute("visible", 
+                    !cfg.runner || cfg.runner.debugger);
                 btnDebug.setAttribute("value", cfg.debug);
                 btnRunner.setAttribute("caption", "Runner: " 
                     + (cfg.runner || "Auto"));
@@ -731,11 +732,7 @@ define(function(require, exports, module) {
                     if (session == currentSession) {
                         btnRunner.setAttribute("caption", "Runner: " 
                             + (runner ? runner.caption : "Auto"));
-                        
-                        if (!runner || runner.debugger)
-                            btnDebug.show();
-                        else
-                            btnDebug.hide();
+                        updateToolbar(session);
                     }
                 }
                 
