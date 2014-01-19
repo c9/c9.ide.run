@@ -564,7 +564,7 @@ define(function(require, exports, module) {
                 
                 var cfg = session.config;
                 btnDebug.setAttribute("visible", 
-                    !cfg.runner || session.runner.debugger);
+                    !session.runner || session.runner.debugger ? true : false);
                 btnDebug.setAttribute("value", cfg.debug);
                 btnRunner.setAttribute("caption", "Runner: " 
                     + (cfg.runner || "Auto"));
