@@ -774,13 +774,13 @@ define(function(require, exports, module) {
                 session.updateTitle = function(){
                     var process = session.process;
                     
-                    doc.title   = 
-                    doc.tooltip = (!process
-                        ? "[Idle] "
+                    doc.tooltip = 
+                    doc.title   = (session.config.name || session.config.command || "")
+                      + " - " + (!process
+                        ? "Idle"
                         : (process.running
-                            ? "[Running] "
-                            : "[Stopped] ")) 
-                        + (session.config.name || session.config.command || "");
+                            ? "Running"
+                            : "Stopped"));
                     
                     if (process && process.running)
                         tab.className.add("running");
