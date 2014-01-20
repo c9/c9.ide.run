@@ -1,5 +1,5 @@
 {
-    "caption" : "Apache (PHP, HTML)",
-    "cmd": ["apache", "$project_path", "$file"],
+    "caption" : "Apache httpd (PHP, HTML)",
+    "cmd": ["httpd", "-X", "-c", "Listen 127.0.0.1:8080", "-c", "DocumentRoot $project_path"],
     "selector": "^.*\\.(php|phtml|html|shtml)$"
 }
