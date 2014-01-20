@@ -265,8 +265,7 @@ define(function(require, module, exports) {
     
                     // Open a pty session with tmux on the output buffer
                     // @todo add argument escaping
-                    cmd += (options[idx].debug 
-                      && runner["cmd-debug"] || runner.cmd).join(" ");
+                    cmd += bashQuote(options[idx].debug && runner["cmd-debug"] || runner.cmd);
                     
                     // Replace variables
                     cmd = insertVariables(cmd, options[idx]);
@@ -280,9 +279,6 @@ define(function(require, module, exports) {
                 var cwd = options.cwd || runner[0].working_dir 
                         || options.path && dirname(options.path) || "/";
                 cwd = insertVariables(cwd, options);
-    
-                // @todo deal with escaped double quotes 
-                // cmd = bashQuote(cmd);
                 
                 // Execute run.sh
                 proc.pty("~/.c9/bin/run.sh", {
@@ -736,8 +732,10 @@ define(function(require, module, exports) {
             return plugin;
         }
         
-        function bashQuote(str) {
-            return "'" + str.replace(/'/g, "'\\''") + "'";
+        function bashQuote(commandArgs) {
+            return commandArgs.map(function(part) {
+                return "'" + part.replace(/'/g, "'\\''") + "'";
+            }).join(" ");
         }
         
         /***** Lifecycle *****/
