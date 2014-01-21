@@ -406,8 +406,7 @@ define(function(require, module, exports) {
                 var fnme, idx;
 
                 if (name == "file") 
-                    return (path || "") 
-                        + (args && args.length ? " "  + args.join(" ") : "");
+                    return (path || "");
                 if (name == "file_path")
                     return dirname(path || "");
                 if (name == "file_name") 
@@ -418,6 +417,8 @@ define(function(require, module, exports) {
                     idx = fnme.lastIndexOf(".");
                     return idx == -1 ? "" : fnme.substr(idx + 1);
                 }
+                if (name === "args")
+                    return args.join(" ");
                 if (name == "file_base_name") {
                     if (!path) return "";
                     fnme = basename(path);
@@ -735,6 +736,8 @@ define(function(require, module, exports) {
         
         function bashQuote(commandArgs) {
             return commandArgs.map(function(part) {
+                if (part === "$args")
+                    return part;
                 return "'" + part.replace(/'/g, "'\\''") + "'";
             }).join(" ");
         }
@@ -979,6 +982,7 @@ define(function(require, module, exports) {
              * <tr><td>Variable</td><td>               Description</td></tr>
              * <tr><td>"$file_path"</td><td>           The directory of the current file, e. g., C:\Files.</td></tr>
              * <tr><td>"$file"</td><td>                The full path to the current file, e. g., C:\Files\Chapter1.txt.</td></tr>
+             * <tr><td>"$args"</td><td>                Any arguments entered after the file name.</td></tr>
              * <tr><td>"$file_name"</td><td>           The name portion of the current file, e. g., Chapter1.txt.</td></tr>
              * <tr><td>"$file_extension"</td><td>      The extension portion of the current file, e. g., txt.</td></tr>
              * <tr><td>"$file_base_name"</td><td>      The name only portion of the current file, e. g., Document.</td></tr>
