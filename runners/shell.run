@@ -1,4 +1,4 @@
 {
     "caption" : "Shell Command",
-    "cmd": ["bash", "-c", "$file"]
+    "cmd": ["bash", "-c", "$file", "$args"]
 }
