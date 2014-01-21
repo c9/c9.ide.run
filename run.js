@@ -164,6 +164,7 @@ define(function(require, module, exports) {
                 name = "output";
             
             (options instanceof Array ? options : [options]).forEach(function(a){
+                a.relPath = a.path;
                 if (a.path && a.path.charAt(0) === "/")
                     a.path = base + a.path;
             });
@@ -405,8 +406,10 @@ define(function(require, module, exports) {
                 });
             }
             
-            function getVariable(name, path, args){
+            function getVariable(name, options){
                 var fnme, idx;
+                var path = options.path;
+                var args = options.args;
 
                 if (name == "file") 
                     return (path || "");
@@ -439,9 +442,11 @@ define(function(require, module, exports) {
                 if (name == "project_contents")
                     return workspace.contents;
                 if (name == "hostname")
-                    return c9.hostname;
+                    return c9.hostname || "localhost";
+                if (name == "hostname_path")
+                    return (c9.hostname || "localhost") + options.relPath;
                 if (name == "port")
-                    return c9.port;
+                    return c9.port || "8080";
                 if (name == "ip")
                     return "0.0.0.0";
                 if (name == "home")
@@ -455,12 +460,12 @@ define(function(require, module, exports) {
                 cmd = cmd.replace(/(^|[^\\])\$([\w_]+)|(^|[^\\])\$\{([^}]+)\}/g, 
                 function(m, char, name, nchar, nacco){
                     if (char || !nchar)
-                        return char + getVariable(name, options.path, options.args);
+                        return char + getVariable(name, options);
                     else if (nchar) {
                         
                         // Test for default value
                         if (nacco.match(/^([\w_]+)\:(.*)$/))
-                            return nchar + (getVariable(RegExp.$1, options.path, options.args) || RegExp.$2);
+                            return nchar + (getVariable(RegExp.$1, options) || RegExp.$2);
                             
                         // Test for conditional value
                         if (nacco.match(/^([\w_]+)\?(.*)$/))
@@ -471,7 +476,7 @@ define(function(require, module, exports) {
                             return nchar + reverse(nacco)
                                 .replace(/^\/?(.*)\/(?!\\)(.*)\/(?!\\)([\w_]+)$/, 
                                 function (m, replace, find, name){
-                                    var data = getVariable(reverse(name), options.path, options.args);
+                                    var data = getVariable(reverse(name), options);
                                     var re   = new RegExp(reverse(find), "g");
                                     return data.replace(re, reverse(replace));
                                 });
@@ -479,7 +484,7 @@ define(function(require, module, exports) {
                         
                         // TODO quotes
                         // Assume just a name
-                        return nchar + getVariable(nacco, options.path, options.args);
+                        return nchar + getVariable(nacco, options);
                     }
                 });
                 
@@ -995,9 +1000,10 @@ define(function(require, module, exports) {
              * <tr><td>"$project_name"</td><td>        The name portion of the current project file.</td></tr>
              * <tr><td>"$project_extension"</td><td>   The extension portion of the current project file.</td></tr>
              * <tr><td>"$project_base_name"</td><td>   The name only portion of the current project file.</td></tr>
-             * <tr><td>"$hostname"</td><td>            The hostname of the workspace</td></tr>
-             * <tr><td>"$port"</td><td>                The port assigned to the workspace</td></tr>
-             * <tr><td>"$ip"</td><td>                  The ip address to run a process against in the workspace</td></tr>
+             * <tr><td>"$hostname"</td><td>            The hostname of the workspace.</td></tr>
+             * <tr><td>"$hostname_path"</td><td>       The hostname of the workspace together with the relative path of the project file.</td></tr>
+             * <tr><td>"$port"</td><td>                The port assigned to the workspace.</td></tr>
+             * <tr><td>"$ip"</td><td>                  The ip address to run a process against in the workspace.</td></tr>
              * </table>
              * 
              * The following declarations can be used to add defaults or regexp
