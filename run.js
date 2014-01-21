@@ -446,7 +446,7 @@ define(function(require, module, exports) {
                     return "0.0.0.0";
                 if (name == "home")
                     return c9.home;
-                return "$" + name;
+                return "";
             }
             function reverse(str){ 
                 return str.split('').reverse().join('');
