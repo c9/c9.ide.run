@@ -663,7 +663,7 @@ define(function(require, exports, module) {
                     // Start this run config with the new runner
                     run.getRunner(value, function(err, result){
                         if (err)
-                            return showError(err);
+                            return showError("Cannot use " + value + ": " + err);
                         
                         currentSession.setRunner(result);
                     });

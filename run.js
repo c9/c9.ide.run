@@ -137,6 +137,9 @@ define(function(require, module, exports) {
                     if (err)
                         return callback(err);
                     
+                    // Remove comments
+                    data = data.replace(/\/\/.*/g, "");
+                    
                     var runner;
                     try{ runner = JSON.parse(data); }
                     catch(e){ return callback(e); }
