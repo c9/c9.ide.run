@@ -221,7 +221,7 @@ define(function(require, exports, module) {
                 
                 var path   = tbCommand.value || session.config.command;
                 var bDebug = btnDebug.visible && btnDebug.value;
-                var args   = path.split(" ");
+                var args   = splitPathArgs(path);
                 
                 path = args.shift();
                 
@@ -273,6 +273,26 @@ define(function(require, exports, module) {
                 }
                 
                 runGui.lastRun = [runner, path];
+            }
+            
+            function splitPathArgs(pathArgs) {
+                var results = [];
+                var lastStart = 0;
+                for (var i = 0; i < pathArgs.length; i++) {
+                    var c = pathArgs[i];
+                    if (c === "\\") {
+                        pathArgs = pathArgs.substr(0, i) + pathArgs.substr(i + 1);
+                        continue;
+                    }
+                    if (c === " ") {
+                        results.push(pathArgs.substring(lastStart, i));
+                        lastStart = i + 1;
+                    }
+                }
+                var lastPart = pathArgs.substring(lastStart, i);
+                if (lastPart.length)
+                    results.push(lastPart);
+                return results;
             }
             
             function decorateProcess(session){
