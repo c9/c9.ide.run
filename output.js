@@ -775,7 +775,7 @@ define(function(require, exports, module) {
                     var process = session.process;
                     
                     doc.tooltip = 
-                    doc.title   = (session.config.name || session.config.command || "")
+                    doc.title   = (session.config.name || session.config.command || "[New]")
                       + " - " + (!process
                         ? "Idle"
                         : (process.running
