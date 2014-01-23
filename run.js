@@ -457,23 +457,23 @@ define(function(require, module, exports) {
                 return str.split('').reverse().join('');
             }
             function insertVariables(cmd, options){
-                cmd = cmd.replace(/(^|[^\\])\$([\w_]+)|(^|[^\\])\$\{([^}]+)\}/g, 
-                function(m, char, name, nchar, nacco){
-                    if (char || !nchar)
-                        return char + getVariable(name, options);
-                    else if (nchar) {
+                cmd = cmd.replace(/(^|[^\\])(?:\$([\w_]+)|\$\{([^}]+)\})/g,
+                function(m, startChar, name, nameBrackets){
+                    if (name || !nameBrackets)
+                        return startChar + getVariable(name, options);
+                    else if (startChar) {
                         
                         // Test for default value
-                        if (nacco.match(/^([\w_]+)\:(.*)$/))
-                            return nchar + (getVariable(RegExp.$1, options) || RegExp.$2);
+                        if (nameBrackets.match(/^([\w_]+)\:(.*)$/))
+                            return startChar + (getVariable(RegExp.$1, options) || RegExp.$2);
                             
                         // Test for conditional value
-                        if (nacco.match(/^([\w_]+)\?(.*)$/))
-                            return nchar + (options[RegExp.$1] ? RegExp.$2 : "");
+                        if (nameBrackets.match(/^([\w_]+)\?(.*)$/))
+                            return startChar + (options[RegExp.$1] ? RegExp.$2 : "");
                             
                         // Test for regular expression
-                        if (nacco.match(/^([\w_]+)\/(.*)$/)) {
-                            return nchar + reverse(nacco)
+                        if (nameBrackets.match(/^([\w_]+)\/(.*)$/)) {
+                            return startChar + reverse(nameBrackets)
                                 .replace(/^\/?(.*)\/(?!\\)(.*)\/(?!\\)([\w_]+)$/, 
                                 function (m, replace, find, name){
                                     var data = getVariable(reverse(name), options);
@@ -484,7 +484,7 @@ define(function(require, module, exports) {
                         
                         // TODO quotes
                         // Assume just a name
-                        return nchar + getVariable(nacco, options);
+                        return startChar + getVariable(nameBrackets, options);
                     }
                 });
                 
