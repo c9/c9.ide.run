@@ -457,19 +457,19 @@ define(function(require, module, exports) {
                 return str.split('').reverse().join('');
             }
             function insertVariables(cmd, options){
-                cmd = cmd.replace(/(^|[^\\])(?:\$([\w_]+)|\$\{([^}]+)\})/g,
-                function(m, startChar, name, nameBrackets){
+                cmd = cmd.replace(/(^|[^\\])(?:\$([\w_]+)|\$\{([^}]+)\})([^\\]|)/g,
+                function(m, startChar, name, nameBrackets, endChar) {
                     if (name || !nameBrackets)
-                        return startChar + getVariable(name, options);
+                        return startChar + getVariable(name, options) + endChar;
                     else if (startChar) {
                         
                         // Test for default value
                         if (nameBrackets.match(/^([\w_]+)\:(.*)$/))
-                            return startChar + (getVariable(RegExp.$1, options) || RegExp.$2);
+                            return startChar + (getVariable(RegExp.$1, options) || RegExp.$2) + endChar;
                             
                         // Test for conditional value
                         if (nameBrackets.match(/^([\w_]+)\?(.*)$/))
-                            return startChar + (options[RegExp.$1] ? RegExp.$2 : "");
+                            return options[RegExp.$1] ? startChar + RegExp.$2 + endChar : "";
                             
                         // Test for regular expression
                         if (nameBrackets.match(/^([\w_]+)\/(.*)$/)) {
@@ -479,12 +479,12 @@ define(function(require, module, exports) {
                                     var data = getVariable(reverse(name), options);
                                     var re   = new RegExp(reverse(find), "g");
                                     return data.replace(re, reverse(replace));
-                                });
+                                }) + endChar;
                         }
                         
                         // TODO quotes
                         // Assume just a name
-                        return startChar + getVariable(nameBrackets, options);
+                        return startChar + getVariable(nameBrackets, options) + endChar;
                     }
                 });
                 
