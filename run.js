@@ -424,7 +424,7 @@ define(function(require, module, exports) {
                     return idx == -1 ? "" : fnme.substr(idx + 1);
                 }
                 if (name === "args")
-                    return args.join(" ");
+                    return bashQuote(args, true);
                 if (name == "file_base_name") {
                     if (!path) return "";
                     fnme = basename(path);
@@ -742,9 +742,9 @@ define(function(require, module, exports) {
             return plugin;
         }
         
-        function bashQuote(commandArgs) {
+        function bashQuote(commandArgs, alsoQuoteArgs) {
             return commandArgs.map(function(part) {
-                if (part === "$args")
+                if (part === "$args" && !alsoQuoteArgs)
                     return part;
                 return "'" + part.replace(/'/g, "'\\''") + "'";
             }).join(" ");
