@@ -245,7 +245,7 @@ define(function(require, exports, module) {
                     
                     session.process = run.run(runner, {
                         path  : path,
-                        cwd   : "",
+                        cwd   : session.config.cwd || "",
                         env   : session.config.env || {},
                         args  : args,
                         debug : bDebug
@@ -696,7 +696,8 @@ define(function(require, exports, module) {
                 };
                 
                 btnCwd.on("click", function selectCwd(e, cwd) {
-                    showSave("Select current working directory", cwd || currentSession.runner.working_dir || "/",
+                    cwd = cwd || currentSession.config.cwd || currentSession.runner.working_dir || "/";
+                    showSave("Select current working directory", cwd,
                         function(directory, stat, hide) {
                             if (!stat) {
                                 hide();
@@ -707,7 +708,7 @@ define(function(require, exports, module) {
                                     selectCwd(e, directory)
                                 );
                             }
-                            currentSession.runner.working_dir = directory;
+                            currentSession.config.cwd = directory;
                             hide();
                         },
                         function() {},

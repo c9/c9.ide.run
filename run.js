@@ -167,6 +167,8 @@ define(function(require, module, exports) {
                 a.relPath = a.path;
                 if (a.path && a.path.charAt(0) === "/")
                     a.path = base + a.path;
+                if (a.cwd && a.cwd.charAt(0) === "/")
+                    a.cwd = base + a.cwd;
             });
             
             var proc = new Process(name, runner, options, callback);
