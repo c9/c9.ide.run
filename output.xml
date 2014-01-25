@@ -36,7 +36,7 @@
             caption  = "CWD"
             class    = "bug"
             tooltip  = "Set current working directory"
-            style    = "min-width:23px"/>
+            style    = "min-width:45px"/>
         <a:button skin="c9-toolbarbutton-glossy" id="btnEnv" caption="Environment" style="min-width:30px"/>
     </div>
 </a:application>
