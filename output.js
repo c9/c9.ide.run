@@ -3,7 +3,7 @@ define(function(require, exports, module) {
         "Editor", "editors", "util", "commands", "terminal",
         "settings", "ui", "proc", "tabManager", "run", "console", "run.gui",
         "layout", "debugger", "settings", "dialog.question", "c9", "preferences",
-        "dialog.error", "dialog.filesave"
+        "dialog.error", "dialog.filesave", "dialog.alert"
     ];
     main.provides = ["output"];
     return main;
@@ -25,6 +25,7 @@ define(function(require, exports, module) {
         var runGui    = imports["run.gui"];
         var question  = imports["dialog.question"];
         var showError = imports["dialog.error"].show;
+        var showAlert = imports["dialog.alert"].show;
         var showSave  = imports["dialog.filesave"].show;
         var Terminal  = imports.terminal.Terminal;
         var debug     = imports.debugger;
@@ -694,13 +695,26 @@ define(function(require, exports, module) {
                     btnRunner.setAttribute("caption", "Runner: " + value);
                 };
                 
-                btnCwd.on("click", function(){
-                    showSave("Select current working directory", "/",
-                        function() {
-                            // onChoose
+                btnCwd.on("click", function selectCwd(e, cwd) {
+                    showSave("Select current working directory", cwd || currentSession.runner.working_dir || "/",
+                        function(directory, stat, hide) {
+                            if (!stat) {
+                                hide();
+                                return showAlert(
+                                    "Select current working directory",
+                                    "Directory does not exist",
+                                    directory,
+                                    selectCwd(e, directory)
+                                );
+                            }
+                            currentSession.runner.working_dir = directory;
+                            hide();
                         },
                         function() {},
-                        { chooseCaption: "Select" }
+                        {
+                            chooseCaption: "Select",
+                            hideFilename: true
+                        }
                     )
                 });
                 
