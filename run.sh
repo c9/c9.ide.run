@@ -9,7 +9,8 @@ BASE="$HOME/.c9/"
 WATCHFILE="$BASE.run_$NAME.watch"
 
 if [ "$TMUX" = "pid" ]; then
-    ps ax | grep $WATCHFILE | grep rm || echo -1
+    PID=`ps ax | grep $WATCHFILE | grep rm || echo -1`
+    echo "PID: $PID"
     exit 0
 fi
 

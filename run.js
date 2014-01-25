@@ -33,11 +33,12 @@ define(function(require, module, exports) {
         var TMUX   = options.tmux || "~/.c9/bin/tmux";
         var BASH   = "bash";
         
-        var runners   = options.runners;
-        var testing   = options.testing;
-        var base      = options.base;
-        var workspace = info.getWorkspace();
-        var processes = [];
+        var runners    = options.runners;
+        var testing    = options.testing;
+        var runnerPath = options.runnerPath || "/.c9/runners";
+        var base       = options.base;
+        var workspace  = info.getWorkspace();
+        var processes  = [];
         
         var loaded = false;
         function load(){
@@ -48,7 +49,7 @@ define(function(require, module, exports) {
             settings.on("read", function(e){
                 // Defaults
                 settings.setDefaults("project/run", [
-                    ["path", "~/.c9/runners"]
+                    ["path", runnerPath]
                 ]);
             }, handle);
             // @todo Could consider adding a watcher to ~/.c9/runners
@@ -136,6 +137,9 @@ define(function(require, module, exports) {
                     if (err)
                         return callback(err);
                     
+                    // Remove comments
+                    data = data.replace(/\/\/.*/g, "");
+                    
                     var runner;
                     try{ runner = JSON.parse(data); }
                     catch(e){ return callback(e); }
@@ -160,6 +164,7 @@ define(function(require, module, exports) {
                 name = "output";
             
             (options instanceof Array ? options : [options]).forEach(function(a){
+                a.relPath = a.path;
                 if (a.path && a.path.charAt(0) === "/")
                     a.path = base + a.path;
             });
@@ -401,12 +406,13 @@ define(function(require, module, exports) {
                 });
             }
             
-            function getVariable(name, path, args){
+            function getVariable(name, options){
                 var fnme, idx;
+                var path = options.path;
+                var args = options.args;
 
                 if (name == "file") 
-                    return (path || "") 
-                        + (args && args.length ? " "  + args.join(" ") : "");
+                    return (path || "");
                 if (name == "file_path")
                     return dirname(path || "");
                 if (name == "file_name") 
@@ -417,6 +423,8 @@ define(function(require, module, exports) {
                     idx = fnme.lastIndexOf(".");
                     return idx == -1 ? "" : fnme.substr(idx + 1);
                 }
+                if (name === "args")
+                    return bashQuote(args, true);
                 if (name == "file_base_name") {
                     if (!path) return "";
                     fnme = basename(path);
@@ -434,47 +442,49 @@ define(function(require, module, exports) {
                 if (name == "project_contents")
                     return workspace.contents;
                 if (name == "hostname")
-                    return c9.hostname;
+                    return c9.hostname || "localhost";
+                if (name == "hostname_path")
+                    return (c9.hostname || "localhost") + options.relPath;
                 if (name == "port")
-                    return c9.port;
+                    return c9.port || "8080";
                 if (name == "ip")
                     return "0.0.0.0";
                 if (name == "home")
                     return c9.home;
-                return "$" + name;
+                return "";
             }
             function reverse(str){ 
                 return str.split('').reverse().join('');
             }
             function insertVariables(cmd, options){
-                cmd = cmd.replace(/(^|[^\\])\$([\w_]+)|(^|[^\\])\$\{([^}]+)\}/g, 
-                function(m, char, name, nchar, nacco){
-                    if (char || !nchar)
-                        return char + getVariable(name, options.path, options.args);
-                    else if (nchar) {
+                cmd = cmd.replace(/(^|[^\\])(?:\$([\w_]+)|\$\{([^}]+)\})([^\\]|)/g,
+                function(m, startChar, name, nameBrackets, endChar) {
+                    if (name || !nameBrackets)
+                        return startChar + getVariable(name, options) + endChar;
+                    else if (startChar) {
                         
                         // Test for default value
-                        if (nacco.match(/^([\w_]+)\:(.*)$/))
-                            return nchar + (getVariable(RegExp.$1, options.path, options.args) || RegExp.$2);
+                        if (nameBrackets.match(/^([\w_]+)\:(.*)$/))
+                            return startChar + (getVariable(RegExp.$1, options) || RegExp.$2) + endChar;
                             
                         // Test for conditional value
-                        if (nacco.match(/^([\w_]+)\?(.*)$/))
-                            return nchar + (options[RegExp.$1] ? RegExp.$2 : "");
+                        if (nameBrackets.match(/^([\w_]+)\?(.*)$/))
+                            return options[RegExp.$1] ? startChar + RegExp.$2 + endChar : "";
                             
                         // Test for regular expression
-                        if (nacco.match(/^([\w_]+)\/(.*)$/)) {
-                            return nchar + reverse(nacco)
+                        if (nameBrackets.match(/^([\w_]+)\/(.*)$/)) {
+                            return startChar + reverse(nameBrackets)
                                 .replace(/^\/?(.*)\/(?!\\)(.*)\/(?!\\)([\w_]+)$/, 
                                 function (m, replace, find, name){
-                                    var data = getVariable(reverse(name), options.path, options.args);
+                                    var data = getVariable(reverse(name), options);
                                     var re   = new RegExp(reverse(find), "g");
                                     return data.replace(re, reverse(replace));
-                                });
+                                }) + endChar;
                         }
                         
                         // TODO quotes
                         // Assume just a name
-                        return nchar + getVariable(nacco, options.path, options.args);
+                        return startChar + getVariable(nameBrackets, options) + endChar;
                     }
                 });
                 
@@ -581,7 +591,7 @@ define(function(require, module, exports) {
                         pid = parseInt(RegExp.$1, 10);
                     
                     // Process has exited
-                    if (err || pid == -1 || pid != originalPid) {
+                    if (err || pid == -1 || pid != originalPid || !pid) {
                         cleanup(function(){
                             checking = false;
                         });
@@ -732,8 +742,10 @@ define(function(require, module, exports) {
             return plugin;
         }
         
-        function bashQuote(commandArgs) {
+        function bashQuote(commandArgs, alsoQuoteArgs) {
             return commandArgs.map(function(part) {
+                if (part === "$args" && !alsoQuoteArgs)
+                    return part;
                 return "'" + part.replace(/'/g, "'\\''") + "'";
             }).join(" ");
         }
@@ -978,6 +990,7 @@ define(function(require, module, exports) {
              * <tr><td>Variable</td><td>               Description</td></tr>
              * <tr><td>"$file_path"</td><td>           The directory of the current file, e. g., C:\Files.</td></tr>
              * <tr><td>"$file"</td><td>                The full path to the current file, e. g., C:\Files\Chapter1.txt.</td></tr>
+             * <tr><td>"$args"</td><td>                Any arguments entered after the file name.</td></tr>
              * <tr><td>"$file_name"</td><td>           The name portion of the current file, e. g., Chapter1.txt.</td></tr>
              * <tr><td>"$file_extension"</td><td>      The extension portion of the current file, e. g., txt.</td></tr>
              * <tr><td>"$file_base_name"</td><td>      The name only portion of the current file, e. g., Document.</td></tr>
@@ -987,9 +1000,10 @@ define(function(require, module, exports) {
              * <tr><td>"$project_name"</td><td>        The name portion of the current project file.</td></tr>
              * <tr><td>"$project_extension"</td><td>   The extension portion of the current project file.</td></tr>
              * <tr><td>"$project_base_name"</td><td>   The name only portion of the current project file.</td></tr>
-             * <tr><td>"$hostname"</td><td>            The hostname of the workspace</td></tr>
-             * <tr><td>"$port"</td><td>                The port assigned to the workspace</td></tr>
-             * <tr><td>"$ip"</td><td>                  The ip address to run a process against in the workspace</td></tr>
+             * <tr><td>"$hostname"</td><td>            The hostname of the workspace.</td></tr>
+             * <tr><td>"$hostname_path"</td><td>       The hostname of the workspace together with the relative path of the project file.</td></tr>
+             * <tr><td>"$port"</td><td>                The port assigned to the workspace.</td></tr>
+             * <tr><td>"$ip"</td><td>                  The ip address to run a process against in the workspace.</td></tr>
              * </table>
              * 
              * The following declarations can be used to add defaults or regexp

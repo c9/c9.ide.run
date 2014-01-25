@@ -204,9 +204,9 @@ define(function(require, module, exports) {
                             value  : '// Create a custom Cloud9 runner - similar to the Sublime build system\n'
                               + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
                               + '{\n'
-                              + '    "caption" : "$file",\n'
-                              + '    "cmd" : ["ls"],\n'
-                              + '    "info" : "Started $project_path/$file"\n'
+                              + '    "caption" : "",\n'
+                              + '    "cmd" : ["ls", "$file", "$args"],\n'
+                              + '    "info" : "Started $project_path/$file",\n'
                               + '    "selector" : "source.ext"\n'
                               + '}',
                             document : {

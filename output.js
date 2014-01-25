@@ -221,8 +221,8 @@ define(function(require, exports, module) {
                 }
                 
                 var path   = tbCommand.value || session.config.command;
-                var bDebug = btnDebug.value;
-                var args   = path.split(" ");
+                var bDebug = btnDebug.visible && btnDebug.value;
+                var args   = splitPathArgs(path);
                 
                 path = args.shift();
                 
@@ -274,6 +274,26 @@ define(function(require, exports, module) {
                 }
                 
                 runGui.lastRun = [runner, path];
+            }
+            
+            function splitPathArgs(pathArgs) {
+                var results = [];
+                var lastStart = 0;
+                for (var i = 0; i < pathArgs.length; i++) {
+                    var c = pathArgs[i];
+                    if (c === "\\") {
+                        pathArgs = pathArgs.substr(0, i) + pathArgs.substr(i + 1);
+                        continue;
+                    }
+                    if (c === " ") {
+                        results.push(pathArgs.substring(lastStart, i));
+                        lastStart = i + 1;
+                    }
+                }
+                var lastPart = pathArgs.substring(lastStart, i);
+                if (lastPart.length)
+                    results.push(lastPart);
+                return results;
             }
             
             function decorateProcess(session){
@@ -564,7 +584,8 @@ define(function(require, exports, module) {
                 transformButton(session);
                 
                 var cfg = session.config;
-                
+                btnDebug.setAttribute("visible", 
+                    !session.runner || session.runner.debugger ? true : false);
                 btnDebug.setAttribute("value", cfg.debug);
                 btnRunner.setAttribute("caption", "Runner: " 
                     + (cfg.runner || "Auto"));
@@ -664,7 +685,7 @@ define(function(require, exports, module) {
                     // Start this run config with the new runner
                     run.getRunner(value, function(err, result){
                         if (err)
-                            return showError(err);
+                            return showError("Cannot use " + value + ": " + err);
                         
                         currentSession.setRunner(result);
                     });
@@ -743,11 +764,7 @@ define(function(require, exports, module) {
                     if (session == currentSession) {
                         btnRunner.setAttribute("caption", "Runner: " 
                             + (runner ? runner.caption : "Auto"));
-                        
-                        if (!runner || runner.debugger)
-                            btnDebug.show();
-                        else
-                            btnDebug.hide();
+                        updateToolbar(session);
                     }
                 }
                 
@@ -789,13 +806,13 @@ define(function(require, exports, module) {
                 session.updateTitle = function(){
                     var process = session.process;
                     
-                    doc.title   = 
-                    doc.tooltip = (!process
-                        ? "[Idle] "
+                    doc.tooltip = 
+                    doc.title   = (session.config.name || session.config.command || "[New]")
+                      + " - " + (!process
+                        ? "Idle"
                         : (process.running
-                            ? "[Running] "
-                            : "[Stopped] ")) 
-                        + (session.config.name || session.config.command || "");
+                            ? "Running"
+                            : "Stopped"));
                     
                     if (process && process.running)
                         tab.className.add("running");

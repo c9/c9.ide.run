@@ -1,6 +1,6 @@
 {
     "caption" : "Node.js (latest)",
-    "cmd": ["node", "${debug?--debug-brk=15454}", "$file"],
+    "cmd": ["node", "${debug?--debug-brk=15454}", "$file", "$args"],
     "debugger": "v8",
     "debugport": 15454,
     "selector": "source.js",
