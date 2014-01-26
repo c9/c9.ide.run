@@ -14,7 +14,7 @@ if [ "$TMUX" = "pid" ]; then
     exit 0
 fi
 
-if [ ! -x $TMUX ]; then
+if [ ! -x "$TMUX" ]; then
     echo "Could not find executable tmux at $TMUX" >&2
     exit 100
 fi
@@ -23,13 +23,13 @@ fi
 export LD_LIBRARY_PATH=~/.c9/local/lib:$LD_LIBRARY_PATH
 
 # Kill any existing session
-$TMUX kill-session -t $NAME
+"$TMUX" kill-session -t $NAME
     
 # Write the watch file
 echo "-1" > $WATCHFILE
 
 # Start a new session
-$TMUX new -s $NAME "$CMD; ([ -e $WATCHFILE ] && rm $WATCHFILE)" \
+"$TMUX" new -s $NAME "$CMD; ([ -e $WATCHFILE ] && rm $WATCHFILE)" \
     \; set-option -g status off \
     \; set-option destroy-unattached off \
     \; set-option mouse-select-pane on \
