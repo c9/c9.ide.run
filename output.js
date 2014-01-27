@@ -716,7 +716,7 @@ define(function(require, exports, module) {
                         function() {},
                         {
                             chooseCaption: "Select",
-                            hideFilename: true
+                            hideFileInput: true
                         }
                     )
                 });
