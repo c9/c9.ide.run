@@ -593,6 +593,7 @@ define(function(require, exports, module) {
                 tbCommand.setAttribute("value", cfg.command);
                 tbName.setAttribute("value", cfg.name);
                 // btnEnv.setAttribute("value", );
+                btnCwd.$ext.title = cfg.cwd || "Current working directory (unset)";
                 
                 btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
             }
@@ -705,10 +706,11 @@ define(function(require, exports, module) {
                                     "Select current working directory",
                                     "Directory does not exist",
                                     directory,
-                                    selectCwd(e, directory)
+                                    selectCwd.bind(null, e, directory)
                                 );
                             }
                             currentSession.config.cwd = directory;
+                            updateToolbar(currentSession);
                             hide();
                         },
                         function() {},
