@@ -599,7 +599,7 @@ define(function(require, module, exports) {
             });
         }
         
-        function runNow(runner, path){
+        function runNow(runner, path, isEscapedPath){
             if (!path) {
                 path = findTabToRun() || "";
                 // if (!path) return;
@@ -622,7 +622,7 @@ define(function(require, module, exports) {
                         run    : true,
                         config : {
                             runner  : runner.caption || runner,
-                            command : util.escapeShell(path)
+                            command : isEscapedPath ? path : util.escapeShell(path)
                         }
                     });
                     
@@ -756,7 +756,7 @@ define(function(require, module, exports) {
         
         function runLastFile(){
             if (lastRun)
-                runNow.apply(this, lastRun);
+                runNow(lastRun[0], lastRun[1], true);
         }
     
         function onHelpClick() {

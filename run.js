@@ -770,7 +770,7 @@ define(function(require, module, exports) {
         /***** Register and define API *****/
         
         /**
-         * Runs arbitrary programs and code from within Cloud9 IDE based on a
+         * Runs arbitrary programs and code from within Cloud9 based on a
          * runner. 
          * 
          * *NB.: If you just want to run a process in the background you should
@@ -1036,7 +1036,7 @@ define(function(require, module, exports) {
              *  until a line matching file regex is found, and use these two 
              *  matches to determine the file and line to go to.
              * @param {RegExp} [runner.selector] Used when the automatic selection of the
-             *  runner is set. Cloud9 IDE uses this scope selector to 
+             *  runner is set. Cloud9 uses this scope selector to 
              *  find the appropriate build system for the active view.
              * @param {String} [runner.working_dir] Directory to change the current 
              *  directory to before running cmd. The original current 
