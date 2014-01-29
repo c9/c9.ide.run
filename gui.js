@@ -363,13 +363,17 @@ define(function(require, module, exports) {
                     value   : "command",
                     width   : "30%",
                 }, {
+                    caption : "CWD",
+                    value   : "cwd",
+                    width   : "10%"
+                }, {
                     caption : "Debug",
                     value   : "debug",
                     width   : "10%"
                 }, {
                     caption : "Runner",
                     value   : "runner",
-                    width   : "30%"
+                    width   : "20%"
                 }];
                 
                 var container = hbox.$ext.appendChild(document.createElement("div"));
@@ -513,7 +517,7 @@ define(function(require, module, exports) {
                 }), 800, plugin);
                 menus.addItemToMenu(menu, new ui.divider(), 900, plugin);
             });
-        };
+        }
         
         var drawn = false;
         function draw(){

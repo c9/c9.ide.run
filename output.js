@@ -3,7 +3,7 @@ define(function(require, exports, module) {
         "Editor", "editors", "util", "commands", "terminal",
         "settings", "ui", "proc", "tabManager", "run", "console", "run.gui",
         "layout", "debugger", "settings", "dialog.question", "c9", "preferences",
-        "dialog.error"
+        "dialog.error", "dialog.filesave", "dialog.alert"
     ];
     main.provides = ["output"];
     return main;
@@ -25,6 +25,8 @@ define(function(require, exports, module) {
         var runGui    = imports["run.gui"];
         var question  = imports["dialog.question"];
         var showError = imports["dialog.error"].show;
+        var showAlert = imports["dialog.alert"].show;
+        var showSave  = imports["dialog.filesave"].show;
         var Terminal  = imports.terminal.Terminal;
         var debug     = imports.debugger;
         var settings  = imports.settings;
@@ -195,7 +197,7 @@ define(function(require, exports, module) {
             var plugin = new Terminal(true);
             
             var btnRun, currentSession, btnRunner, btnDebug, btnRestart;
-            var tbName, tbCommand, btnEnv;
+            var tbName, tbCommand, btnEnv, btnCwd;
             
             /***** Methods *****/
             
@@ -243,7 +245,7 @@ define(function(require, exports, module) {
                     
                     session.process = run.run(runner, {
                         path  : path,
-                        cwd   : "",
+                        cwd   : session.config.cwd || "",
                         env   : session.config.env || {},
                         args  : args,
                         debug : bDebug
@@ -591,6 +593,7 @@ define(function(require, exports, module) {
                 tbCommand.setAttribute("value", cfg.command);
                 tbName.setAttribute("value", cfg.name);
                 // btnEnv.setAttribute("value", );
+                btnCwd.$ext.title = cfg.cwd || "Current working directory (unset)";
                 
                 btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
             }
@@ -612,6 +615,7 @@ define(function(require, exports, module) {
                 tbCommand  = plugin.getElement("tbCommand");
                 tbName     = plugin.getElement("tbName");
                 btnEnv     = plugin.getElement("btnEnv");
+                btnCwd     = plugin.getElement("btnCwd");
                 
                 btnRun.on("click", function(){
                     var session = currentSession;
@@ -691,6 +695,31 @@ define(function(require, exports, module) {
                     // Set Button Caption
                     btnRunner.setAttribute("caption", "Runner: " + value);
                 };
+                
+                btnCwd.on("click", function selectCwd(e, cwd) {
+                    cwd = cwd || currentSession.config.cwd || currentSession.runner.working_dir || "/";
+                    showSave("Select current working directory", cwd,
+                        function(directory, stat, hide) {
+                            if (!stat) {
+                                hide();
+                                return showAlert(
+                                    "Select current working directory",
+                                    "Directory does not exist",
+                                    directory,
+                                    selectCwd.bind(null, e, directory)
+                                );
+                            }
+                            currentSession.config.cwd = directory;
+                            updateToolbar(currentSession);
+                            hide();
+                        },
+                        function() {},
+                        {
+                            chooseCaption: "Select",
+                            hideFileInput: true
+                        }
+                    )
+                });
                 
                 mnuEnv = new ui.menu({ 
                     htmlNode : document.body,
