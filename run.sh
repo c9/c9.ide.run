@@ -1,15 +1,16 @@
 # set -e
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TMUX=$1
 NAME=$2
 CMD=$3
 DETACH=$4
-BASE="$HOME/.c9/"
+BASE="$DIR/../.c9/"
 
 WATCHFILE="$BASE.run_$NAME.watch"
 
 if [ "$TMUX" = "pid" ]; then
-    PID=`ps ax | grep $WATCHFILE | grep rm || echo -1`
+    PID=`ps ax | grep "$WATCHFILE" | grep rm || echo -1`
     echo "PID: $PID"
     exit 0
 fi
@@ -20,7 +21,7 @@ if [ ! -x "$TMUX" ]; then
 fi
 
 # This is needed for 32 bit tmux
-export LD_LIBRARY_PATH=~/.c9/local/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH="$BASE/local/lib:$LD_LIBRARY_PATH"
 
 # Kill any existing session
 "$TMUX" kill-session -t $NAME
@@ -29,7 +30,7 @@ export LD_LIBRARY_PATH=~/.c9/local/lib:$LD_LIBRARY_PATH
 echo "-1" > $WATCHFILE
 
 # Start a new session
-"$TMUX" new -s $NAME "$CMD; ([ -e $WATCHFILE ] && rm $WATCHFILE)" \
+"$TMUX" new -s $NAME "$CMD; ([ -e '$WATCHFILE' ] && rm '$WATCHFILE')" \
     \; set-option -g status off \
     \; set-option destroy-unattached off \
     \; set-option mouse-select-pane on \
@@ -40,5 +41,5 @@ echo "-1" > $WATCHFILE
     \; $DETACH
     
 # Return the pid
-PID=`ps ax | grep $WATCHFILE | grep rm || echo -1`
+PID=`ps ax | grep "$WATCHFILE" | grep rm || echo -1`
 echo "PID: $PID"

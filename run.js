@@ -29,16 +29,17 @@ define(function(require, module, exports) {
         var STARTING = 1;
         var STARTED  = 2;
         
-        var STATIC = options.staticPrefix;
-        var TMUX   = options.tmux || "~/.c9/bin/tmux";
-        var BASH   = "bash";
+        var STATIC      = options.staticPrefix;
+        var installPath = options.installPath || "~/.c9";
+        var TMUX        = options.tmux || installPath + "/bin/tmux";
+        var BASH        = "bash";
         
-        var runners    = options.runners;
-        var testing    = options.testing;
-        var runnerPath = options.runnerPath || "/.c9/runners";
-        var base       = options.base;
-        var workspace  = info.getWorkspace();
-        var processes  = [];
+        var runners     = options.runners;
+        var testing     = options.testing;
+        var runnerPath  = options.runnerPath || "/.c9/runners";
+        var base        = options.base;
+        var workspace   = info.getWorkspace();
+        var processes   = [];
         
         var loaded = false;
         function load(){
@@ -211,7 +212,7 @@ define(function(require, module, exports) {
                 procName = procName.name;
             }
             
-            var WATCHFILE = "~/.c9/.run_" + procName + ".watch";
+            var WATCHFILE = installPath + "/.run_" + procName + ".watch";
 
             // Deal with connection issues
             c9.on("stateChange", function(e){
@@ -288,7 +289,7 @@ define(function(require, module, exports) {
                 cwd = insertVariables(cwd, options);
                 
                 // Execute run.sh
-                proc.pty("~/.c9/bin/run.sh", {
+                proc.pty(installPath + "/bin/run.sh", {
                     args : [TMUX, procName, cmd, 
                              options.detach !== false ? "detach" : ""],
                     cols : 100,
@@ -299,7 +300,7 @@ define(function(require, module, exports) {
                 }, function(err, pty){
                     if (err) {
                         // If error - install run.sh - retry
-                        if (err.code == "ENOENT")
+                        if (err.code == "ENOENT") {
                             return installRunSH(function(err){
                                 if (err) 
                                     return callback(err);
@@ -309,6 +310,7 @@ define(function(require, module, exports) {
                                 
                                 run(srunner, options, callback);
                             });
+                        }
                         
                         return callback(err);
                     }
@@ -365,11 +367,13 @@ define(function(require, module, exports) {
                 http.request(STATIC + "/run.sh", function(err, data){
                     if (err) return retry(err);
                     
-                    fs.writeFile("~/.c9/bin/run.sh", data, function(err){
+                    fs.writeFile(installPath + "/bin/run.sh", data, function(err){
                         if (err) 
                             return retry(err);
                         
-                        proc.execFile(BASH, { args: ["-c", "chmod +x ~/.c9/bin/run.sh"] }, function(err){
+                        proc.execFile(BASH, { 
+                            args: ["-c", "chmod +x '" + installPath + "/bin/run.sh'"] 
+                        }, function(err){
                             retry(err);
                         });
                     });
@@ -434,7 +438,7 @@ define(function(require, module, exports) {
                     return idx == -1 ? fnme : fnme.substr(0, idx);
                 }
                 if (name == "packages")
-                    return "~/.c9/packages";
+                    return installPath + "/packages";
                 if (name == "project_path")
                     return base;
                 if (name == "project_id")
@@ -586,7 +590,7 @@ define(function(require, module, exports) {
                 var originalPid = pid;
                 
                 // Execute run.sh
-                proc.execFile("~/.c9/bin/run.sh", {
+                proc.execFile(installPath + "/bin/run.sh", {
                     args : ["pid", procName]
                 }, function(err, stdout, stderr){
                     if (stdout && stdout.match(/PID:\s+([\-\d]+)/))
@@ -934,7 +938,7 @@ define(function(require, module, exports) {
              * A runner is a JSON file that describes how a certain file can
              * be executed. The JSON file format is based on and compatible with
              * the sublime build scripts. Besides the build in runners, the
-             * user can store runners in ~/.c9/runners. This list will contain
+             * user can store runners in <installPath>/runners. This list will contain
              * both the user's runners as well as the build-in runners.
              * @param {Function} callback           Called when the runners are retrieved
              * @param {Error}    callback.err       The error object if an error occurred.
