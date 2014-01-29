@@ -1,6 +1,6 @@
 {
     "caption" : "Node.js 0.8.x",
-    "cmd": ["node-openshift-v8", "--nocrankshaft", "--nolazy", "--nodead_code_elimination", "${debug?--debug-brk=15454}", "$file", "$args"],
+    "cmd": ["node-openshift-v8", "${debug?--nocrankshaft}", "${debug?--nolazy}", "${debug?--nodead_code_elimination}", "${debug?--debug-brk=15454}", "$file", "$args"],
     "debugger": "v8",
     "debugport": 15454,
     "info": "Your code is running at \\033[01;34m$hostname\\033[00m.\n\\033[01;31mImportant:\\033[00m use \\033[01;32mprocess.env.PORT\\033[00m as the port and \\033[01;32mprocess.env.IP\\033[00m as the host in your scripts!\n"
