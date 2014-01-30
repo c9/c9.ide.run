@@ -318,7 +318,7 @@ define(function(require, module, exports) {
                     // Set process variable for later use
                     process = pty;
                     
-                    // // Execute Monitor
+                    // Execute Monitor
                     monitor();
                     
                     // Running
