@@ -319,7 +319,7 @@ define(function(require, module, exports) {
                     process = pty;
                     
                     // // Execute Monitor
-                    // monitor();
+                    monitor();
                     
                     // Running
                     running = STARTED;
@@ -341,8 +341,8 @@ define(function(require, module, exports) {
                         // Hook data event
                         pty.on("data", function detectPid(data){
                             // Start the monitor
-                            if (data.match(/MONITOR:1/))
-                                monitor();
+                            // if (data.match(/MONITOR:1/))
+                            //     monitor();
                                 
                             if (!data.match(/PID: (.*)/))
                                 return;
