@@ -644,13 +644,8 @@ define(function(require, exports, module) {
                     }
                 });
                 tbCommand.on("afterchange", function(e){
-                    if (currentSession) {
-                        currentSession.config.command = e.value;
-                        saveConfig();
-                        
-                        if (!currentSession.runner)
-                            updateRunner(currentSession);
-                    }
+                    if (currentSession)
+                        currentSession.changeCommand(e.value);
                 });
                 tbCommand.$ext.addEventListener("keydown", function(e) {
                     if (e.keyCode === 13)
@@ -659,24 +654,7 @@ define(function(require, exports, module) {
                 tbName.on("afterchange", function(e){
                     if (!currentSession) return;
                     
-                    if (!e.value && currentSession.config.name) {
-                        question.show("Remove this configuration?",
-                            "You have cleared the name of this configuration.",
-                            "Would you like to remove this configuration from your project settings?",
-                            function(){ // Yes
-                                removeConfig();
-                                currentSession.config.name = "";
-                            },
-                            function(){ // No
-                                // Revert change
-                                tbName.setAttribute("value", currentSession.config.name);
-                            });
-                    }
-                    else {
-                        removeConfig();
-                        currentSession.config.name = e.value;
-                        saveConfig();
-                    }
+                    currentSession.changeName(e.value);
                 });
                 
                 btnRunner.setAttribute("submenu", runGui.getElement("mnuRunAs"));
@@ -836,6 +814,36 @@ define(function(require, exports, module) {
                     else
                         tab.className.remove("running");
                 };
+                
+                session.changeCommand = function(value){
+                    currentSession.config.command = value;
+                    saveConfig();
+                    
+                    if (!currentSession.runner)
+                        updateRunner(currentSession);
+                };
+                
+                session.changeName = function(value){
+                    if (!value && session.config.name) {
+                        question.show("Remove this configuration?",
+                            "You have cleared the name of this configuration.",
+                            "Would you like to remove this configuration from your project settings?",
+                            function(){ // Yes
+                                removeConfig();
+                                session.config.name = "";
+                                session.updateTitle();
+                            },
+                            function(){ // No
+                                // Revert change
+                                tbName.setAttribute("value", session.config.name);
+                            });
+                    }
+                    else {
+                        removeConfig();
+                        session.config.name = value;
+                        saveConfig();
+                    }
+                }
                     
                 session.show = function(v){ 
                     // plugin.ace.container.style.visibility = "visible";
@@ -901,8 +909,14 @@ define(function(require, exports, module) {
             });
             
             plugin.on("documentActivate", function(e){
-                currentSession = e.doc.getSession();
+                if (currentSession && currentSession.loaded) {
+                    if (tbCommand.getValue() != currentSession.config.command)
+                        currentSession.changeCommand(tbCommand.getValue());
+                    if (tbName.getValue() != currentSession.config.name)
+                        currentSession.changeName(tbName.getValue());
+                }
                 
+                currentSession = e.doc.getSession();
                 updateToolbar(currentSession);
             });
             
