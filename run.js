@@ -318,8 +318,8 @@ define(function(require, module, exports) {
                     // Set process variable for later use
                     process = pty;
                     
-                    // Execute Monitor
-                    monitor();
+                    // // Execute Monitor
+                    // monitor();
                     
                     // Running
                     running = STARTED;
@@ -340,10 +340,17 @@ define(function(require, module, exports) {
                         
                         // Hook data event
                         pty.on("data", function detectPid(data){
+                            // Start the monitor
+                            if (data.match(/MONITOR:1/))
+                                monitor();
+                                
                             if (!data.match(/PID: (.*)/))
                                 return;
                             
                             data = RegExp.$1;
+                            
+                            pty.off("exit", fail);
+                            pty.off("data", detectPid);
                             
                             if (parseInt(data, 10) == -1) {
                                 // The process already exited
@@ -354,9 +361,6 @@ define(function(require, module, exports) {
                                 pid = parseInt(data.trim().split(" ", 1)[0], 10);
                                 callback(null, pid);
                             }
-                            
-                            pty.off("exit", fail);
-                            pty.off("data", detectPid);
                         });
                         pty.on("exit", fail);
                     }
@@ -370,10 +374,8 @@ define(function(require, module, exports) {
                     fs.writeFile(installPath + "/bin/run.sh", data, function(err){
                         if (err) 
                             return retry(err);
-                        
-                        proc.execFile(BASH, { 
-                            args: ["-c", "chmod +x '" + installPath + "/bin/run.sh'"] 
-                        }, function(err){
+                            
+                        fs.chmod(installPath + "/bin/run.sh", "+x", function(err){
                             retry(err);
                         });
                     });
@@ -569,14 +571,7 @@ define(function(require, module, exports) {
                     // Clean up here to make sure runner is in correct state
                     // when the callback is called
                     cleanup(function(){
-                        // When killing the process file won't be rewritten
-                        if (!err) {
-                            fs.writeFile(WATCHFILE, "", "utf8", function(err){
-                                callback(err, e);
-                            });
-                        }
-                        else
-                            callback(err, e);
+                        callback(err, e);
                     });
                 });
             }
