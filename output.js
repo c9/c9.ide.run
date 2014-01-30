@@ -258,6 +258,11 @@ define(function(require, exports, module) {
                             return showError(err);
                         }
                         
+                        session.updateTitle();
+                        
+                        if (session.process.running < session.process.STARTING)
+                            return;
+                        
                         session.process.meta.debug = bDebug;
                         
                         if (bDebug) {
@@ -266,8 +271,6 @@ define(function(require, exports, module) {
                                     return; // Either the debugger is not found or paused
                             });
                         }
-                        
-                        session.updateTitle();
                     });
                     
                     decorateProcess(session);
