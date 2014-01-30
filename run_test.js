@@ -254,7 +254,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                     });
                 });
                 
-                it('should run a file with a runner and stop it with stop()', function(done) {
+                it.only('should run a file with a runner and stop it with stop()', function(done) {
                     var count = 0;
                     
                     run.getRunner("node", false, function(err, runner){
@@ -277,6 +277,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 
                                 // setTimeout(function(){
                                 waitForOutput(/Hello\sWorld[\s\S]*Hello\sWorld/, function(){
+                                    count++;
                                     process.stop(function(err, e){
                                         if (err) throw err.message;
                                     });
@@ -299,7 +300,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 count++;
                                 
                                 fs.rmfile("/helloworld.js", function(){
-                                    countEvents(count, 3, done);
+                                    countEvents(count, 4, done);
                                 });
                             });
                         });
