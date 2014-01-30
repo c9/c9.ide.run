@@ -254,7 +254,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                     });
                 });
                 
-                it.only('should run a file with a runner and stop it with stop()', function(done) {
+                it('should run a file with a runner and stop it with stop()', function(done) {
                     var count = 0;
                     
                     run.getRunner("node", false, function(err, runner){
