@@ -350,7 +350,7 @@ define(function(require, exports, module) {
                     btnRun.setAttribute("caption", "Run");
                     btnRun.setAttribute("class", "stopped");
                     
-                    btnRestart.hide();
+                    btnRestart.disabl();
                     
                     return path;
                 }
