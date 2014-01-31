@@ -65,8 +65,9 @@ define(function(require, module, exports) {
 //                    return callback(err);
                 
                 if (files) {
-                    files.forEach(function(file){
-                        runners.push(file.name);
+                    files.forEach(function(file) {
+                        if (runners.indexOf(file.name) < 0)
+                            runners.push(file.name);
                     });
                 }
                 
