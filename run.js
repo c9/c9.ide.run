@@ -318,9 +318,6 @@ define(function(require, module, exports) {
                     // Set process variable for later use
                     process = pty;
                     
-                    // Execute Monitor
-                    monitor();
-                    
                     // Running
                     running = STARTED;
                     emit("started", { pty: pty });
@@ -340,10 +337,6 @@ define(function(require, module, exports) {
                         
                         // Hook data event
                         pty.on("data", function detectPid(data){
-                            // Start the monitor
-                            // if (data.match(/MONITOR:1/))
-                            //     monitor();
-                                
                             if (!data.match(/PID: (.*)/))
                                 return;
                             
@@ -352,11 +345,16 @@ define(function(require, module, exports) {
                             pty.off("exit", fail);
                             pty.off("data", detectPid);
                             
+                            
                             if (parseInt(data, 10) == -1) {
                                 // The process already exited
                                 callback(null, -1);
+                                cleanup();
                             }
                             else {
+                                // Start the monitor
+                                monitor();
+                                
                                 // Parse PID
                                 pid = parseInt(data.trim().split(" ", 1)[0], 10);
                                 callback(null, pid);
