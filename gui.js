@@ -151,15 +151,15 @@ define(function(require, module, exports) {
             
             // menus.addItemByPath("Run/Enable Source Maps", new ui.item({
             //     type    : "check",
-            //     checked : "[{settings.model}::project/debug/@sourcemaps]"
+            //     checked : "project/debug/@sourcemaps"
             // }), c += 100, plugin);
             menus.addItemByPath("Run/Show Debugger at Break", new ui.item({
                 type    : "check",
-                checked : "[{settings.model}::user/debug/@autoshow]"
+                checked : "user/debug/@autoshow"
             }), c += 100, plugin);
             menus.addItemByPath("Run/Show Output at Run", new ui.item({
                 type    : "check",
-                checked : "[{settings.model}::user/runconfig/@showconsole]"
+                checked : "user/runconfig/@showconsole"
             }), c += 100, plugin);
             
             menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
