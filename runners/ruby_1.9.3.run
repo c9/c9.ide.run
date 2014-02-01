@@ -1,5 +1,4 @@
 {
-    "caption" : "Ruby 1.9.3",
     "cmd": ["ruby", "$file"],
     "selector": "^.*\\.(ruby|rb)$",
     "env": {

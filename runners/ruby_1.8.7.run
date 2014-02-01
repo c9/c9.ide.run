@@ -1,5 +1,4 @@
 {
-    "caption" : "Ruby 1.8.7",
     "cmd": ["ruby", "$file", "$args"],
     "env": {
         "GEM_HOME": "$home/lib/ruby/gems",
