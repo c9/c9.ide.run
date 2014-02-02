@@ -66,9 +66,11 @@ define(function(require, module, exports) {
                 
                 if (files) {
                     files.forEach(function(file) {
-                        var basename = file.name.replace(/\.run$/, "");
-                        if (runners.indexOf(basename) < 0 && file.name !== basename)
-                            runners.push(basename);
+                        var name = file.name.match(/(.*)\.run$/);
+                        if (!name)
+                            return console.warn("Runner ignored, doesn't have .run extension: " + file.name)
+                        if (runners.indexOf(name[1]) < 0)
+                            runners.push(name[1]);
                     });
                 }
                 
