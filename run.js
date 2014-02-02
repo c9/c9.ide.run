@@ -146,7 +146,8 @@ define(function(require, module, exports) {
                     try{ runner = JSON.parse(data); }
                     catch(e){ return callback(e); }
                     
-                    runners[name] = runner;
+                    runner.caption = name.replace(/\.run$/, "");
+                    runners[runner.caption] = runner;
                     callback(null, runner);
                 });
             }
@@ -813,7 +814,6 @@ define(function(require, module, exports) {
          * Node.js files looks like this:
          * 
          *     {
-         *         "caption" : "Node.js",
          *         "cmd": [node, "${debug?--debug-brk=15454}", "$file"],
          *         "debugger": "v8",
          *         "debugport": 15454,
