@@ -14,7 +14,7 @@
             width    = "22"
             icon     = "restart-icon.png"
             tooltip  = "Restart"
-            visible  = "false" 
+            class    = "light"
             style    = "min-width:22px;" />
         <!--<a:button skin="c9-toolbarbutton-glossy" id="btnConsoleClear" class="clear" icon="console_clear.png" />-->
         <a:textbox skin="tbsimple" id="tbName" initial-message="Run Config Name" style="min-width:40px"/>

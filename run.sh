@@ -1,11 +1,11 @@
 # set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(dirname $(readlink -f $0))"
 TMUX=$1
 NAME=$2
 CMD=$3
 DETACH=$4
-BASE="$DIR/../.c9/"
+BASE="$DIR/../"
 
 WATCHFILE="$BASE.run_$NAME.watch"
 
@@ -28,6 +28,9 @@ export LD_LIBRARY_PATH="$BASE/local/lib:$LD_LIBRARY_PATH"
     
 # Write the watch file
 echo "-1" > $WATCHFILE
+
+# Tell the client to start the monitor
+echo "MONITOR:1"
 
 # Start a new session
 "$TMUX" new -s $NAME "$CMD; ([ -e '$WATCHFILE' ] && rm '$WATCHFILE')" \

@@ -25,7 +25,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.ide.ui/lib_apf",
         {
             packagePath : "plugins/c9.core/settings",
-            settings : "<settings><state><console>" + JSON.stringify({
+            settings : { state: { console: {
                 type  : "pane", 
                 nodes : [
                     {
@@ -50,7 +50,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         }
                     }
                 ]
-            }) + "</console></state></settings>"
+            } } }
         },
         "plugins/c9.core/api.js",
         {
@@ -73,7 +73,10 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.ide.console/console",
         "plugins/c9.fs/proc",
         "plugins/c9.fs/fs",
-        "plugins/c9.vfs.client/vfs_client",
+        {
+            packagePath: "plugins/c9.vfs.client/vfs_client",
+            debug: true
+        },
         "plugins/c9.vfs.client/endpoint",
         "plugins/c9.ide.auth/auth",
         {
@@ -274,6 +277,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 
                                 // setTimeout(function(){
                                 waitForOutput(/Hello\sWorld[\s\S]*Hello\sWorld/, function(){
+                                    count++;
                                     process.stop(function(err, e){
                                         if (err) throw err.message;
                                     });
@@ -296,7 +300,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 count++;
                                 
                                 fs.rmfile("/helloworld.js", function(){
-                                    countEvents(count, 3, done);
+                                    countEvents(count, 4, done);
                                 });
                             });
                         });
@@ -370,8 +374,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             }, "testoutput2", function(err, pid){
                                 if (err) throw err.message;
 
-                                expect(parseInt(pid, 10))
-                                    .to.ok;
+                                expect(parseInt(pid, 10)).to.ok;
                                 expect(process.running).to.not.equal(run.STARTING);
 
                                 foundPid = true;
