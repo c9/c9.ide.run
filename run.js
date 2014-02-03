@@ -34,7 +34,7 @@ define(function(require, module, exports) {
         var TMUX        = options.tmux || installPath + "/bin/tmux";
         var BASH        = "bash";
         
-        var runners     = options.runners;
+        var runners     = util.cloneObject(options.runners);
         var testing     = options.testing;
         var runnerPath  = options.runnerPath || "/.c9/runners";
         var base        = options.base;
@@ -65,8 +65,12 @@ define(function(require, module, exports) {
 //                    return callback(err);
                 
                 if (files) {
-                    files.forEach(function(file){
-                        runners.push(file.name);
+                    files.forEach(function(file) {
+                        var name = file.name.match(/(.*)\.run$/);
+                        if (!name)
+                            return console.warn("Runner ignored, doesn't have .run extension: " + file.name)
+                        if (runners.indexOf(name[1]) < 0)
+                            runners.push(name[1]);
                     });
                 }
                 
@@ -124,31 +128,40 @@ define(function(require, module, exports) {
             }
         }
         
-        function getRunner(name, refresh, callback){
+        function getRunner(name, refresh, callback) {
             if (typeof refresh == "function") {
                 callback = refresh;
                 refresh  = false;
             }
             
-            if (runners[name] && !refresh)
-                callback(null, runners[name]);
-            else {
-                fs.readFile(settings.get("project/run/@path") + "/" 
-                  + name, "utf8", function(err, data){
-                    if (err)
-                        return callback(err);
-                    
-                    // Remove comments
-                    data = data.replace(/\/\/.*/g, "");
-                    
-                    var runner;
-                    try{ runner = JSON.parse(data); }
-                    catch(e){ return callback(e); }
-                    
-                    runners[name] = runner;
-                    callback(null, runner);
-                });
-            }
+            var path = settings.get("project/run/@path") + "/"  + name + ".run";
+            fs.exists(path, function(exists) {
+                if (!exists) {
+                    if (options.runners[name])
+                        return callback(null, options.runners[name]);
+                    callback("Runner does not exist");
+                }
+                else if (runners[name] && !refresh && (!exists || options.runners[name] === runners[name]))  {
+                    callback(null, runners[name]);
+                }
+                else {
+                    fs.readFile(path, "utf8", function(err, data){
+                        if (err)
+                            return callback(err);
+                            
+                        // Remove comments
+                        data = data.replace(/\/\/.*/g, "");
+                            
+                        var runner;
+                        try { runner = JSON.parse(data); }
+                        catch (e) { return callback(e); }
+                            
+                        runner.caption = name.replace(/\.run$/, "");
+                        runners[runner.caption] = runner;
+                        callback(null, runner);
+                    });
+                }
+            });
         }
         
         function restoreProcess(state){
@@ -804,7 +817,6 @@ define(function(require, module, exports) {
          * Node.js files looks like this:
          * 
          *     {
-         *         "caption" : "Node.js",
          *         "cmd": [node, "${debug?--debug-brk=15454}", "$file"],
          *         "debugger": "v8",
          *         "debugport": 15454,

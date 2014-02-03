@@ -672,9 +672,9 @@ define(function(require, exports, module) {
                         
                         currentSession.setRunner(result);
                     });
+                    btnRunner.setAttribute("caption", "Runner: " + value);
                     
                     // Set Button Caption
-                    btnRunner.setAttribute("caption", "Runner: " + value);
                 };
                 
                 btnCwd.on("click", function selectCwd(e, cwd) {
@@ -743,7 +743,7 @@ define(function(require, exports, module) {
                 
                 session.setRunner = function(runner){
                     if (!runner) {
-                        run.getRunner("Shell Command", function(err, runner){
+                        run.getRunner("Shell command", function(err, runner){
                             if (!err) session.setRunner(runner);
                         });
                         return;

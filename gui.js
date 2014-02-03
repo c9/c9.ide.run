@@ -26,6 +26,7 @@ define(function(require, module, exports) {
         var c9console   = imports.console;
         var ace         = imports.ace;
         var showError   = imports["dialog.error"].show;
+        var assert      = require("c9/assert");
         
         var Tree        = require("ace_tree/tree");
         var TreeData    = require("./runcfgdp");
@@ -38,7 +39,7 @@ define(function(require, module, exports) {
         var plugin  = new Plugin("Ajax.org", main.consumes);
         var emit    = plugin.getEmitter();
         
-        var btnRun, lastRun, process, mnuRunCfg;
+        var btnRun, lastRun, mnuRunWith, process, mnuRunCfg;
         var model, datagrid;
         
         var loaded = false;
@@ -171,7 +172,7 @@ define(function(require, module, exports) {
                     if (e.value && !preventLoop) {
                         run.listRunners(function(err, names){
                             var nodes = mnuRunAs.childNodes;
-                            for (var i = nodes.length - 3; i >= 0; i--) {
+                            for (var i = nodes.length - 4; i >= 0; i--) {
                                 mnuRunAs.removeChild(nodes[i]);
                             }
                             
@@ -193,18 +194,28 @@ define(function(require, module, exports) {
                         });
                         
                         lastOpener = this.opener;
+                        
+                        // Show edit menu only in Output tab
+                        var editMenu = mnuRunAs.childNodes[mnuRunAs.childNodes.length - 1];
+                        if (this.opener.getAttribute("caption") !== "Run With") {
+                            editMenu.setAttribute("visible", true);
+                            // Make sure caption doesn't break edit-run-system
+                            assert(this.opener.getAttribute("caption").match(/Runner: .*/));
+                        }
+                        else {
+                            editMenu.setAttribute("visible", false);
+                        }
                     }
                 },
                 "onitemclick": function(e){
                     if (e.value == "new-run-system") {
                         tabs.open({
                             path   : settings.get("project/run/@path") 
-                              + "/New Runner",
+                              + "/New Runner.run",
                             active : true,
                             value  : '// Create a custom Cloud9 runner - similar to the Sublime build system\n'
                               + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
                               + '{\n'
-                              + '    "caption" : "",\n'
                               + '    "cmd" : ["ls", "$file", "$args"],\n'
                               + '    "info" : "Started $project_path/$file",\n'
                               + '    "selector" : "source.ext"\n'
@@ -218,6 +229,36 @@ define(function(require, module, exports) {
                                 }
                             }
                         }, function(){});
+                        return;
+                    }
+                    else if (e.value === "edit-run-system") {
+                        var runnerName = lastOpener.getAttribute("caption").match(/Runner: (.*)/)[1];
+                        var path = settings.get("project/run/@path") + "/" + runnerName + ".run";
+                        run.getRunner(runnerName, function(err, runner) {
+                            if (err)
+                                return showError("Could not find runner: " + err);
+                            if (runner) {
+                                delete runner.caption;
+                                delete runner.$builtin;
+                            }
+                            fs.exists(path, function(exists) {
+                                tabs.open({
+                                    path   : path,
+                                    active : true,
+                                    value  : !exists && "// This file overrides the built-in " + runnerName + " runner\n"
+                                        + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
+                                        + JSON.stringify(runner, null, 2),
+                                    document : !exists && {
+                                        meta : {
+                                            newfile: true
+                                        },
+                                        ace : {
+                                            customSyntax : "javascript"
+                                        }
+                                    }
+                                }, function(){});
+                            });
+                        });
                         return;
                     }
                     
@@ -289,6 +330,9 @@ define(function(require, module, exports) {
             menus.addItemByPath("Run/Run With/~", new ui.divider(), c += 1000, plugin);
             menus.addItemByPath("Run/Run With/New Runner", new ui.item({
                 value : "new-run-system"
+            }), c += 100, plugin);
+            menus.addItemByPath("Run/Run With/Edit Runner", new ui.item({
+                value : "edit-run-system"
             }), c += 100, plugin);
             
             // Other Menus
