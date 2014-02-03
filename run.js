@@ -345,7 +345,6 @@ define(function(require, module, exports) {
                             pty.off("exit", fail);
                             pty.off("data", detectPid);
                             
-                            
                             if (parseInt(data, 10) == -1) {
                                 // The process already exited
                                 callback(null, -1);
