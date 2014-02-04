@@ -218,6 +218,7 @@ define(function(require, module, exports) {
                               + '{\n'
                               + '    "cmd" : ["ls", "$file", "$args"],\n'
                               + '    "info" : "Started $project_path/$file",\n'
+                              + '    "env" : {},\n'
                               + '    "selector" : "source.ext"\n'
                               + '}',
                             document : {

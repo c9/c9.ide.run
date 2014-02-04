@@ -1,5 +1,4 @@
 {
-    "caption" : "Ruby On Rails (Rails 4.0 + Ruby 1.9.3)",
     "cmd": ["rails", "s", "-p", "$PORT", "-b", "$IP"],
     "env": {
         "GEM_HOME": "$home/lib/ruby/gems",

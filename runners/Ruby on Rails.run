@@ -1,5 +1,5 @@
 {
-    "cmd": ["rails", "s", "-p", "$PORT", "-b", "$IP"],
+    "cmd": ["rails", "s"],
     "env": {},
     "working_dir": "$project_path"
 }
