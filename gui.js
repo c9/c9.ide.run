@@ -306,7 +306,10 @@ define(function(require, module, exports) {
                         return;
                     }
                     
-                    openRunConfig(e.value);
+                    commands.exec("showoutput", null, {
+                        run    : true,
+                        config : cfg
+                    });
                 }
             });
             plugin.addElement(mnuRunAs, mnuRunCfg);
@@ -618,30 +621,6 @@ define(function(require, module, exports) {
                     return run.runners[name];
             }
             return false;
-        }
-        
-        function openRunConfig(cfg){
-            var found = false;
-            tabs.getTabs().some(function(tab){
-                if (tab.editorType == "output" 
-                  && tab.document.getSession().config
-                  && tab.document.getSession().config.name == cfg.name) {
-                    found = tab;
-                    return true;
-                }
-            });
-            
-            if (found) {
-                var session = found.document.getSession();
-                if (!session.process || !session.process.running)
-                    session.run();
-                return tabs.focusTab(found);
-            }
-            
-            commands.exec("showoutput", null, {
-                run    : true,
-                config : cfg
-            });
         }
         
         function runNow(runner, path, isEscapedPath){
