@@ -624,6 +624,7 @@ define(function(require, module, exports) {
             var found = false;
             tabs.getTabs().some(function(tab){
                 if (tab.editorType == "output" 
+                  && tab.document.getSession().config
                   && tab.document.getSession().config.name == cfg.name) {
                     found = tab;
                     return true;
