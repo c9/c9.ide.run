@@ -138,11 +138,11 @@ define(function(require, module, exports) {
             fs.exists(path, function(exists) {
                 if (!exists) {
                     if (options.runners[name])
-                        return callback(null, options.runners[name]);
+                        return done(options.runners[name]);
                     callback("Runner does not exist");
                 }
                 else if (runners[name] && !refresh && (!exists || options.runners[name] === runners[name]))  {
-                    callback(null, runners[name]);
+                    done(runners[name]);
                 }
                 else {
                     fs.readFile(path, "utf8", function(err, data){
@@ -158,10 +158,15 @@ define(function(require, module, exports) {
                             
                         runner.caption = name.replace(/\.run$/, "");
                         runners[runner.caption] = runner;
-                        callback(null, runner);
+                        done(runner);
                     });
                 }
             });
+            
+            function done(runner) {
+                runner.caption = name;
+                callback(null, runner);
+            }
         }
         
         function restoreProcess(state){

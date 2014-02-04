@@ -233,10 +233,15 @@ define(function(require, exports, module) {
                     done();
                 
                 function done(){
-                    if (bDebug)
-                        debug.checkAttached(start);
-                    else
-                        start();
+                    run.getRunner(runner.caption, function(err, result) {
+                        // Make sure we have the latest runner if possible, or ignore err
+                        if (!err)
+                            runner = result;
+                        if (bDebug)
+                            debug.checkAttached(start);
+                        else
+                            start();
+                    });
                 }
                 
                 function start(){
