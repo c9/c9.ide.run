@@ -1,0 +1,5 @@
+{
+    "cmd": ["httpd", "-X", "-c", "Listen $ip:8080", "-c", "DocumentRoot $project_path"],
+    "selector": "^.*\\.(php|phtml|html|shtml)$",
+    "info": "Started Apache httpd, serving \\033[01;34m$hostname_path\\033[00m."
+}
