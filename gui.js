@@ -309,7 +309,7 @@ define(function(require, module, exports) {
                     
                     commands.exec("showoutput", null, {
                         run    : true,
-                        config : cfg
+                        config : e.value
                     });
                 }
             });
