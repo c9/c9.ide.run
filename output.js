@@ -566,8 +566,10 @@ define(function(require, exports, module) {
                 var cfg = configs[session.config.name] || session.config;
                 
                 session.config = cfg;
-                updateToolbar(session);
                 updateRunner(session);
+                
+                if (currentSession == session)
+                    updateToolbar(session);
             }
             
             function updateRunner(session){
