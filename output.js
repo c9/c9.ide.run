@@ -955,7 +955,7 @@ define(function(require, exports, module) {
                     updateConfig(session);
                 }
                 
-                if (state.running) {
+                if (state.running && !session.process) {
                     session.process = run.restoreProcess(state.running);
                     decorateProcess(session);
                     transformButton(session);
