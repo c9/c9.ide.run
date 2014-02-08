@@ -566,8 +566,10 @@ define(function(require, exports, module) {
                 var cfg = configs[session.config.name] || session.config;
                 
                 session.config = cfg;
-                updateToolbar(session);
                 updateRunner(session);
+                
+                if (currentSession == session)
+                    updateToolbar(session);
             }
             
             function updateRunner(session){
@@ -955,7 +957,7 @@ define(function(require, exports, module) {
                     updateConfig(session);
                 }
                 
-                if (state.running) {
+                if (state.running && !session.process) {
                     session.process = run.restoreProcess(state.running);
                     decorateProcess(session);
                     transformButton(session);
