@@ -81,7 +81,7 @@ define(function(require, exports, module) {
                             output : {
                                 id     : id || "output",
                                 config : argv.config,
-                                runner : argv.runner || argv.config.runner,
+                                runner : argv.runner || argv.config && argv.config.runner,
                                 run    : argv.run
                             }
                         }
