@@ -4,11 +4,12 @@ function readRunners(path) {
     var results = {};
     var runnersPath = __dirname + "/" + path + "/";
     fs.readdirSync(runnersPath).forEach(function (name) {
-    	try {
-        	var json = JSON.parse(fs.readFileSync(runnersPath + name));
+        var json;
+        try {
+            json = JSON.parse(fs.readFileSync(runnersPath + name, "utf8").replace(/\/\/.*$/mg, ""));
         } catch (e) {
-        	console.error("Syntax error in runner", runnersPath + name, e);
-        	throw e;
+            console.error("Syntax error in runner", runnersPath + name, e);
+            throw e;
         }
         json.caption = name.replace(/\.run$/, "");
         json.$builtin = true;
@@ -17,6 +18,10 @@ function readRunners(path) {
     return results;
 }
 
-module.exports.runners = readRunners("runners");
+module.exports = {
+    local: readRunners("runners"),
+    openshift: readRunners("runners-openshift"),
+    docker: readRunners("runners-docker")
+};
 
-module.exports.hostedRunners = readRunners("runners-hosted");
+module.exports.ssh = module.exports.local;

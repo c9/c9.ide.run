@@ -440,7 +440,7 @@ define(function(require, module, exports) {
                     return "0.0.0.0";
                 if (name == "home")
                     return c9.home;
-                return "";
+                return "$" + name;
             }
             function reverse(str){ 
                 return str.split('').reverse().join('');
@@ -462,7 +462,7 @@ define(function(require, module, exports) {
                             
                         // Test for conditional value
                         if (nameBrackets.match(/^([\w_]+)\?(.*)$/))
-                            return options[RegExp.$1] ? startChar + RegExp.$2 + endChar : "";
+                            return options[RegExp.$1] ? startChar + RegExp.$2 + endChar : startChar + endChar;
                             
                         // Test for regular expression
                         if (nameBrackets.match(/^([\w_]+)\/(.*)$/)) {
