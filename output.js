@@ -771,9 +771,9 @@ define(function(require, exports, module) {
                             + (runner ? runner.caption : "Auto"));
                         updateToolbar(session);
                     }
-                }
+                };
                 
-                session.filter = function(data){
+                session.filter = function(data, recur){
                     // Ignore clear screen when detaching
                     if (/output:0:.*\[dead\] - /.test(data))
                         return;
@@ -782,6 +782,8 @@ define(function(require, exports, module) {
                         /\[exited\]\r/.test(data) ||
                         /Set option: remain-on-exit \-\> on/.test(data)
                     ) {
+                        session.stopped = false;
+                        session.terminal.showCursor();
                         tab.className.add(session.process 
                             && session.process.running > 0 ? "running" : "loading");
                         return;
@@ -795,17 +797,49 @@ define(function(require, exports, module) {
                             data = "";
                         } else {
                             data = data
-                              .replace(/Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
-                              .replace(/Pane is dead/g, "[Process stopped]");
+                              .replace(/\s*Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
+                              .replace(/\s*Pane is dead/g, "[Process stopped]");
                         }
+                        data = data.replace(/\s+$/, "");
+                        
+                        if (session.stopped)
+                            recur = true;
+                        
+                        session.stopped = true;
+                        session.terminal.hideCursor();
+                        
                         tab.className.remove(session.process 
                             && session.process.running > 0 ? "running" : "loading");
                         
                         if (session.process && session.process.running > 1)
                             session.process.checkState();
+                        
+                        // sometimes if process finishes quickly and with little output
+                        // tmux won't show most of it so we have to reload
+                        if (!recur && session.terminal.lines.length < 2 * session.terminal.rows)
+                            setTimeout(session.$reloadHistory);
                     }
                     
                     return data;
+                };
+                
+                session.$reloadHistory = function() {
+                    if (session.getScrollBack) {
+                        session.getScrollBack({
+                            id : session.id,
+                            start : -1000,
+                            end : 1000
+                        }, function(e, output) {
+                            if (e || !output) return;
+                            if (session.filter)
+                                output = session.filter(output, true);
+                            session.terminal.reset();
+                            var convertEol = session.terminal.convertEol;
+                            session.terminal.convertEol = true;
+                            session.terminal.write(output);
+                            session.terminal.convertEol = convertEol;
+                        });
+                    }
                 };
                 
                 session.updateTitle = function(){
