@@ -307,31 +307,20 @@ define(function(require, module, exports) {
                 cwd = insertVariables(cwd, options);
                 
                 // Execute run.sh
-                proc.pty(installPath + "/bin/run.sh", {
-                    args : [TMUX, procName, cmd, 
-                             options.detach !== false ? "detach" : ""],
-                    cols : 100,
-                    rows : 5,
-                    cwd  : cwd,
+                proc.tmux(cmd, {
+                    session      : procName,
+                    detach       : options.detach !== false,
+                    base         : installPath,
+                    kill         : true,
+                    output       : true,
+                    cols         : 100,
+                    rows         : 5,
+                    cwd          : cwd,
                     validatePath : true,
                     testing      : testing
-                }, function(err, pty){
-                    if (err) {
-                        // If error - install run.sh - retry
-                        if (err.code == "ENOENT") {
-                            return installRunSH(function(err){
-                                if (err) 
-                                    return callback(err);
-                                
-                                // Reset state to be able to reenter
-                                running = STOPPED;
-                                
-                                run(srunner, options, callback);
-                            });
-                        }
-                        
+                }, function(err, pty, pid){
+                    if (err)
                         return callback(err);
-                    }
 
                     // Set process variable for later use
                     process = pty;
@@ -348,52 +337,17 @@ define(function(require, module, exports) {
                     }
                     // Else if detached
                     else {
-                        var fail = function(){ 
+                        if (pid == -1) {
+                            // The process already exited
+                            callback(null, -1);
                             cleanup();
-                            callback(new Error("Unspecified Error"));
-                        };
-                        
-                        // Hook data event
-                        pty.on("data", function detectPid(data){
-                            if (!data.match(/PID: (.*)/))
-                                return;
-                            
-                            data = RegExp.$1;
-                            
-                            pty.off("exit", fail);
-                            pty.off("data", detectPid);
-                            
-                            if (parseInt(data, 10) == -1) {
-                                // The process already exited
-                                callback(null, -1);
-                                cleanup();
-                            }
-                            else {
-                                // Start the monitor
-                                monitor();
-                                
-                                // Parse PID
-                                pid = parseInt(data.trim().split(" ", 1)[0], 10);
-                                callback(null, pid);
-                            }
-                        });
-                        pty.on("exit", fail);
+                        }
+                        else {
+                            // Start the monitor
+                            monitor();
+                            callback(null, pid);
+                        }
                     }
-                });
-            }
-            
-            function installRunSH(retry){
-                http.request(STATIC + "/run.sh", function(err, data){
-                    if (err) return retry(err);
-                    
-                    fs.writeFile(installPath + "/bin/run.sh", data, function(err){
-                        if (err) 
-                            return retry(err);
-                            
-                        fs.chmod(installPath + "/bin/run.sh", "+x", function(err){
-                            retry(err);
-                        });
-                    });
                 });
             }
             
@@ -600,12 +554,10 @@ define(function(require, module, exports) {
                 var originalPid = pid;
                 
                 // Execute run.sh
-                proc.execFile(installPath + "/bin/run.sh", {
-                    args : ["pid", procName]
-                }, function(err, stdout, stderr){
-                    if (stdout && stdout.match(/PID:\s+([\-\d]+)/))
-                        pid = parseInt(RegExp.$1, 10);
-                    
+                proc.tmux("", {
+                    session      : procName,
+                    fetchpid     : true
+                }, function(err, pty, pid){
                     // Process has exited
                     if (err || pid == -1 || pid != originalPid || !pid) {
                         cleanup(function(){
