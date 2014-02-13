@@ -318,12 +318,13 @@ define(function(require, module, exports) {
                     cwd          : cwd,
                     validatePath : true,
                     testing      : testing
-                }, function(err, pty, pid){
+                }, function(err, pty, processId){
                     if (err)
                         return callback(err);
 
                     // Set process variable for later use
                     process = pty;
+                    pid     = processId;
                     
                     // Running
                     running = STARTED;
