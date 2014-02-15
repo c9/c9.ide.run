@@ -538,12 +538,12 @@ define(function(require, module, exports) {
     
                 // Kill the pty session
                 if (c9.platform == "win32") {
-                    process.kill(-1);
-                    // process.on("kill", function(){
+                    process.on("kill", function(){
                         cleanup(function(){
                             callback();
                         });
-                    // });
+                    });
+                    process.kill(-1);
                 }
                 else {
                     proc.execFile("kill", {args:[pid]}, function(err, e){
