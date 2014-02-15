@@ -537,13 +537,23 @@ define(function(require, module, exports) {
                 emit("stopping");
     
                 // Kill the pty session
-                proc.execFile("kill", {args:[pid]}, function(err, e){
-                    // Clean up here to make sure runner is in correct state
-                    // when the callback is called
-                    cleanup(function(){
-                        callback(err, e);
+                if (c9.platform == "win32") {
+                    process.kill(-1);
+                    // process.on("kill", function(){
+                        cleanup(function(){
+                            callback();
+                        });
+                    // });
+                }
+                else {
+                    proc.execFile("kill", {args:[pid]}, function(err, e){
+                        // Clean up here to make sure runner is in correct state
+                        // when the callback is called
+                        cleanup(function(){
+                            callback(err, e);
+                        });
                     });
-                });
+                }
             }
             
             var checking;
