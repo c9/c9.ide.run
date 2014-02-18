@@ -38,6 +38,7 @@ define(function(require, module, exports) {
         var testing     = options.testing;
         var runnerPath  = options.runnerPath || "/.c9/runners";
         var base        = options.base;
+        var platform    = options.platform;
         var workspace   = info.getWorkspace();
         var processes   = [];
         
@@ -61,14 +62,14 @@ define(function(require, module, exports) {
         function listRunners(callback){
             var runners = Object.keys(options.runners || {});
             fs.readdir(settings.get("project/run/@path"), function(err, files){
-//                if (err && err.code == "ENOENT")
-//                    return callback(err);
+                // if (err && err.code == "ENOENT")
+                //     return callback(err);
                 
                 if (files) {
                     files.forEach(function(file) {
                         var name = file.name.match(/(.*)\.run$/);
                         if (!name)
-                            return console.warn("Runner ignored, doesn't have .run extension: " + file.name)
+                            return console.warn("Runner ignored, doesn't have .run extension: " + file.name);
                         if (runners.indexOf(name[1]) < 0)
                             runners.push(name[1]);
                     });
@@ -183,9 +184,14 @@ define(function(require, module, exports) {
                 name = "output";
             
             (options instanceof Array ? options : [options]).forEach(function(a){
+                function toExternalPath(path) {
+                    if (platform == "win32")
+                        path = path.replace(/^[/]+/, "").replace(/[/]/g, "\\");
+                    return path;
+                }
                 a.relPath = a.path;
                 if (a.path && a.path.charAt(0) === "/")
-                    a.path = base + a.path;
+                    a.path = toExternalPath(base + a.path);
                 if (a.cwd && a.cwd.charAt(0) === "/")
                     a.cwd = base + a.cwd;
             });
