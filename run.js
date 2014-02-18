@@ -38,7 +38,6 @@ define(function(require, module, exports) {
         var testing     = options.testing;
         var runnerPath  = options.runnerPath || "/.c9/runners";
         var base        = options.base;
-        var platform    = options.platform;
         var workspace   = info.getWorkspace();
         var processes   = [];
         
@@ -185,7 +184,7 @@ define(function(require, module, exports) {
             
             (options instanceof Array ? options : [options]).forEach(function(a){
                 function toExternalPath(path) {
-                    if (platform == "win32")
+                    if (c9.platform == "win32")
                         path = path.replace(/^[/]+/, "").replace(/[/]/g, "\\");
                     return path;
                 }
