@@ -1,4 +1,4 @@
-# set -e
+#!/bin/bash -l
 
 DIR=$(dirname "$0")
 TMUX=$1
