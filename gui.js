@@ -85,7 +85,7 @@ define(function(require, module, exports) {
                     return tree.selectedNode && !tree.selectedNode.isFolder;
                 },
                 onclick : function(){
-                    runNow("auto", tree.selected);
+                    runNow("auto", tree.selected.replace(/^\//, ""));
                 }
             });
             tree.getElement("mnuCtxTree", function(mnuCtxTree) {
@@ -727,7 +727,7 @@ define(function(require, module, exports) {
                 }
                 return true;
             }) && foundActive) {
-                return foundActive.path;
+                return foundActive.path.replace(/^\//, "");
             }
             
             return false;

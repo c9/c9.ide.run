@@ -189,9 +189,9 @@ define(function(require, module, exports) {
                     return path;
                 }
                 a.relPath = a.path;
-                if (a.path && a.path.charAt(0) === "/")
+                if (a.path && a.path.charAt(0) !== "/")
                     a.path = toExternalPath(base + a.path);
-                if (a.cwd && a.cwd.charAt(0) === "/")
+                if (a.cwd && a.cwd.charAt(0) !== "/")
                     a.cwd = base + a.cwd;
             });
             
