@@ -909,6 +909,9 @@ define(function(require, exports, module) {
                             + "run configuration prior to closing this tab.",
                             function(){ // Yes
                                 // do nothing
+                                
+                                if (question.dontAsk)
+                                    settings.set("user/output/nosavequestion", "true");
                             }, 
                             function(){ // No
                                 tab.meta.$ignore = true;
