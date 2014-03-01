@@ -190,7 +190,8 @@ define(function(require, module, exports) {
                 }
                 a.relPath = a.path;
                 if (a.path && a.path.charAt(0) !== "/")
-                    a.path = toExternalPath(base + a.path);
+                    a.path = base + a.path;
+                a.path = toExternalPath(a.path);
                 if (a.cwd && a.cwd.charAt(0) !== "/")
                     a.cwd = base + a.cwd;
             });
@@ -543,6 +544,10 @@ define(function(require, module, exports) {
     
                 // Kill the pty session
                 if (c9.platform == "win32") {
+                    if (!process)
+                        return cleanup(function(){
+                            callback();
+                        });
                     process.on("kill", function(){
                         cleanup(function(){
                             callback();
