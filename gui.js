@@ -716,7 +716,7 @@ define(function(require, module, exports) {
         
         function findTabToRun(){
             var path = tabs.focussedTab && tabs.focussedTab.path;
-            if (path) return path;
+            if (path) return path.replace(/^\//, "");
             
             var foundActive;
             if (tabs.getPanes().every(function(pane){
