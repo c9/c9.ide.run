@@ -37,7 +37,7 @@ define(function(require, module, exports) {
         var runners     = util.cloneObject(options.runners);
         var testing     = options.testing;
         var runnerPath  = options.runnerPath || "/.c9/runners";
-        var base        = options.base.replace(/\/?$/, "/");
+        var base        = (options.base || "").replace(/\/?$/, "/");
         var workspace   = info.getWorkspace();
         var processes   = [];
         
