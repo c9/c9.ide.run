@@ -211,7 +211,7 @@ define(function(require, module, exports) {
                     if (e.value == "new-run-system") {
                         tabs.open({
                             path   : settings.get("project/run/@path") 
-                              + "/New Runner.run",
+                              + "/My Runner.run",
                             active : true,
                             value  : '// Create a custom Cloud9 runner - similar to the Sublime build system\n'
                               + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
