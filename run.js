@@ -451,6 +451,10 @@ define(function(require, module, exports) {
                         if (nameBrackets.match(/^([\w_]+)\:(.*)$/))
                             return startChar + (getVariable(RegExp.$1, options) || RegExp.$2) + endChar;
                             
+                        // Test for conditional shell expression value
+                        if (nameBrackets.match(/^([\w_]+)\?`(.*)`$/))
+                            return options[RegExp.$1] ? "`" + RegExp.$2 + "`" : "";
+                            
                         // Test for conditional value
                         if (nameBrackets.match(/^([\w_]+)\?(.*)$/))
                             return options[RegExp.$1] ? startChar + RegExp.$2 + endChar : "";
@@ -465,6 +469,10 @@ define(function(require, module, exports) {
                                     return data.replace(re, reverse(replace));
                                 }) + endChar;
                         }
+                        
+                        // Test for shell expression value
+                        if (nameBrackets.match(/^`(.*)`$/))
+                            return "`" + RegExp.$1 + "`";
                         
                         // TODO quotes
                         // Assume just a name
