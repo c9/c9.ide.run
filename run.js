@@ -321,7 +321,7 @@ define(function(require, module, exports) {
                 proc.tmux(cmd, {
                     session      : procName,
                     detach       : options.detach !== false,
-                    base         : installPath.replace(/^~/, c9.home),
+                    base         : installPath.replace(/^~/, c9.home || "~"),
                     kill         : true,
                     output       : true,
                     cols         : 100,
