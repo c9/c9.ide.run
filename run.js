@@ -60,21 +60,26 @@ define(function(require, module, exports) {
         
         function listRunners(callback){
             var runners = Object.keys(options.runners || {});
-            fs.readdir(settings.get("project/run/@path"), function(err, files){
-                // if (err && err.code == "ENOENT")
-                //     return callback(err);
+            fs.exists(settings.get("project/run/@path"), function(exists) {
+                if (!exists)
+                    return callback(null, runners);
                 
-                if (files) {
-                    files.forEach(function(file) {
-                        var name = file.name.match(/(.*)\.run$/);
-                        if (!name)
-                            return console.warn("Runner ignored, doesn't have .run extension: " + file.name);
-                        if (runners.indexOf(name[1]) < 0)
-                            runners.push(name[1]);
-                    });
-                }
-                
-                callback(null, runners);
+                fs.readdir(settings.get("project/run/@path"), function(err, files){
+                    // if (err && err.code == "ENOENT")
+                    //     return callback(err);
+                    
+                    if (files) {
+                        files.forEach(function(file) {
+                            var name = file.name.match(/(.*)\.run$/);
+                            if (!name)
+                                return console.warn("Runner ignored, doesn't have .run extension: " + file.name);
+                            if (runners.indexOf(name[1]) < 0)
+                                runners.push(name[1]);
+                        });
+                    }
+                    
+                    callback(null, runners);
+                });
             });
         }
         
