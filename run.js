@@ -427,8 +427,10 @@ define(function(require, module, exports) {
                     return workspace.contents;
                 if (name == "hostname")
                     return c9.hostname || "localhost";
-                if (name == "hostname_path")
-                    return (c9.hostname || "localhost") + options.relPath;
+                if (name == "hostname_path") {
+                    var port = (options.local ? ":" + (c9.port || "8080") : "");
+                    return (c9.hostname || "localhost") + port  + "/" + options.relPath;
+                }
                 if (name == "port")
                     return c9.port || "8080";
                 if (name == "ip")
