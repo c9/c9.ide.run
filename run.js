@@ -317,6 +317,8 @@ define(function(require, module, exports) {
                         || options.path && dirname(options.path) || "/";
                 cwd = insertVariables(cwd, options);
                 
+                console.log("CMD", cmd);
+                
                 // Execute run.sh
                 proc.tmux(cmd, {
                     session      : procName,
@@ -462,7 +464,12 @@ define(function(require, module, exports) {
                             
                         // Test for conditional value
                         if (nameBrackets.match(/^([\w_]+)\?(.*)$/))
-                            return options[RegExp.$1] ? startChar + RegExp.$2 + endChar : startChar + endChar;
+                            if (options[RegExp.$1])
+                                return startChar + RegExp.$2 + endChar
+                            else if (startChar.trim().charAt(0).match(/['"]/))
+                                return "";
+                            else 
+                                return startChar + endChar;
                             
                         // Test for regular expression
                         if (nameBrackets.match(/^([\w_]+)\/(.*)$/)) {

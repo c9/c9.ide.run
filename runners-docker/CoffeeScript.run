@@ -1,5 +1,5 @@
 {
-    "cmd": ["coffee", "--nodejs", "${debug?--nocrankshaft --nolazy --nodead_code_elimination --debug-brk=15454}", "$file", "$args"],
+    "cmd": ["coffee", "${debug?--nodejs}", "${debug?--nocrankshaft --nolazy --nodead_code_elimination --debug-brk=15454}", "$file", "$args"],
     "debugger": "v8",
     "debugport": 15454,
     "selector": "source.coffee",
