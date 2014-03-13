@@ -317,8 +317,6 @@ define(function(require, module, exports) {
                         || options.path && dirname(options.path) || "/";
                 cwd = insertVariables(cwd, options);
                 
-                console.log("CMD", cmd);
-                
                 // Execute run.sh
                 proc.tmux(cmd, {
                     session      : procName,
