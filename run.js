@@ -432,8 +432,10 @@ define(function(require, module, exports) {
                     return workspace.contents;
                 if (name == "hostname")
                     return c9.hostname || "localhost";
-                if (name == "hostname_path")
-                    return (c9.hostname || "localhost") + options.relPath;
+                if (name == "hostname_path") {
+                    var port = (options.local ? ":" + (c9.port || "8080") : "");
+                    return (c9.hostname || "localhost") + port  + "/" + options.relPath;
+                }
                 if (name == "port")
                     return c9.port || "8080";
                 if (name == "ip")
@@ -446,49 +448,56 @@ define(function(require, module, exports) {
                 return str.split('').reverse().join('');
             }
             function insertVariables(cmd, options){
-                cmd = cmd.replace(/(^|[^\\])(?:\$([\w_]+)|\$\{([^}]+)\})([^\\]|)/g,
-                function(m, startChar, name, nameBrackets, endChar) {
-                    if (name || !nameBrackets)
-                        return startChar + getVariable(name, options) + endChar;
-                    else if (startChar) {
-                        
-                        // Test for default value
-                        if (nameBrackets.match(/^([\w_]+)\:(.*)$/))
-                            return startChar + (getVariable(RegExp.$1, options) || RegExp.$2) + endChar;
+                // Loop until we get a fixpoint, since our pattern matches the
+                // two characters next to a variable and would otherwise skip
+                // over adjacent variables like $ip:$port.
+                var oldCmd;
+                do {
+                    oldCmd = cmd;
+                    cmd = cmd.replace(/(^|[^\\])(?:\$([\w_]+)|\$\{([^}]+)\})([^\\]|)/g,
+                    function(m, startChar, name, nameBrackets, endChar) {
+                        if (name || !nameBrackets)
+                            return startChar + getVariable(name, options) + endChar;
+                        else if (startChar) {
                             
-                        // Test for conditional shell expression value
-                        if (nameBrackets.match(/^([\w_]+)\?`(.*)`$/))
-                            return options[RegExp.$1] ? "`" + RegExp.$2 + "`" : "";
+                            // Test for default value
+                            if (nameBrackets.match(/^([\w_]+)\:(.*)$/))
+                                return startChar + (getVariable(RegExp.$1, options) || RegExp.$2) + endChar;
+                                
+                            // Test for conditional shell expression value
+                            if (nameBrackets.match(/^([\w_]+)\?`(.*)`$/))
+                                return options[RegExp.$1] ? "`" + RegExp.$2 + "`" : "";
                             
-                        // Test for conditional value
-                        if (nameBrackets.match(/^([\w_]+)\?(.*)$/))
-                            if (options[RegExp.$1])
-                                return startChar + RegExp.$2 + endChar
-                            else if (startChar.trim().charAt(0).match(/['"]/))
-                                return "";
-                            else 
-                                return startChar + endChar;
+                            // Test for conditional value
+                            if (nameBrackets.match(/^([\w_]+)\?(.*)$/))
+                                if (options[RegExp.$1])
+                                    return startChar + RegExp.$2 + endChar
+                                else if (startChar.trim().charAt(0).match(/['"]/))
+                                    return ""; // remove quotes
+                                else
+                                    return startChar + endChar;
+                                
+                            // Test for regular expression
+                            if (nameBrackets.match(/^([\w_]+)\/(.*)$/)) {
+                                return startChar + reverse(nameBrackets)
+                                    .replace(/^\/?(.*)\/(?!\\)(.*)\/(?!\\)([\w_]+)$/, 
+                                    function (m, replace, find, name){
+                                        var data = getVariable(reverse(name), options);
+                                        var re   = new RegExp(reverse(find), "g");
+                                        return data.replace(re, reverse(replace));
+                                    }) + endChar;
+                            }
+
+                            // Test for shell expression value
+                            if (nameBrackets.match(/^`(.*)`$/))
+                                return "`" + RegExp.$1 + "`";
                             
-                        // Test for regular expression
-                        if (nameBrackets.match(/^([\w_]+)\/(.*)$/)) {
-                            return startChar + reverse(nameBrackets)
-                                .replace(/^\/?(.*)\/(?!\\)(.*)\/(?!\\)([\w_]+)$/, 
-                                function (m, replace, find, name){
-                                    var data = getVariable(reverse(name), options);
-                                    var re   = new RegExp(reverse(find), "g");
-                                    return data.replace(re, reverse(replace));
-                                }) + endChar;
+                            // TODO quotes
+                            // Assume just a name
+                            return startChar + getVariable(nameBrackets, options) + endChar;
                         }
-                        
-                        // Test for shell expression value
-                        if (nameBrackets.match(/^`(.*)`$/))
-                            return "`" + RegExp.$1 + "`";
-                        
-                        // TODO quotes
-                        // Assume just a name
-                        return startChar + getVariable(nameBrackets, options) + endChar;
-                    }
-                });
+                    });
+                } while (cmd !== oldCmd);
                 
                 return cmd;
             }
