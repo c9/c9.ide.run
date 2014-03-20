@@ -40,7 +40,7 @@ define(function(require, module, exports) {
         var emit    = plugin.getEmitter();
         
         var btnRun, lastRun, mnuRunWith, process, mnuRunCfg;
-        var model, datagrid;
+        var model, datagrid, defConfig;
         
         var loaded = false;
         function load(){
@@ -157,10 +157,6 @@ define(function(require, module, exports) {
             menus.addItemByPath("Run/Show Debugger at Break", new ui.item({
                 type    : "check",
                 checked : "user/debug/@autoshow"
-            }), c += 100, plugin);
-            menus.addItemByPath("Run/Show Output at Run", new ui.item({
-                type    : "check",
-                checked : "user/runconfig/@showconsole"
             }), c += 100, plugin);
             
             menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
@@ -405,7 +401,7 @@ define(function(require, module, exports) {
                 model.columns = [{
                     caption : "Name",
                     value   : "name",
-                    width   : "30%",
+                    width   : "15%",
                 }, {
                     caption : "Command",
                     value   : "command",
@@ -413,7 +409,7 @@ define(function(require, module, exports) {
                 }, {
                     caption : "CWD",
                     value   : "cwd",
-                    width   : "10%"
+                    width   : "15%"
                 }, {
                     caption : "Debug",
                     value   : "debug",
@@ -422,11 +418,15 @@ define(function(require, module, exports) {
                     caption : "Runner",
                     value   : "runner",
                     width   : "20%"
+                }, {
+                    caption : "Default",
+                    value   : "default",
+                    width   : "10%"
                 }];
                 
                 var container = hbox.$ext.appendChild(document.createElement("div"));
                 container.style.border = "1px solid rgb(37, 37, 37)";
-                container.style.width  = "500px";
+                container.style.width  = "600px";
                 container.style.marginBottom  = "30px";
                 
                 datagrid = new Tree(container);
@@ -469,6 +469,26 @@ define(function(require, module, exports) {
                         commands.exec("showoutput", null, {});
                     }
                 });
+                new ui.button({
+                    htmlNode : container.parentNode,
+                    caption  : "Set As Default",
+                    skin     : "c9-toolbarbutton-glossy",
+                    style    : "width:95px;position:absolute;left:285px;bottom:10px",
+                    onclick  : function(){
+                        var node = datagrid.selection.getSelectedNodes()[0];
+                        if (!node) return;
+                        
+                        var json = settings.getJson("project/run/configs") || {};
+                        for(var name in json){ delete json[name]["default"]; }
+                        json[node.name]["default"] = true;
+                        settings.setJson("project/run/configs", json);
+                        
+                        defConfig = node.name;
+                        
+                        reloadModel();
+                        transformButton();
+                    }
+                });
                 
                 reloadModel();
             }, plugin);
@@ -478,9 +498,16 @@ define(function(require, module, exports) {
                 settings.setDefaults("user/runconfig", [
                     ["saveallbeforerun", "false"],
                     ["debug", "true"],
-                    ["showconsole", "true"],
                     ["showruncfglist", "false"]
                 ]);
+                
+                var json = settings.getJson("project/run/configs") || {};
+                for (var name in json){ 
+                    if (json[name]["default"]) {
+                        defConfig = name; 
+                        break; 
+                    } 
+                }
                 
                 var state = settings.getJson("state/run/process");
                 if (state) {
@@ -497,6 +524,9 @@ define(function(require, module, exports) {
                         });
                     }
                 }
+                else if(defConfig) {
+                    transformButton();
+                }
             }, plugin);
             
             settings.on("project/run/configs", function(){
@@ -507,6 +537,8 @@ define(function(require, module, exports) {
                 if (process && process.running)
                     return;
                 
+                if (defConfig) return;
+
                 var path = findTabToRun();
                 if (path) {
                     btnRun.enable();
@@ -535,7 +567,7 @@ define(function(require, module, exports) {
             }, plugin);
             
             tabs.on("tabDestroy", function(e){
-                if (e.last) {
+                if (e.last && !defConfig) {
                     btnRun.disable();
                     btnRun.setAttribute("tooltip", "");
                 }
@@ -639,53 +671,34 @@ define(function(require, module, exports) {
                 if (!runner)
                     runner = "auto";
                 
-                if (settings.getBool("user/runconfig/@showconsole")) {
-                    // @todo use run config instead
-                    
-                    commands.exec("showoutput", null, {
-                        runner : runner,
-                        run    : true,
-                        config : {
-                            runner  : runner.caption || runner,
-                            command : isEscapedPath ? path : util.escapeShell(path)
-                        }
-                    });
-                    
-                    return; // @todo unless global
+                var config;
+                if (defConfig) {
+                    var configs = settings.getJson("project/run/configs") || {};
+                    config = configs[defConfig];
+                }
+                else {
+                    config = {
+                        runner  : runner.caption || runner,
+                        command : isEscapedPath ? path : util.escapeShell(path)
+                    };
                 }
                 
-                var bDebug = settings.getBool("user/runconfig/@debug");
-                if (bDebug)
-                    debug.checkAttached(start);
-                else
-                    start();
-                
-                function start(){
-                    process = run.run(runner, {
-                        path  : path,
-                        debug : bDebug
-                    }, function(err, pid){
-                        if (err) {
-                            transformButton();
-                            process = null;
-                            return showError(err);
+                commands.exec("showoutput", null, {
+                    runner   : runner,
+                    run      : true,
+                    config   : config,
+                    callback : function(proc){
+                        if (defConfig) {
+                            process = proc;
+                            decorateProcess();
+                            transformButton("stop");
+                            
+                            var state = process.getState();
+                            state.debug = process.meta.debug;
+                            settings.setJson("state/run/process", state);
                         }
-                        
-                        var state = process.getState();
-                        state.debug = bDebug;
-                        settings.setJson("state/run/process", state);
-                        
-                        if (bDebug) {
-                            debug.debug(process, function(err){
-                                if (err)
-                                    return; // Either the debugger is not found or paused
-                            });
-                        }
-                    });
-                    
-                    decorateProcess();
-                    transformButton("stop");
-                }
+                    }
+                });
             }
             
             lastRun = [runner, path];
@@ -743,25 +756,33 @@ define(function(require, module, exports) {
                 btnRun.enable();
             }
             else {
-                var path = findTabToRun();
-                
-                var runner = !path && lastRun && (lastRun[0] == "auto"
-                    ? getRunner(lastRun[1])
-                    : lastRun[0]);
-                    
                 btnRun.setAttribute("icon", "run.png");
-                btnRun.setAttribute("caption", !path && lastRun ? "Run Last" : "Run");
-                btnRun.setAttribute("tooltip", path 
-                    ? "Run " + basename(path)
-                    : (lastRun 
-                        ? "Run Last ("
-                            + basename(lastRun[1]) + ", " 
-                            + (runner.caption || "auto") + ")"
-                        : ""));
                 btnRun.setAttribute("class", "stopped");
-                btnRun.setAttribute("command", !path && lastRun ? "runlast" : "run");
                 
-                return path;
+                if (defConfig) {
+                    btnRun.setAttribute("caption", "Run Project");
+                    btnRun.setAttribute("tooltip", "");
+                    btnRun.setAttribute("command", "run");
+                    btnRun.setAttribute("disabled", "false");
+                }
+                else {
+                    var path   = findTabToRun();
+                    var runner = !path && lastRun && (lastRun[0] == "auto"
+                        ? getRunner(lastRun[1])
+                        : lastRun[0]);
+                        
+                    btnRun.setAttribute("caption", !path && lastRun ? "Run Last" : "Run");
+                    btnRun.setAttribute("tooltip", path 
+                        ? "Run " + basename(path)
+                        : (lastRun 
+                            ? "Run Last ("
+                                + basename(lastRun[1]) + ", " 
+                                + (runner.caption || "auto") + ")"
+                            : ""));
+                    btnRun.setAttribute("command", !path && lastRun ? "runlast" : "run");
+                    
+                    return path;
+                }
             }
         }
         
@@ -782,14 +803,6 @@ define(function(require, module, exports) {
         function runLastFile(){
             if (lastRun)
                 runNow(lastRun[0], lastRun[1], true);
-        }
-    
-        function onHelpClick() {
-            var tab = "running_and_debugging_code";
-            if (ide.infraEnv)
-                require("ext/docum" + "entation/documentation").show(tab);
-            else
-                window.open("https://docs.c9.io/" + tab + ".html");
         }
     
         /***** Lifecycle *****/

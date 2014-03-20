@@ -79,10 +79,11 @@ define(function(require, exports, module) {
                         document   : {
                             title  : "Output",
                             output : {
-                                id     : id || "output",
-                                config : argv.config,
-                                runner : argv.runner || argv.config && argv.config.runner,
-                                run    : argv.run
+                                id       : id || "output",
+                                config   : argv.config,
+                                runner   : argv.runner || argv.config && argv.config.runner,
+                                run      : argv.run,
+                                callback : argv.callback
                             }
                         }
                     }, function(){});
@@ -175,7 +176,7 @@ define(function(require, exports, module) {
                   && (session.id == id || cmd && session.config 
                   && (session.config.command || "").indexOf(cmd) === 0)) {
                     if (argv && argv.run)
-                        tablist[i].editor.run(tablist[i].document.getSession());
+                        tablist[i].editor.run(tablist[i].document.getSession(), argv.callback);
                       
                     tabs.focusTab(tablist[i]);
                     return true;
@@ -201,13 +202,13 @@ define(function(require, exports, module) {
             
             /***** Methods *****/
             
-            function runNow(session){
+            function runNow(session, callback){
                 if (!session)
                     session = currentSession;
                     
                 var runner = session.runner;
                 if (!runner) {
-                    session.runOnRunner = true;
+                    session.runOnRunner = { callback: callback };
                     return;
                 }
                 
@@ -280,6 +281,8 @@ define(function(require, exports, module) {
                     
                     decorateProcess(session);
                     transformButton(session);
+                    
+                    callback && callback(session.process);
                 }
                 
                 runGui.lastRun = [runner, path];
@@ -760,7 +763,7 @@ define(function(require, exports, module) {
                     session.config.runner = runner.caption;
                     
                     if (session.runOnRunner) {
-                        runNow(session);
+                        runNow(session, session.runOnRunner.callback);
                         delete session.runOnRunner;
                     }
                     
@@ -1011,7 +1014,7 @@ define(function(require, exports, module) {
                 }
                 
                 if (state.run)
-                    runNow(session);
+                    runNow(session, state.callback);
                 else
                     session.connect();
                 
