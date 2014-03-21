@@ -53,7 +53,9 @@ define(function(require, module, exports) {
                 group   : "Run & Debug",
                 "hint"  : "run or debug an application",
                 bindKey : { mac: "Option-F5", win: "Alt-F5" },
-                exec    : function(){ runNow() }
+                exec    : function(editor, args){ 
+                    runNow(null, null, null, args.callback);
+                }
             }, plugin);
     
             commands.addCommand({
@@ -653,7 +655,7 @@ define(function(require, module, exports) {
             return false;
         }
         
-        function runNow(runner, path, isEscapedPath){
+        function runNow(runner, path, isEscapedPath, callback){
             if (!path) {
                 path = findTabToRun() || "";
                 // if (!path) return;
@@ -691,7 +693,10 @@ define(function(require, module, exports) {
                             transformButton("stop");
                             
                             settings.set("state/run/process", process.name);
+                            
                         }
+                        
+                        callback && callback(proc, tab);
                     }
                 });
             }
@@ -835,7 +840,7 @@ define(function(require, module, exports) {
          */
         plugin.freezePublicAPI({
             get lastRun(){ return lastRun },
-            set lastRun(lr){ lastRun = lr }
+            set lastRun(lr){ lastRun = lr },
         });
         
         register(null, {
