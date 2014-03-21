@@ -505,8 +505,10 @@ define(function(require, module, exports) {
                     ["showruncfglist", "false"]
                 ]);
                 
-                if (!settings.getBool("project/run/configs/@inited"))
+                if (!settings.getBool("project/run/configs/@inited")) {
                     settings.setJson("project/run/configs", defaultConfigs);
+                    settings.set("project/run/configs/@inited", "true");
+                }
                 
                 var json = settings.getJson("project/run/configs") || {};
                 for (var name in json){ 
