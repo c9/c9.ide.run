@@ -39,6 +39,8 @@ define(function(require, module, exports) {
         var plugin  = new Plugin("Ajax.org", main.consumes);
         var emit    = plugin.getEmitter();
         
+        var defaultConfigs = options.defaultConfigs;
+        
         var btnRun, lastRun, mnuRunWith, process, mnuRunCfg;
         var model, datagrid, defConfig;
         
@@ -502,6 +504,9 @@ define(function(require, module, exports) {
                     ["debug", "true"],
                     ["showruncfglist", "false"]
                 ]);
+                
+                if (!settings.getBool("project/run/configs/@inited"))
+                    settings.setJson("project/run/configs", defaultConfigs);
                 
                 var json = settings.getJson("project/run/configs") || {};
                 for (var name in json){ 
