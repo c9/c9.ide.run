@@ -282,7 +282,7 @@ define(function(require, exports, module) {
                     decorateProcess(session);
                     transformButton(session);
                     
-                    callback && callback(session.process);
+                    callback && callback(session.process, session.tab);
                 }
                 
                 runGui.lastRun = [runner, path];
@@ -746,6 +746,8 @@ define(function(require, exports, module) {
                 
                 if (!session.config)
                     session.config = { env : {} };
+                
+                session.tab = tab;
                 
                 session.run = function(){
                     runNow(session);

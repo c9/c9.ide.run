@@ -175,7 +175,9 @@ define(function(require, module, exports) {
         }
         
         function restoreProcess(state){
-            return new Process(state);
+            var process = new Process(state);
+            handleEmit("create", { process: process });
+            return process;
         }
         
         function run(runner, options, name, callback){
@@ -213,6 +215,8 @@ define(function(require, module, exports) {
                 handleEmit("stopped", event); 
                 processes.remove(proc);
             });
+            
+            handleEmit("create", event);
             
             return proc;
         }
@@ -510,6 +514,8 @@ define(function(require, module, exports) {
                     emit("stopped");
                     
                     callback && callback();
+                    
+                    return false; // Prevent error when watchfile doesn't exist
                 }
                 
                 if (running == CLEANING || running == STOPPED) {

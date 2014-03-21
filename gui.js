@@ -508,24 +508,21 @@ define(function(require, module, exports) {
                         break; 
                     } 
                 }
-                
-                var state = settings.getJson("state/run/process");
-                if (state) {
-                    process = run.restoreProcess(state);
-                    decorateProcess();
-                    transformButton("stop");
-                    
-                    if (state.debug && process.running > 0) {
-                        process.once("back", function(){
-                            debug.debug(process, true, function(err){
-                                if (err)
-                                    return; // Either the debugger is not found or paused
-                            });
-                        });
-                    }
-                }
-                else if(defConfig) {
+                if (defConfig)
                     transformButton();
+                
+                var state = settings.get("state/run/process");
+                if (state) {
+                    run.on("create", function wait(e){
+                        if (e.process.name == state) {
+                            process = e.process;
+                            
+                            decorateProcess();
+                            transformButton("stop");
+                            
+                            run.off("create", wait);
+                        }
+                    });
                 }
             }, plugin);
             
@@ -687,15 +684,13 @@ define(function(require, module, exports) {
                     runner   : runner,
                     run      : true,
                     config   : config,
-                    callback : function(proc){
+                    callback : function(proc, tab){
                         if (defConfig) {
                             process = proc;
                             decorateProcess();
                             transformButton("stop");
                             
-                            var state = process.getState();
-                            state.debug = process.meta.debug;
-                            settings.setJson("state/run/process", state);
+                            settings.set("state/run/process", process.name);
                         }
                     }
                 });
@@ -718,7 +713,7 @@ define(function(require, module, exports) {
                 btnRun.enable();
                 
                 var path = transformButton();
-                if (path || lastRun)
+                if (path || lastRun || defConfig)
                     btnRun.enable();
                 else
                     btnRun.disable();
