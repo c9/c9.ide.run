@@ -190,11 +190,6 @@ define(function(require, module, exports) {
                 name = "output";
             
             (options instanceof Array ? options : [options]).forEach(function(a){
-                function toExternalPath(path) {
-                    if (c9.platform == "win32")
-                        path = path.replace(/^[/]+/, "").replace(/[/]/g, "\\");
-                    return path;
-                }
                 a.relPath = a.path;
                 if (a.path && a.path.charAt(0) !== "/")
                     a.path = base + a.path;
@@ -225,6 +220,18 @@ define(function(require, module, exports) {
             processes.forEach(function(proc){
                 proc.stop();
             });
+        }
+        
+        function toExternalPath(path) {
+            if (c9.platform == "win32")
+                path = path.replace(/^[/]+/, "").replace(/[/]+/g, "\\");
+            return path;
+        }
+        
+        function toInternalPath(path) {
+            if (c9.platform == "win32")
+                path = path.replace(/^[/]*/, "/").replace(/[\\/]+/g, "/");
+            return path;
         }
         
         /***** Process Class *****/
@@ -318,7 +325,7 @@ define(function(require, module, exports) {
                 options = options[0];
                 
                 var cwd = options.cwd || runner[0].working_dir 
-                        || options.path && dirname(options.path) || "/";
+                        || options.path && dirname(toInternalPath(options.path)) || "/";
                 cwd = insertVariables(cwd, options);
                 
                 // Execute run.sh
