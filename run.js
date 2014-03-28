@@ -193,7 +193,7 @@ define(function(require, module, exports) {
                 a.relPath = a.path;
                 if (a.path && a.path.charAt(0) !== "/")
                     a.path = base + a.path;
-                a.path = toExternalPath(a.path);
+                a.path = c9.toExternalPath(a.path);
                 if (a.cwd && a.cwd.charAt(0) !== "/")
                     a.cwd = base + a.cwd;
             });
@@ -220,18 +220,6 @@ define(function(require, module, exports) {
             processes.forEach(function(proc){
                 proc.stop();
             });
-        }
-        
-        function toExternalPath(path) {
-            if (c9.platform == "win32")
-                path = path.replace(/^[/]+/, "").replace(/[/]+/g, "\\");
-            return path;
-        }
-        
-        function toInternalPath(path) {
-            if (c9.platform == "win32")
-                path = path.replace(/^[/]*/, "/").replace(/[\\/]+/g, "/");
-            return path;
         }
         
         /***** Process Class *****/
@@ -325,7 +313,7 @@ define(function(require, module, exports) {
                 options = options[0];
                 
                 var cwd = options.cwd || runner[0].working_dir 
-                        || options.path && dirname(toInternalPath(options.path)) || "/";
+                        || options.path && dirname(c9.toInternalPath(options.path)) || "/";
                 cwd = insertVariables(cwd, options);
                 
                 // Execute run.sh
@@ -498,10 +486,6 @@ define(function(require, module, exports) {
                                         return data.replace(re, reverse(replace));
                                     }) + endChar;
                             }
-
-                            // Test for shell expression value
-                            if (nameBrackets.match(/^`(.*)`$/))
-                                return "`" + RegExp.$1 + "`";
                             
                             // TODO quotes
                             // Assume just a name
@@ -775,7 +759,9 @@ define(function(require, module, exports) {
             return commandArgs.map(function(part) {
                 if (part === "$args" && !alsoQuoteArgs)
                     return part;
-                return "'" + part.replace(/'/g, "'\\''") + "'";
+                return part.match(/^`.*`$/) // shell expression
+                        ? part
+                        : "'" + part.replace(/'/g, "'\\''") + "'";
             }).join(" ");
         }
         
