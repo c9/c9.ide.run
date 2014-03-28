@@ -197,7 +197,7 @@ define(function(require, module, exports) {
                         
                         // Show edit menu only in Output tab
                         var editMenu = mnuRunAs.childNodes[mnuRunAs.childNodes.length - 1];
-                        if (this.opener.getAttribute("caption") !== "Run With") {
+                        if (this.opener && this.opener.getAttribute("caption") !== "Run With") {
                             editMenu.setAttribute("visible", true);
                             // Make sure caption doesn't break edit-run-system
                             assert(this.opener.getAttribute("caption").match(/Runner: .*/));
