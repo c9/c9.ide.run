@@ -486,10 +486,6 @@ define(function(require, module, exports) {
                                         return data.replace(re, reverse(replace));
                                     }) + endChar;
                             }
-
-                            // Test for shell expression value
-                            if (nameBrackets.match(/^`(.*)`$/))
-                                return "`" + RegExp.$1 + "`";
                             
                             // TODO quotes
                             // Assume just a name
@@ -763,7 +759,9 @@ define(function(require, module, exports) {
             return commandArgs.map(function(part) {
                 if (part === "$args" && !alsoQuoteArgs)
                     return part;
-                return "'" + part.replace(/'/g, "'\\''") + "'";
+                return part.match(/^`.*`$/) // shell expression
+                        ? part
+                        : "'" + part.replace(/'/g, "'\\''") + "'";
             }).join(" ");
         }
         
