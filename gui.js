@@ -2,7 +2,7 @@ define(function(require, module, exports) {
     main.consumes = [
         "c9", "Plugin", "run", "settings", "menus", "tabbehavior", "ace", 
         "commands", "layout", "tabManager", "preferences", "ui", "fs", 
-        "layout", "debugger", "tree", "dialog.error", "util", "console"
+        "layout", "debugger", "tree", "dialog.error", "util", "console", "save"
     ];
     main.provides = ["run.gui"];
     return main;
@@ -25,6 +25,7 @@ define(function(require, module, exports) {
         var prefs       = imports.preferences;
         var c9console   = imports.console;
         var ace         = imports.ace;
+        var save        = imports.save;
         var showError   = imports["dialog.error"].show;
         var assert      = require("c9/assert");
         
@@ -500,7 +501,7 @@ define(function(require, module, exports) {
             // settings
             settings.on("read", function(e){
                 settings.setDefaults("user/runconfig", [
-                    ["saveallbeforerun", "false"],
+                    ["saveallbeforerun", "true"],
                     ["debug", "true"],
                     ["showruncfglist", "false"]
                 ]);
@@ -668,10 +669,17 @@ define(function(require, module, exports) {
                 // if (!path) return;
             }
             
-            if (process && process.running)
-                stop(done);
+            if (settings.getBool("user/runconfig/@saveallbeforerun"))
+                save.saveAll(start);
             else
-                done();
+                start();
+            
+            function start(){
+                if (process && process.running)
+                    stop(done);
+                else
+                    done();
+            }
             
             function done(){
                 if (!runner)
