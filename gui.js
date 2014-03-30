@@ -619,8 +619,7 @@ define(function(require, module, exports) {
                 command  : "run",
                 caption  : "Run",
                 disabled : true,
-                icon     : "run.png",
-                visible  : "true"
+                icon     : "run.png"
             }), 100, plugin);
             
             btnRun.on("contextmenu", function(e){
