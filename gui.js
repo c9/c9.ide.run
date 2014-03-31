@@ -247,7 +247,9 @@ define(function(require, module, exports) {
                                 tabs.open({
                                     path   : path,
                                     active : true,
-                                    value  : !exists && "// This file overrides the built-in " + runnerName + " runner\n"
+                                    value  : exists 
+                                      ? undefined
+                                      : "// This file overrides the built-in " + runnerName + " runner\n"
                                         + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
                                         + JSON.stringify(runner, null, 2),
                                     document : !exists && {
