@@ -155,7 +155,7 @@ define(function(require, module, exports) {
                             return callback(err);
                             
                         // Remove comments
-                        data = data.replace(/\/\/.*/g, "");
+                        data = data.replace(/(^|\n)\s*\/\/.*/g, "");
                             
                         var runner;
                         try { runner = JSON.parse(data); }
