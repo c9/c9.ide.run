@@ -238,7 +238,7 @@ define(function(require, module, exports) {
                         var path = settings.get("project/run/@path") + "/" + runnerName + ".run";
                         run.getRunner(runnerName, function(err, runner) {
                             if (err)
-                                return showError("Could not find runner: " + err);
+                                showError(err); // warn and continue
                             if (runner) {
                                 delete runner.caption;
                                 delete runner.$builtin;
