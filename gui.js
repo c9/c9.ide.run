@@ -218,7 +218,7 @@ define(function(require, module, exports) {
                               + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
                               + '{\n'
                               + '    "cmd" : ["ls", "$file", "$args"],\n'
-                              + '    "info" : "Started $project_path/$file",\n'
+                              + '    "info" : "Started $project_path/$file_name",\n'
                               + '    "env" : {},\n'
                               + '    "selector" : "source.ext"\n'
                               + '}',
