@@ -545,8 +545,9 @@ define(function(require, module, exports) {
             tabs.on("focus", function(e){
                 if (process && process.running)
                     return;
-                
-                if (defConfig) return;
+                    
+                if (defConfig)
+                    return transformButton();
 
                 var path = findTabToRun();
                 if (path) {
@@ -665,7 +666,7 @@ define(function(require, module, exports) {
         }
         
         function runNow(runner, path, isEscapedPath, callback){
-            if (!path) {
+            if (!path && !defConfig) {
                 path = findTabToRun() || "";
                 // if (!path) return;
             }
@@ -687,7 +688,7 @@ define(function(require, module, exports) {
                     runner = "auto";
                 
                 var config;
-                if (defConfig) {
+                if (defConfig && !path) {
                     var configs = settings.getJson("project/run/configs") || {};
                     config = configs[defConfig];
                 }
