@@ -907,20 +907,20 @@ define(function(require, exports, module) {
                       && (!session.config.name && session.config.command 
                       && !tab.meta.$ignore)) {
                         question.show("Unsaved changes",
-                            "Would you like to save this as a run configuration?",
+                            "Are you sure you want to close this run configuration without saving it?",
                             "You can keep these settings in a run configuration "
                             + "for easy access later. If you would like to do "
-                            + "this, choose Yes and fill in the name of the "
+                            + "this, choose No and fill in the name of the "
                             + "run configuration prior to closing this tab.",
                             function(){ // Yes
-                                // do nothing
+                                tab.meta.$ignore = true;
+                                tab.close();
                                 
                                 if (question.dontAsk)
                                     settings.set("user/output/nosavequestion", "true");
                             }, 
                             function(){ // No
-                                tab.meta.$ignore = true;
-                                tab.close();
+                                // do nothing; allow user to set a name
                                 
                                 if (question.dontAsk)
                                     settings.set("user/output/nosavequestion", "true");
