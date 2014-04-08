@@ -218,7 +218,7 @@ define(function(require, module, exports) {
                               + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
                               + '{\n'
                               + '    "cmd" : ["ls", "$file", "$args"],\n'
-                              + '    "info" : "Started $project_path/$file",\n'
+                              + '    "info" : "Started $project_path/$file_name",\n'
                               + '    "env" : {},\n'
                               + '    "selector" : "source.ext"\n'
                               + '}',
@@ -351,7 +351,7 @@ define(function(require, module, exports) {
                 onclick : function(){
                     var tab = mnuContext.$tab;
                     if (tab && tab.path)
-                        runNow("auto", tab.path);
+                        runNow("auto", tab.path.replace(/^\//, ""));
                 },
                 isAvailable: function(){
                     var tab = mnuContext.$tab;
@@ -487,11 +487,12 @@ define(function(require, module, exports) {
                         if (!node) return;
                         
                         var json = settings.getJson("project/run/configs") || {};
+                        var wasDefault = json[node.name]["default"];
                         for(var name in json){ delete json[name]["default"]; }
-                        json[node.name]["default"] = true;
+                        json[node.name]["default"] = !wasDefault;
                         settings.setJson("project/run/configs", json);
                         
-                        defConfig = node.name;
+                        defConfig = wasDefault ? null : node.name;
                         
                         reloadModel();
                         transformButton();
@@ -546,8 +547,9 @@ define(function(require, module, exports) {
             tabs.on("focus", function(e){
                 if (process && process.running)
                     return;
-                
-                if (defConfig) return;
+                    
+                if (defConfig)
+                    return transformButton();
 
                 var path = findTabToRun();
                 if (path) {
@@ -652,6 +654,15 @@ define(function(require, module, exports) {
             }).sort();
             
             model.setRoot({children : nodes});
+            
+            defConfig = null;
+            for (var name in cfgs) { 
+                if (cfgs[name]["default"]) {
+                    defConfig = name; 
+                    break; 
+                }
+            }
+            transformButton();
         }
         
         /***** Methods *****/
@@ -666,7 +677,7 @@ define(function(require, module, exports) {
         }
         
         function runNow(runner, path, isEscapedPath, callback){
-            if (!path) {
+            if (!path && !defConfig) {
                 path = findTabToRun() || "";
                 // if (!path) return;
             }
@@ -688,7 +699,7 @@ define(function(require, module, exports) {
                     runner = "auto";
                 
                 var config;
-                if (defConfig) {
+                if (defConfig && !path) {
                     var configs = settings.getJson("project/run/configs") || {};
                     config = configs[defConfig];
                 }
