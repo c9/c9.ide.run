@@ -350,7 +350,7 @@ define(function(require, module, exports) {
                 onclick : function(){
                     var tab = mnuContext.$tab;
                     if (tab && tab.path)
-                        runNow("auto", tab.path);
+                        runNow("auto", tab.path.replace(/^\//, ""));
                 },
                 isAvailable: function(){
                     var tab = mnuContext.$tab;
