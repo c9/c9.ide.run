@@ -486,11 +486,12 @@ define(function(require, module, exports) {
                         if (!node) return;
                         
                         var json = settings.getJson("project/run/configs") || {};
+                        var wasDefault = json[node.name]["default"];
                         for(var name in json){ delete json[name]["default"]; }
-                        json[node.name]["default"] = true;
+                        json[node.name]["default"] = !wasDefault;
                         settings.setJson("project/run/configs", json);
                         
-                        defConfig = node.name;
+                        defConfig = wasDefault ? null : node.name;
                         
                         reloadModel();
                         transformButton();
@@ -652,6 +653,15 @@ define(function(require, module, exports) {
             }).sort();
             
             model.setRoot({children : nodes});
+            
+            defConfig = null;
+            for (var name in cfgs) { 
+                if (cfgs[name]["default"]) {
+                    defConfig = name; 
+                    break; 
+                }
+            }
+            transformButton();
         }
         
         /***** Methods *****/
