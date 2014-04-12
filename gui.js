@@ -2,7 +2,7 @@ define(function(require, module, exports) {
     main.consumes = [
         "c9", "Plugin", "run", "settings", "menus", "tabbehavior", "ace", 
         "commands", "layout", "tabManager", "preferences", "ui", "fs", 
-        "layout", "debugger", "tree", "dialog.error", "util", "console"
+        "layout", "debugger", "tree", "dialog.error", "util", "console", "save"
     ];
     main.provides = ["run.gui"];
     return main;
@@ -25,6 +25,7 @@ define(function(require, module, exports) {
         var prefs       = imports.preferences;
         var c9console   = imports.console;
         var ace         = imports.ace;
+        var save        = imports.save;
         var showError   = imports["dialog.error"].show;
         var assert      = require("c9/assert");
         
@@ -217,7 +218,7 @@ define(function(require, module, exports) {
                               + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
                               + '{\n'
                               + '    "cmd" : ["ls", "$file", "$args"],\n'
-                              + '    "info" : "Started $project_path/$file",\n'
+                              + '    "info" : "Started $project_path/$file_name",\n'
                               + '    "env" : {},\n'
                               + '    "selector" : "source.ext"\n'
                               + '}',
@@ -236,8 +237,9 @@ define(function(require, module, exports) {
                         var runnerName = lastOpener.getAttribute("caption").match(/Runner: (.*)/)[1];
                         var path = settings.get("project/run/@path") + "/" + runnerName + ".run";
                         run.getRunner(runnerName, function(err, runner) {
-                            if (err)
-                                return showError("Could not find runner: " + err);
+                            if (err) {
+                                showError(err); // warn and continue
+                            }
                             if (runner) {
                                 delete runner.caption;
                                 delete runner.$builtin;
@@ -246,7 +248,9 @@ define(function(require, module, exports) {
                                 tabs.open({
                                     path   : path,
                                     active : true,
-                                    value  : !exists && "// This file overrides the built-in " + runnerName + " runner\n"
+                                    value  : exists 
+                                      ? undefined
+                                      : "// This file overrides the built-in " + runnerName + " runner\n"
                                         + '// For more information see http://docs.c9.io:8080/#!/api/run-method-run\n'
                                         + JSON.stringify(runner, null, 2),
                                     document : !exists && {
@@ -347,7 +351,7 @@ define(function(require, module, exports) {
                 onclick : function(){
                     var tab = mnuContext.$tab;
                     if (tab && tab.path)
-                        runNow("auto", tab.path);
+                        runNow("auto", tab.path.replace(/^\//, ""));
                 },
                 isAvailable: function(){
                     var tab = mnuContext.$tab;
@@ -483,11 +487,12 @@ define(function(require, module, exports) {
                         if (!node) return;
                         
                         var json = settings.getJson("project/run/configs") || {};
+                        var wasDefault = json[node.name]["default"];
                         for(var name in json){ delete json[name]["default"]; }
-                        json[node.name]["default"] = true;
+                        json[node.name]["default"] = !wasDefault;
                         settings.setJson("project/run/configs", json);
                         
-                        defConfig = node.name;
+                        defConfig = wasDefault ? null : node.name;
                         
                         reloadModel();
                         transformButton();
@@ -500,7 +505,7 @@ define(function(require, module, exports) {
             // settings
             settings.on("read", function(e){
                 settings.setDefaults("user/runconfig", [
-                    ["saveallbeforerun", "false"],
+                    ["saveallbeforerun", "true"],
                     ["debug", "true"],
                     ["showruncfglist", "false"]
                 ]);
@@ -542,8 +547,9 @@ define(function(require, module, exports) {
             tabs.on("focus", function(e){
                 if (process && process.running)
                     return;
-                
-                if (defConfig) return;
+                    
+                if (defConfig)
+                    return transformButton();
 
                 var path = findTabToRun();
                 if (path) {
@@ -618,8 +624,7 @@ define(function(require, module, exports) {
                 command  : "run",
                 caption  : "Run",
                 disabled : true,
-                icon     : "run.png",
-                visible  : "true"
+                icon     : "run.png"
             }), 100, plugin);
             
             btnRun.on("contextmenu", function(e){
@@ -649,6 +654,15 @@ define(function(require, module, exports) {
             }).sort();
             
             model.setRoot({children : nodes});
+            
+            defConfig = null;
+            for (var name in cfgs) { 
+                if (cfgs[name]["default"]) {
+                    defConfig = name; 
+                    break; 
+                }
+            }
+            transformButton();
         }
         
         /***** Methods *****/
@@ -663,22 +677,29 @@ define(function(require, module, exports) {
         }
         
         function runNow(runner, path, isEscapedPath, callback){
-            if (!path) {
+            if (!path && !defConfig) {
                 path = findTabToRun() || "";
                 // if (!path) return;
             }
             
-            if (process && process.running)
-                stop(done);
+            if (settings.getBool("user/runconfig/@saveallbeforerun"))
+                save.saveAll(start);
             else
-                done();
+                start();
+            
+            function start(){
+                if (process && process.running)
+                    stop(done);
+                else
+                    done();
+            }
             
             function done(){
                 if (!runner)
                     runner = "auto";
                 
                 var config;
-                if (defConfig) {
+                if (defConfig && !path) {
                     var configs = settings.getJson("project/run/configs") || {};
                     config = configs[defConfig];
                 }

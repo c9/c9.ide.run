@@ -155,7 +155,7 @@ define(function(require, module, exports) {
                             return callback(err);
                             
                         // Remove comments
-                        data = data.replace(/\/\/.*/g, "");
+                        data = data.replace(/(^|\n)\s*\/\/.*/g, "");
                             
                         var runner;
                         try { runner = JSON.parse(data); }
@@ -287,14 +287,13 @@ define(function(require, module, exports) {
                     
                     // Display a message prior to running the command
                     if (runner.info)
-                        cmd += "printf '" + runner.info.replace(/%/g, "%%") + "\n' ; ";
+                        cmd += "printf '\\033[1m" + runner.info.replace(/%/g, "%%") + "\\033[m\n' ; ";
                         
                     // Set the PATH variable if needed
                     if (runner.path)
                         cmd += "export PATH=" + runner.path + " ; ";
                         
                     var env = util.extend({}, options[idx].env, runner.env);
-                    env["C9_HOSTNAME"] = c9.hostname;
                     for (var name in env) {
                         cmd += "export " + name + "=" + env[name] + " ; ";
                     }
