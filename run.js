@@ -286,7 +286,7 @@ define(function(require, module, exports) {
                     
                     // Display a message prior to running the command
                     if (runner.info)
-                        cmd += "printf 'la la la \\033[1m" + runner.info.replace(/%/g, "%%") + "\\033[m\n' ; ";
+                        cmd += "printf '\\033[1m" + runner.info.replace(/%/g, "%%") + "\\033[m\n' ; ";
                         
                     // Set the PATH variable if needed
                     if (runner.path)
