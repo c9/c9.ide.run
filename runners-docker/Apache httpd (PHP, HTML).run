@@ -1,5 +1,5 @@
 {
-    "cmd": ["apache2", "-X"],
+    "cmd": ["apache2", "-X", "-c", "ServerName https://$user_name-c9-$project_name.c9.io"],
     "selector": "^.*\\.(php|phtml|html|shtml)$",
     "info": "Started Apache httpd, serving \\033[01;34m$hostname_path\\033[00m."
 }

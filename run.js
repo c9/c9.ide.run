@@ -9,7 +9,6 @@ define(function(require, module, exports) {
         var Plugin      = imports.Plugin;
         var settings    = imports.settings;
         var proc        = imports.proc;
-        var http        = imports.http;
         var util        = imports.util;
         var fs          = imports.fs;
         var c9          = imports.c9;
