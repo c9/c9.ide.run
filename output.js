@@ -260,6 +260,7 @@ define(function(require, exports, module) {
                         
                         if (err) {
                             transformButton(session);
+                            session.process.stop(function(){});
                             session.process = null;
                             return showError(err);
                         }
