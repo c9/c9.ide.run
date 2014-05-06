@@ -12,34 +12,34 @@ define(function(require, exports, module) {
     // add special case in terminal.js to not auto connect when isOutput
     
     function main(options, imports, register) {
-        var editors   = imports.editors;
-        var ui        = imports.ui;
-        var c9        = imports.c9;
-        var commands  = imports.commands;
-        var console   = imports.console;
-        var layout    = imports.layout;
-        var tabs      = imports.tabManager;
-        var util      = imports.util;
-        var run       = imports.run;
-        var prefs     = imports.preferences;
-        var runGui    = imports["run.gui"];
-        var question  = imports["dialog.question"];
+        var editors = imports.editors;
+        var ui = imports.ui;
+        var c9 = imports.c9;
+        var commands = imports.commands;
+        var console = imports.console;
+        var layout = imports.layout;
+        var tabs = imports.tabManager;
+        var util = imports.util;
+        var run = imports.run;
+        var prefs = imports.preferences;
+        var runGui = imports["run.gui"];
+        var question = imports["dialog.question"];
         var showError = imports["dialog.error"].show;
         var showAlert = imports["dialog.alert"].show;
-        var showSave  = imports["dialog.filesave"].show;
-        var Terminal  = imports.terminal.Terminal;
-        var debug     = imports.debugger;
-        var settings  = imports.settings;
+        var showSave = imports["dialog.filesave"].show;
+        var Terminal = imports.terminal.Terminal;
+        var debug = imports.debugger;
+        var settings = imports.settings;
         
-        var markup    = require("text!./output.xml");
+        var markup = require("text!./output.xml");
         
-        var keys       = require("ace/lib/keys");
-        var Tree       = require("ace_tree/tree");
-        var TreeData   = require("ace_tree/data_provider");
+        var keys = require("ace/lib/keys");
+        var Tree = require("ace_tree/tree");
+        var TreeData = require("ace_tree/data_provider");
         var TreeEditor = require("ace_tree/edit");
         
         // Set up the generic handle
-        var handle     = editors.register("output", "Output", Output, []);
+        var handle = editors.register("output", "Output", Output, []);
         var handleEmit = handle.getEmitter();
         
         var defaults = {
@@ -54,11 +54,11 @@ define(function(require, exports, module) {
             ui.insertCss(require("text!./style.css"), handle);
             
             commands.addCommand({
-                name    : "showoutput",
-                group   : "Panels",
-                exec    : function (editor, argv) {
+                name: "showoutput",
+                group: "Panels",
+                exec: function (editor, argv) {
                     if (!argv) argv = false;
-                    var id  = argv.id;
+                    var id = argv.id;
                     var cmd = argv.config && argv.config.command;
                     
                     if (id === undefined)
@@ -75,17 +75,17 @@ define(function(require, exports, module) {
                     
                     // Else open the output panel in the console
                     tabs.open({
-                        editorType : "output", 
-                        active     : true,
-                        pane       : console.getPanes()[0],
-                        document   : {
-                            title  : "Output",
-                            output : {
-                                id       : id || "output",
-                                config   : argv.config,
-                                runner   : argv.runner || argv.config && argv.config.runner,
-                                run      : argv.run,
-                                callback : argv.callback
+                        editorType: "output", 
+                        active: true,
+                        pane: console.getPanes()[0],
+                        document: {
+                            title: "Output",
+                            output: {
+                                id: id || "output",
+                                config: argv.config,
+                                runner: argv.runner || argv.config && argv.config.runner,
+                                run: argv.run,
+                                callback: argv.callback
                             }
                         }
                     }, function(){});
@@ -93,8 +93,8 @@ define(function(require, exports, module) {
             }, handle);
             
             function setSettings(){
-                var cname  = ".output .c9terminal .c9terminalcontainer .terminal";
-                var sname  = ".output .c9terminal .c9terminalcontainer";
+                var cname = ".output .c9terminal .c9terminalcontainer .terminal";
+                var sname = ".output .c9terminal .c9terminalcontainer";
                 var fcolor = settings.get("user/output/@foregroundColor");
                 var bcolor = settings.get("user/output/@backgroundColor");
                 var scolor = settings.get("user/output/@selectionColor");
@@ -102,7 +102,7 @@ define(function(require, exports, module) {
                     [cname, "color", fcolor || "rgb(255,255,255)"],
                     [sname, "backgroundColor", bcolor || "rgb(25, 34, 39)"],
                     [cname + " .ace_selection", "backgroundColor", scolor || "rgb(81, 93, 119)"]
-                ].forEach(function(i){
+                ].forEach(function(i) {
                     ui.setStyleRule(i[0], i[1], i[2]);
                 });
                 
@@ -125,7 +125,7 @@ define(function(require, exports, module) {
 
             settings.on("user/output", setSettings);
             
-            layout.on("themeChange", function(e){
+            layout.on("themeChange", function(e) {
                 var skin = e.oldTheme;
                 if (!(settings.get("user/output/@backgroundColor") == defaults[skin][0] &&
                   settings.get("user/output/@foregroundColor") == defaults[skin][1] &&
@@ -133,7 +133,7 @@ define(function(require, exports, module) {
                     return false;
             });
             
-            layout.on("themeDefaults", function(e){
+            layout.on("themeDefaults", function(e) {
                 var skin = e.theme;
                 settings.set("user/output/@backgroundColor", defaults[skin][0]);
                 settings.set("user/output/@foregroundColor", defaults[skin][1]);
@@ -145,31 +145,31 @@ define(function(require, exports, module) {
             prefs.add({
                 "Editors" : {
                     "Output" : {
-                        position : 130,
+                        position: 130,
                         "Text Color" : {
-                           type     : "colorbox",
-                           path     : "user/output/@foregroundColor",
-                           position : 10100
+                           type: "colorbox",
+                           path: "user/output/@foregroundColor",
+                           position: 10100
                         },
                         "Background Color" : {
-                           type     : "colorbox",
-                           path     : "user/output/@backgroundColor",
-                           position : 10200
+                           type: "colorbox",
+                           path: "user/output/@backgroundColor",
+                           position: 10200
                         },
                         "Selection Color" : {
-                           type     : "colorbox",
-                           path     : "user/output/@selectionColor",
-                           position : 10250
+                           type: "colorbox",
+                           path: "user/output/@selectionColor",
+                           position: 10250
                         },
                         "Warn Before Closing Unnamed Configuration" : {
-                           type     : "checkbox",
-                           path     : "user/output/@nosavequestion",
-                           position : 10300
+                           type: "checkbox",
+                           path: "user/output/@nosavequestion",
+                           position: 10300
                         },
                         "Preserve log between runs" : {
-                           type     : "checkbox",
-                           path     : "user/output/@keepOutput",
-                           position : 10300
+                           type: "checkbox",
+                           path: "user/output/@keepOutput",
+                           position: 10300
                         }
                     }
                 }
@@ -177,7 +177,7 @@ define(function(require, exports, module) {
         });
         
         //Search through pages
-        function search(id, cmd, argv){
+        function search(id, cmd, argv) {
             if (!id) id = "output";
             var tablist = tabs.getTabs(), session;
             for (var i = 0; i < tablist.length; i++) {
@@ -212,7 +212,7 @@ define(function(require, exports, module) {
             
             /***** Methods *****/
             
-            function runNow(session, callback){
+            function runNow(session, callback) {
                 if (!session)
                     session = currentSession;
                     
@@ -232,9 +232,9 @@ define(function(require, exports, module) {
                         term.reset();
                 }
                 
-                var path   = tbCommand.value || session.config.command;
+                var path = tbCommand.value || session.config.command;
                 var bDebug = btnDebug.visible && btnDebug.value;
-                var args   = splitPathArgs(path);
+                var args = splitPathArgs(path);
                 
                 path = args.shift();
                 
@@ -260,12 +260,12 @@ define(function(require, exports, module) {
                         runner = "auto";
                     
                     session.process = run.run(runner, {
-                        path  : path,
-                        cwd   : session.config.cwd || "",
-                        env   : session.config.env || {},
-                        args  : args,
-                        debug : bDebug
-                    }, session.id, function(err, pid){
+                        path: path,
+                        cwd: session.config.cwd || "",
+                        env: session.config.env || {},
+                        args: args,
+                        debug: bDebug
+                    }, session.id, function(err, pid) {
                         session.connect();
                         
                         if (err) {
@@ -282,7 +282,7 @@ define(function(require, exports, module) {
                         session.process.meta.debug = bDebug;
                         
                         if (bDebug) {
-                            debug.debug(session.process, function(err){
+                            debug.debug(session.process, function(err) {
                                 if (err)
                                     return; // Either the debugger is not found or paused
                             });
@@ -318,7 +318,7 @@ define(function(require, exports, module) {
                 return results;
             }
             
-            function decorateProcess(session){
+            function decorateProcess(session) {
                 session.process.on("away", function(){
                     if (session == currentSession) {
                         btnRun.disable();
@@ -348,7 +348,7 @@ define(function(require, exports, module) {
                 }, plugin);
             }
             
-            function transformButton(session){
+            function transformButton(session) {
                 btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
                 
                 if (session && session.process && session.process.running) {
@@ -380,7 +380,7 @@ define(function(require, exports, module) {
                 
                 var process = session.process;
                 if (process)
-                    process.stop(function(err){
+                    process.stop(function(err) {
                         if (err) {
                             showError(err.message || err);
                         }
@@ -395,11 +395,11 @@ define(function(require, exports, module) {
                     });
             }
             
-            function detectRunner(session){
+            function detectRunner(session) {
                 var path = session.path;
                 if (!path) return;
                 
-                run.detectRunner({ path: path }, function(err, runner){
+                run.detectRunner({ path: path }, function(err, runner) {
                     session.setRunner(err ? null : runner);
                 });
             }
@@ -432,19 +432,19 @@ define(function(require, exports, module) {
                 
                 model = new TreeData();
                 model.emptyMessage = "Type a new environment variable here...";
-                model.rowHeight    = 18;
+                model.rowHeight = 18;
                 
                 model.$sorted = false;
                 model.columns = [{
-                    caption : "Name",
-                    value   : "name",
-                    width   : "40%",
-                    editor  : "textbox"
+                    caption: "Name",
+                    value: "name",
+                    width: "40%",
+                    editor: "textbox"
                 }, {
-                    caption : "Value",
-                    value   : "value",
-                    width   : "60%",
-                    editor  : "textbox"
+                    caption: "Value",
+                    value: "value",
+                    width: "60%",
+                    editor: "textbox"
                 }];
                 
                 mnuEnv.$setStyleClass(mnuEnv.$ext, "envcontainer");
@@ -458,21 +458,21 @@ define(function(require, exports, module) {
                 
                 var justEdited = false;
                 
-                datagrid.textInput.getElement().addEventListener("keydown", function(e){
+                datagrid.textInput.getElement().addEventListener("keydown", function(e) {
                     var cursor = datagrid.selection.getCursor();
                     var key = keys[e.keyCode] || "";
                     if (key.length == 1 || key.substr(0, 3) == "num" && cursor && !justEdited)
                         datagrid.edit.startRename(cursor, 0);
                 }, true);
                 
-                datagrid.textInput.getElement().addEventListener("keyup", function(e){
+                datagrid.textInput.getElement().addEventListener("keyup", function(e) {
                     var cursor = datagrid.selection.getCursor();
                     if (e.keyCode == 13 && cursor && !justEdited)
                         datagrid.edit.startRename(cursor, 0);
                 }, true);
                 
-                datagrid.on("delete", function(e){
-                    datagrid.selection.getSelectedNodes().forEach(function(n){
+                datagrid.on("delete", function(e) {
+                    datagrid.selection.getSelectedNodes().forEach(function(n) {
                         delete model.session.config.env[n.name];
                     });
                     
@@ -482,19 +482,19 @@ define(function(require, exports, module) {
                     mnuEnv.resize();
                 });
                 
-                datagrid.on("rename", function(e){
+                datagrid.on("rename", function(e) {
                     if (!e.column) return;
                     
-                    var node   = e.node;
+                    var node = e.node;
                     var config = model.session.config;
                     var name, value;
                     
                     if (e.column.value == "name" || node.isNew) {
-                        name  = e.value;
+                        name = e.value;
                         value = node.value || "";
                     }
                     else {
-                        name  = node.name;
+                        name = node.name;
                         value = e.value;
                     }
                     
@@ -518,7 +518,7 @@ define(function(require, exports, module) {
                     mnuEnv.resize();
                 });
                 
-                datagrid.on("rename", function(e){
+                datagrid.on("rename", function(e) {
                     justEdited = true;
                     setTimeout(function(){ justEdited = false }, 500);
                 });
@@ -536,9 +536,9 @@ define(function(require, exports, module) {
                 }
             }
             
-            function findNode(name){
+            function findNode(name) {
                 var f;
-                model.root.children.some(function(n){
+                model.root.children.some(function(n) {
                     return n.name == name && (f = n);
                 });
                 return f;
@@ -551,22 +551,22 @@ define(function(require, exports, module) {
                 
                 for (var name in cfg.env) {
                     env.push({
-                        name  : name, 
-                        value : cfg.env[name]
+                        name: name, 
+                        value: cfg.env[name]
                     });
                 }
                 env.sort(function(a, b) {
                     return TreeData.alphanumCompare(a.name, b.name);
                 });
                 model.newEnvNode = model.newEnvNode || {
-                    name      : model.emptyMessage,
-                    className : "newenv",
-                    fullWidth : true,
-                    isNew     : true,
+                    name: model.emptyMessage,
+                    className: "newenv",
+                    fullWidth: true,
+                    isNew: true,
                 };
                 model.setRoot({
-                    items   : [].concat(env, model.newEnvNode),
-                    $sorted : true
+                    items: [].concat(env, model.newEnvNode),
+                    $sorted: true
                 });
                 
                 // restore selection
@@ -574,7 +574,7 @@ define(function(require, exports, module) {
                     model.selection.setSelection(findNode(sel.name));
             }
             
-            function updateConfig(session){
+            function updateConfig(session) {
                 var configs = settings.getJson("project/run/configs");
                 var cfg = configs[session.config.name] || session.config;
                 
@@ -585,12 +585,12 @@ define(function(require, exports, module) {
                     updateToolbar(session);
             }
             
-            function updateRunner(session){
+            function updateRunner(session) {
                 session.runner = null;
                 
                 var runner = session.config.runner;
                 if (runner && runner != "auto") {
-                    run.getRunner(session.config.runner, function(err, result){
+                    run.getRunner(session.config.runner, function(err, result) {
                         session.setRunner(err ? null : result);
                     });
                 }
@@ -598,13 +598,13 @@ define(function(require, exports, module) {
                     var path = /([^\\ ]|\\.)*/.exec(session.config.command || "")[0];
                     if (!path) return;
                     
-                    run.detectRunner({ path: path }, function(err, runner){
+                    run.detectRunner({ path: path }, function(err, runner) {
                         session.setRunner(err ? null : runner);
                     });
                 }
             }
             
-            function updateToolbar(session){
+            function updateToolbar(session) {
                 transformButton(session);
                 
                 var cfg = session.config;
@@ -623,7 +623,7 @@ define(function(require, exports, module) {
             
             /***** Lifecycle *****/
             
-            plugin.on("draw", function(e){
+            plugin.on("draw", function(e) {
                 // Create UI elements
                 ui.insertMarkup(e.tab, markup, plugin);
                 
@@ -631,20 +631,20 @@ define(function(require, exports, module) {
                 e.htmlNode.className += " output";
                 
                 // Decorate UI
-                btnRun     = plugin.getElement("btnRun");
+                btnRun = plugin.getElement("btnRun");
                 btnRestart = plugin.getElement("btnRestart");
-                btnDebug   = plugin.getElement("btnDebug");
-                btnRunner  = plugin.getElement("btnRunner");
-                tbCommand  = plugin.getElement("tbCommand");
-                tbName     = plugin.getElement("tbName");
-                btnEnv     = plugin.getElement("btnEnv");
-                btnCwd     = plugin.getElement("btnCwd");
+                btnDebug = plugin.getElement("btnDebug");
+                btnRunner = plugin.getElement("btnRunner");
+                tbCommand = plugin.getElement("tbCommand");
+                tbName = plugin.getElement("tbName");
+                btnEnv = plugin.getElement("btnEnv");
+                btnCwd = plugin.getElement("btnCwd");
                 
                 btnRun.on("click", function(){
                     var session = currentSession;
                     if (!session) return;
                     
-                    if (session.process && session.process.running){
+                    if (session.process && session.process.running) {
                         stop(function(){});
                     }
                     else {
@@ -660,13 +660,13 @@ define(function(require, exports, module) {
                         stop(function(){ runNow(session); });
                 });
                 
-                btnDebug.on("prop.value", function(e){
+                btnDebug.on("prop.value", function(e) {
                     if (currentSession) {
                         currentSession.config.debug = e.value;
                         saveConfig();
                     }
                 });
-                tbCommand.on("afterchange", function(e){
+                tbCommand.on("afterchange", function(e) {
                     if (currentSession)
                         currentSession.changeCommand(e.value);
                 });
@@ -674,19 +674,19 @@ define(function(require, exports, module) {
                     if (e.keyCode === 13)
                         currentSession && runNow(currentSession);
                 });
-                tbName.on("afterchange", function(e){
+                tbName.on("afterchange", function(e) {
                     if (!currentSession) return;
                     
                     currentSession.changeName(e.value);
                 });
                 
                 btnRunner.setAttribute("submenu", runGui.getElement("mnuRunAs"));
-                btnRunner.onitemclick = function(value){
+                btnRunner.onitemclick = function(value) {
                     // Stop the current process
                     // @todo
                     
                     // Start this run config with the new runner
-                    run.getRunner(value, function(err, result){
+                    run.getRunner(value, function(err, result) {
                         if (err)
                             return showError("Cannot use " + value + ": " + err);
                         
@@ -723,12 +723,12 @@ define(function(require, exports, module) {
                 });
                 
                 mnuEnv = new ui.menu({ 
-                    htmlNode : document.body,
-                    width    : 250
+                    htmlNode: document.body,
+                    width: 250
                 });
                 btnEnv.setAttribute("submenu", mnuEnv);
                 
-                mnuEnv.on("prop.visible", function(e){
+                mnuEnv.on("prop.visible", function(e) {
                     if (!e.value || mnuEnv.reopen)
                         return;
                     
@@ -749,9 +749,9 @@ define(function(require, exports, module) {
                 }, plugin);
             });
             
-            plugin.on("documentLoad", function(e){
-                var doc     = e.doc;
-                var tab     = e.doc.tab;
+            plugin.on("documentLoad", function(e) {
+                var doc = e.doc;
+                var tab = e.doc.tab;
                 var session = doc.getSession();
                 
                 if (!session.config)
@@ -763,9 +763,9 @@ define(function(require, exports, module) {
                     runNow(session);
                 }
                 
-                session.setRunner = function(runner){
+                session.setRunner = function(runner) {
                     if (!runner) {
-                        run.getRunner("Shell command", function(err, runner){
+                        run.getRunner("Shell command", function(err, runner) {
                             if (!err) session.setRunner(runner);
                         });
                         return;
@@ -788,7 +788,7 @@ define(function(require, exports, module) {
                     }
                 };
                 
-                session.filter = function(data, recur){
+                session.filter = function(data, recur) {
                     // Ignore clear screen when detaching
                     if (/output:0:.*\[dead\] - /.test(data))
                         return;
@@ -841,9 +841,9 @@ define(function(require, exports, module) {
                 session.$reloadHistory = function() {
                     if (session.getScrollBack) {
                         session.getScrollBack({
-                            id : session.id,
-                            start : -1000,
-                            end : 1000
+                            id: session.id,
+                            start: -1000,
+                            end: 1000
                         }, function(e, output) {
                             if (e || !output) return;
                             if (session.filter)
@@ -861,7 +861,7 @@ define(function(require, exports, module) {
                     var process = session.process;
                     
                     doc.tooltip = 
-                    doc.title   = (session.config.name || session.config.command || "[New]")
+                    doc.title = (session.config.name || session.config.command || "[New]")
                       + " - " + (!process
                         ? "Idle"
                         : (process.running
@@ -874,7 +874,7 @@ define(function(require, exports, module) {
                         tab.className.remove("running");
                 };
                 
-                session.changeCommand = function(value){
+                session.changeCommand = function(value) {
                     currentSession.config.command = value;
                     saveConfig();
                     
@@ -882,7 +882,7 @@ define(function(require, exports, module) {
                         updateRunner(currentSession);
                 };
                 
-                session.changeName = function(value){
+                session.changeName = function(value) {
                     if (!value && session.config.name) {
                         question.show("Remove this configuration?",
                             "You have cleared the name of this configuration.",
@@ -904,11 +904,11 @@ define(function(require, exports, module) {
                     }
                 }
                     
-                session.show = function(v){ 
+                session.show = function(v) { 
                     // plugin.ace.container.style.visibility = "visible";
                 };
                 
-                session.hide = function(v){ 
+                session.hide = function(v) { 
                     // plugin.ace.container.style.visibility = "hidden";
                 };
                 
@@ -952,7 +952,7 @@ define(function(require, exports, module) {
                     session.hide();
                 
                 function setTabColor(){
-                    var bg    = settings.get("user/output/@backgroundColor");
+                    var bg = settings.get("user/output/@backgroundColor");
                     var shade = util.shadeColor(bg, 0.75);
                     doc.tab.backgroundColor = shade.isLight ? bg : shade.color;
                     
@@ -970,7 +970,7 @@ define(function(require, exports, module) {
                 handle.on("settingsUpdate", setTabColor, doc);
             });
             
-            plugin.on("documentActivate", function(e){
+            plugin.on("documentActivate", function(e) {
                 if (currentSession && currentSession.loaded) {
                     if (tbCommand.getValue() != currentSession.config.command)
                         currentSession.changeCommand(tbCommand.getValue());
@@ -982,27 +982,27 @@ define(function(require, exports, module) {
                 updateToolbar(currentSession);
             });
             
-            plugin.on("documentUnload", function(e){
+            plugin.on("documentUnload", function(e) {
                 
             });
             
-            plugin.on("getState", function(e){
+            plugin.on("getState", function(e) {
                 var session = e.doc.getSession();
                 if (!session.id)
                     return;
                 
                 var state = e.state;
-                state.config  = session.config;
+                state.config = session.config;
                 
                 if (session.process && session.process.running) {
-                    state.running       = session.process.getState();
+                    state.running = session.process.getState();
                     state.running.debug = session.process.meta.debug;
                 }
             });
             
-            plugin.on("setState", function(e){
+            plugin.on("setState", function(e) {
                 var session = e.doc.getSession();
-                var state   = e.state;
+                var state = e.state;
                 
                 if (state.config) {
                     session.config = state.config;
@@ -1017,7 +1017,7 @@ define(function(require, exports, module) {
                     if (state.running.debug && session.process.running > 0) {
                         session.process.meta.debug = true;
                         session.process.once("back", function(){
-                            debug.debug(session.process, true, function(err){
+                            debug.debug(session.process, true, function(err) {
                                 if (err)
                                     return; // Either the debugger is not found or paused
                             });

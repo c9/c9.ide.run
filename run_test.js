@@ -1,4 +1,4 @@
-/*global describe it before after bar  =*/
+/*global describe it before after bar = */
 
 "use client";
 
@@ -8,15 +8,15 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
     
     expect.setupArchitectTest([
         {
-            packagePath : "plugins/c9.core/c9",
-            workspaceId : "ubuntu/ip-10-35-77-180",
-            startdate   : new Date(),
-            debug       : true,
-            hosted      : true,
-            local       : false,
-            hostname    : "dev.javruben.c9.io",
-            davPrefix   : "/",
-            platform    : "linux" //"darwin"
+            packagePath: "plugins/c9.core/c9",
+            workspaceId: "ubuntu/ip-10-35-77-180",
+            startdate: new Date(),
+            debug: true,
+            hosted: true,
+            local: false,
+            hostname: "dev.javruben.c9.io",
+            davPrefix: "/",
+            platform: "linux" //"darwin"
         },
         
         "plugins/c9.core/ext",
@@ -24,28 +24,28 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.core/util",
         "plugins/c9.ide.ui/lib_apf",
         {
-            packagePath : "plugins/c9.core/settings",
-            settings : { state: { console: {
-                type  : "pane", 
-                nodes : [
+            packagePath: "plugins/c9.core/settings",
+            settings: { state: { console: {
+                type: "pane", 
+                nodes: [
                     {
-                        type : "tab",
-                        editorType : "output",
-                        document : { 
-                            title : "Output",
+                        type: "tab",
+                        editorType: "output",
+                        document: { 
+                            title: "Output",
                             "output" : {
-                                id : "testoutput1"
+                                id: "testoutput1"
                             }
                         },
-                        active : "true"
+                        active: "true"
                     },
                     {
-                        type : "tab",
-                        editorType : "output",
-                        document : {
-                            title : "Output2",
+                        type: "tab",
+                        editorType: "output",
+                        document: {
+                            title: "Output2",
                             "output" : {
-                                id : "testoutput2"
+                                id: "testoutput2"
                             }
                         }
                     }
@@ -54,16 +54,16 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         },
         "plugins/c9.core/api.js",
         {
-            packagePath  : "plugins/c9.ide.ui/ui",
-            staticPrefix : "plugins/c9.ide.ui"
+            packagePath: "plugins/c9.ide.ui/ui",
+            staticPrefix: "plugins/c9.ide.ui"
         },
         "plugins/c9.ide.editors/document",
         "plugins/c9.ide.editors/undomanager",
         "plugins/c9.ide.editors/editors",
         "plugins/c9.ide.editors/editor",
         {
-            packagePath : "plugins/c9.ide.editors/tabmanager",
-            testing     : 2
+            packagePath: "plugins/c9.ide.editors/tabmanager",
+            testing: 2
         },
         "plugins/c9.ide.ui/focus",
         "plugins/c9.ide.editors/pane",
@@ -80,11 +80,11 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.vfs.client/endpoint",
         "plugins/c9.ide.auth/auth",
         {
-            packagePath  : "plugins/c9.ide.run/run",
-            testing      : true,
-            base         : baseProc,
-            staticPrefix : "plugins/c9.ide.run",
-            runners      : {
+            packagePath: "plugins/c9.ide.run/run",
+            testing: true,
+            base: baseProc,
+            staticPrefix: "plugins/c9.ide.run",
+            runners: {
                 "node" : {
                     "caption" : "Node.js (current)",
                     "cmd": ["node", "${debug?--debug-brk=15454}", "$file"],
@@ -106,8 +106,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         
         // Mock plugins
         {
-            consumes : ["apf", "ui", "Plugin"],
-            provides : [
+            consumes: ["apf", "ui", "Plugin"],
+            provides: [
                 "commands", "menus", "layout", "watcher", 
                 "save", "preferences", "anims", "clipboard",
                 
@@ -115,28 +115,28 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 "dialog.filesave", "dialog.fileoverwrite", "run.gui", "debugger",
                 "dialog.error"
             ],
-            setup    : expect.html.mocked
+            setup: expect.html.mocked
         },
         {
-            consumes : ["run", "proc", "fs", "tabManager", "console", "output"],
-            provides : [],
-            setup    : main
+            consumes: ["run", "proc", "fs", "tabManager", "console", "output"],
+            provides: [],
+            setup: main
         }
     ], architect);
     
     function main(options, imports, register) {
-        var run      = imports.run;
-        var fs       = imports.fs;
-        var tabs     = imports.tabManager;
-        var cnsl     = imports.console;
+        var run = imports.run;
+        var fs = imports.fs;
+        var tabs = imports.tabManager;
+        var cnsl = imports.console;
         
-        function getHtmlElement(tab){
+        function getHtmlElement(tab) {
             if (typeof tab == "object")
                 return tab.pane.aml.getPage("editor::" + tab.editorType).$ext;
         }
         expect.html.setConstructor(getHtmlElement);
         
-        function countEvents(count, expected, done){
+        function countEvents(count, expected, done) {
             if (count == expected) 
                 done();
             else
@@ -145,7 +145,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         }
         
         var maxTries = 15, retries = 0;
-        function waitForOutput(match, callback){
+        function waitForOutput(match, callback) {
             setTimeout(function(){
                 if (retries < maxTries && !getHtmlElement(tabs.focussedTab).textContent.match(match)) {
                     retries++;
@@ -160,7 +160,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         }
         
         describe('run', function() {
-            before(function(done){
+            before(function(done) {
                 apf.config.setProperty("allow-select", false);
                 apf.config.setProperty("allow-blur", false);
 
@@ -180,7 +180,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             
             describe("listRunners()", function(){
                 it('should list all runners', function(done) {
-                    run.listRunners(function(err, runners){
+                    run.listRunners(function(err, runners) {
                         if (err) throw err.message;
                         
                         expect(runners).length.gt(0);
@@ -191,7 +191,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             
             describe("getRunner()", function(){
                 it('should retrieve the runner of a certain type', function(done) {
-                    run.getRunner("node", false, function(err, runner){
+                    run.getRunner("node", false, function(err, runner) {
                         if (err) throw err.message;
                         
                         expect(runner).to.ok;
@@ -206,19 +206,19 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 it('should run a file with a runner', function(done) {
                     var foundPid, count = 0;
                     
-                    run.getRunner("node", false, function(err, runner){
+                    run.getRunner("node", false, function(err, runner) {
                         if (err) throw err.message;
                         
                         expect(runner).to.ok;
                         
                         var c = "console.log('Hello World', new Date());";
                         
-                        fs.writeFile("/helloworld.js", c, "utf8", function(err){
+                        fs.writeFile("/helloworld.js", c, "utf8", function(err) {
                             if (err) throw err.message;
                             
                             var process = run.run(runner, {
                                 path: "/helloworld.js"
-                            }, "testoutput1", function(err, pid){
+                            }, "testoutput1", function(err, pid) {
                                 if (err) throw err.message;
 
                                 expect(parseInt(pid, 10)).to.ok;
@@ -257,19 +257,19 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 it('should run a file with a runner and stop it with stop()', function(done) {
                     var count = 0;
                     
-                    run.getRunner("node", false, function(err, runner){
+                    run.getRunner("node", false, function(err, runner) {
                         if (err) throw err.message;
                         
                         expect(runner).to.ok;
                         
                         var c = "setInterval(function(){console.log('Hello World', new Date());}, 500)";
                         
-                        fs.writeFile("/helloworld.js", c, "utf8", function(err){
+                        fs.writeFile("/helloworld.js", c, "utf8", function(err) {
                             if (err) throw err.message;
                             
                             var process = run.run(runner, {
                                 path: "/helloworld.js"
-                            }, "testoutput1", function(err, pid){
+                            }, "testoutput1", function(err, pid) {
                                 if (err) throw err.message;
                                 
                                 expect(parseInt(pid, 10), "Invalid PID").to.ok.to.gt(0);
@@ -278,7 +278,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 // setTimeout(function(){
                                 waitForOutput(/Hello\sWorld[\s\S]*Hello\sWorld/, function(){
                                     count++;
-                                    process.stop(function(err, e){
+                                    process.stop(function(err, e) {
                                         if (err) throw err.message;
                                     });
                                 });
@@ -313,12 +313,12 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                     var outputTab2 = tabs.getTabs()[1];
                     tabs.focusTab(outputTab2);
                     
-                    run.getRunner("pythoni", false, function(err, runner){
+                    run.getRunner("pythoni", false, function(err, runner) {
                         if (err) throw err.message;
                         
                         expect(runner).to.ok;
                         
-                        var process = run.run(runner, {}, "testoutput2", function(err, pid){
+                        var process = run.run(runner, {}, "testoutput2", function(err, pid) {
                             if (err) throw err.message;
                             
                             expect(parseInt(pid, 10)).to.ok.to.gt(0);
@@ -360,18 +360,18 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                     var outputTab2 = tabs.getTabs()[1];
                     tabs.focusTab(outputTab2);
                     
-                    run.getRunner("node", false, function(err, runner){
+                    run.getRunner("node", false, function(err, runner) {
                         if (err) throw err.message;
                         
                         expect(runner).to.ok;
                         
                         var c = "console.log('Hello World', new Date());";
                         
-                        fs.writeFile("/helloworld.js", c, "utf8", function(err){
+                        fs.writeFile("/helloworld.js", c, "utf8", function(err) {
                             if (err) throw err.message;
                             var process = run.run("auto", {
                                 path: "/helloworld.js"
-                            }, "testoutput2", function(err, pid){
+                            }, "testoutput2", function(err, pid) {
                                 if (err) throw err.message;
 
                                 expect(parseInt(pid, 10)).to.ok;
@@ -406,8 +406,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 });
             });
             
-            if (!onload.remain){
-               after(function(done){
+            if (!onload.remain) {
+               after(function(done) {
                     run.unload();
                     tabs.unload();
                     cnsl.unload();

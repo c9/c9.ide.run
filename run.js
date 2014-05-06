@@ -6,39 +6,39 @@ define(function(require, module, exports) {
     return main;
 
     function main(options, imports, register) {
-        var Plugin      = imports.Plugin;
-        var settings    = imports.settings;
-        var proc        = imports.proc;
-        var util        = imports.util;
-        var fs          = imports.fs;
-        var c9          = imports.c9;
-        var info        = imports.info;
+        var Plugin = imports.Plugin;
+        var settings = imports.settings;
+        var proc = imports.proc;
+        var util = imports.util;
+        var fs = imports.fs;
+        var c9 = imports.c9;
+        var info = imports.info;
 
-        var basename    = require("path").basename;
-        var dirname     = require("path").dirname;
+        var basename = require("path").basename;
+        var dirname = require("path").dirname;
         
         /***** Initialization *****/
         
-        var handle     = new Plugin("Ajax.org", main.consumes);
+        var handle = new Plugin("Ajax.org", main.consumes);
         var handleEmit = handle.getEmitter();
         
         var CLEANING = -2;
         var STOPPING = -1;
-        var STOPPED  = 0;
+        var STOPPED = 0;
         var STARTING = 1;
-        var STARTED  = 2;
+        var STARTED = 2;
         
-        var STATIC      = options.staticPrefix;
+        var STATIC = options.staticPrefix;
         var installPath = options.installPath || "~/.c9";
-        var TMUX        = options.tmux || installPath + "/bin/tmux";
-        var BASH        = "bash";
+        var TMUX = options.tmux || installPath + "/bin/tmux";
+        var BASH = "bash";
         
-        var runners     = util.cloneObject(options.runners);
-        var testing     = options.testing;
-        var runnerPath  = options.runnerPath || "/.c9/runners";
-        var base        = (options.base || "").replace(/\/?$/, "/");
-        var workspace   = info.getWorkspace();
-        var processes   = [];
+        var runners = util.cloneObject(options.runners);
+        var testing = options.testing;
+        var runnerPath = options.runnerPath || "/.c9/runners";
+        var base = (options.base || "").replace(/\/?$/, "/");
+        var workspace = info.getWorkspace();
+        var processes = [];
         
         var loaded = false;
         function load(){
@@ -46,7 +46,7 @@ define(function(require, module, exports) {
             loaded = true;
             
             // Settings
-            settings.on("read", function(e){
+            settings.on("read", function(e) {
                 // Defaults
                 settings.setDefaults("project/run", [
                     ["path", runnerPath]
@@ -57,13 +57,13 @@ define(function(require, module, exports) {
         
         /***** Methods *****/
         
-        function listRunners(callback){
+        function listRunners(callback) {
             var runners = Object.keys(options.runners || {});
             fs.exists(settings.get("project/run/@path"), function(exists) {
                 if (!exists)
                     return callback(null, runners);
                 
-                fs.readdir(settings.get("project/run/@path"), function(err, files){
+                fs.readdir(settings.get("project/run/@path"), function(err, files) {
                     // if (err && err.code == "ENOENT")
                     //     return callback(err);
                     
@@ -82,12 +82,12 @@ define(function(require, module, exports) {
             });
         }
         
-        function detectRunner(options, callback){
-            listRunners(function(err, names){
+        function detectRunner(options, callback) {
+            listRunners(function(err, names) {
                 if (err) return callback(err);
                 
                 var count = 0;
-                names.forEach(function(name){
+                names.forEach(function(name) {
                     if (!runners[name]) {
                         count++;
                         getRunner(name, false, function(){
@@ -112,18 +112,18 @@ define(function(require, module, exports) {
             }
         }
         
-        function matchSelector(selector, path){
+        function matchSelector(selector, path) {
             if (typeof selector == "string") {
                 if (selector.indexOf("source.") === 0)
                     return selector == "source." + fs.getExtension(path);
                 else {
-                    var re   = new RegExp(selector);
+                    var re = new RegExp(selector);
                     var file = basename(path);
                     return re.test(file);
                 }
             }
             else if (selector instanceof Array) {
-                return selector.some(function(n){
+                return selector.some(function(n) {
                     return matchSelector(n, path);
                 });
             }
@@ -135,7 +135,7 @@ define(function(require, module, exports) {
         function getRunner(name, refresh, callback) {
             if (typeof refresh == "function") {
                 callback = refresh;
-                refresh  = false;
+                refresh = false;
             }
             
             var path = settings.get("project/run/@path") + "/"  + name + ".run";
@@ -149,7 +149,7 @@ define(function(require, module, exports) {
                     done(runners[name]);
                 }
                 else {
-                    fs.readFile(path, "utf8", function(err, data){
+                    fs.readFile(path, "utf8", function(err, data) {
                         if (err)
                             return callback(err);
                             
@@ -173,13 +173,13 @@ define(function(require, module, exports) {
             }
         }
         
-        function restoreProcess(state){
+        function restoreProcess(state) {
             var process = new Process(state);
             handleEmit("create", { process: process });
             return process;
         }
         
-        function run(runner, options, name, callback){
+        function run(runner, options, name, callback) {
             if (typeof name == "function") {
                 callback = name;
                 name = null;
@@ -188,7 +188,7 @@ define(function(require, module, exports) {
             if (!name)
                 name = "output";
             
-            (options instanceof Array ? options : [options]).forEach(function(a){
+            (options instanceof Array ? options : [options]).forEach(function(a) {
                 a.relPath = a.path;
                 if (a.path && a.path.charAt(0) !== "/")
                     a.path = base + a.path;
@@ -216,33 +216,33 @@ define(function(require, module, exports) {
         }
         
         function stopAll(){
-            processes.forEach(function(proc){
+            processes.forEach(function(proc) {
                 proc.stop();
             });
         }
         
         /***** Process Class *****/
             
-        function Process(procName, runner, options, callback){
+        function Process(procName, runner, options, callback) {
             var plugin = new Plugin("Ajax.org", main.consumes);
-            var emit   = plugin.getEmitter();
+            var emit = plugin.getEmitter();
             emit.setMaxListeners(100);
             
             var running = STOPPED;
-            var meta    = {};
+            var meta = {};
             var pid, process;
             
             if (typeof procName == "object") {
-                pid      = procName.pid;
-                runner   = procName.runner;
-                running  = procName.running;
+                pid = procName.pid;
+                runner = procName.runner;
+                running = procName.running;
                 procName = procName.name;
             }
             
             var WATCHFILE = installPath + "/.run_" + procName + ".watch";
 
             // Deal with connection issues
-            c9.on("stateChange", function(e){
+            c9.on("stateChange", function(e) {
                 if (e.state & c9.PROCESS) {
                     if (running == STARTED || running == STARTING)
                         checkState();
@@ -254,7 +254,7 @@ define(function(require, module, exports) {
     
             /***** Methods *****/
             
-            function run(srunner, options, callback){
+            function run(srunner, options, callback) {
                 // If we're already running something do nothing
                 // @todo this check needs to be improved, to check the output buffer
                 if (running && (!options || !options.force))
@@ -263,7 +263,7 @@ define(function(require, module, exports) {
                 running = STARTING;
                 
                 if (srunner == "auto") {
-                    return detectRunner(options, function(err, runner){
+                    return detectRunner(options, function(err, runner) {
                         if (err) return callback(err);
                         options.force = true;
                         run(runner, options, callback);
@@ -281,7 +281,7 @@ define(function(require, module, exports) {
                 if (!(options instanceof Array))
                     options = [options];
                 
-                var cmd = runner.map(function(runner, idx){
+                var cmd = runner.map(function(runner, idx) {
                     var cmd = "";
                     
                     // Display a message prior to running the command
@@ -316,23 +316,23 @@ define(function(require, module, exports) {
                 
                 // Execute run.sh
                 proc.tmux(cmd, {
-                    session      : procName,
-                    detach       : options.detach !== false,
-                    base         : installPath.replace(/^~/, c9.home || "~"),
-                    kill         : true,
-                    output       : true,
-                    cols         : 100,
-                    rows         : 5,
-                    cwd          : cwd,
-                    validatePath : true,
-                    testing      : testing
-                }, function(err, pty, processId){
+                    session: procName,
+                    detach: options.detach !== false,
+                    base: installPath.replace(/^~/, c9.home || "~"),
+                    kill: true,
+                    output: true,
+                    cols: 100,
+                    rows: 5,
+                    cwd: cwd,
+                    validatePath: true,
+                    testing: testing
+                }, function(err, pty, processId) {
                     if (err)
                         return callback(err);
 
                     // Set process variable for later use
                     process = pty;
-                    pid     = processId;
+                    pid = processId;
                     
                     // Running
                     running = STARTED;
@@ -360,9 +360,9 @@ define(function(require, module, exports) {
                 });
             }
             
-            function monitor(callback){
+            function monitor(callback) {
                 // Set watcher
-                fs.watch(WATCHFILE, function watch(err, event, filename){
+                fs.watch(WATCHFILE, function watch(err, event, filename) {
                     if (err) {
                         if (err.code == "ENOENT") {
                             // The watch file is already gone. Lets stop the process
@@ -392,7 +392,7 @@ define(function(require, module, exports) {
                 });
             }
             
-            function getVariable(name, options){
+            function getVariable(name, options) {
                 var fnme, idx;
                 var path = options.path;
                 var args = options.args;
@@ -448,10 +448,10 @@ define(function(require, module, exports) {
                     return c9.home;
                 return "$" + name;
             }
-            function reverse(str){ 
+            function reverse(str) { 
                 return str.split('').reverse().join('');
             }
-            function insertVariables(cmd, options){
+            function insertVariables(cmd, options) {
                 // Loop until we get a fixpoint, since our pattern matches the
                 // two characters next to a variable and would otherwise skip
                 // over adjacent variables like $ip:$port.
@@ -485,9 +485,9 @@ define(function(require, module, exports) {
                             if (nameBrackets.match(/^([\w_]+)\/(.*)$/)) {
                                 return startChar + reverse(nameBrackets)
                                     .replace(/^\/?(.*)\/(?!\\)(.*)\/(?!\\)([\w_]+)$/, 
-                                    function (m, replace, find, name){
+                                    function (m, replace, find, name) {
                                         var data = getVariable(reverse(name), options);
-                                        var re   = new RegExp(reverse(find), "g");
+                                        var re = new RegExp(reverse(find), "g");
                                         return data.replace(re, reverse(replace));
                                     }) + endChar;
                             }
@@ -502,10 +502,10 @@ define(function(require, module, exports) {
                 return cmd;
             }
             
-            function cleanup(callback){
+            function cleanup(callback) {
                 function finish(){
-                    pid     = 0;
-                    runner  = null;
+                    pid = 0;
+                    runner = null;
                     running = STOPPED;
                     emit("stopped");
                     
@@ -534,7 +534,7 @@ define(function(require, module, exports) {
                 fs.rmfile(WATCHFILE, finish);
             }
             
-            function stop(callback){
+            function stop(callback) {
                 if (!running)
                     return callback();
                 
@@ -549,7 +549,7 @@ define(function(require, module, exports) {
                             });
                         }, 2000);
                         
-                        plugin.on("started", function(e){
+                        plugin.on("started", function(e) {
                             clearTimeout(timer);
                             
                             if (e.pid > 0)
@@ -585,7 +585,7 @@ define(function(require, module, exports) {
                     process.kill(-1);
                 }
                 else {
-                    proc.execFile("kill", {args:[pid]}, function(err, e){
+                    proc.execFile("kill", {args:[pid]}, function(err, e) {
                         // Clean up here to make sure runner is in correct state
                         // when the callback is called
                         cleanup(function(){
@@ -605,9 +605,9 @@ define(function(require, module, exports) {
                 
                 // Execute run.sh
                 proc.tmux("", {
-                    session      : procName,
-                    fetchpid     : true
-                }, function(err, pty, pid){
+                    session: procName,
+                    fetchpid: true
+                }, function(err, pty, pid) {
                     // Process has exited
                     if (err || pid == -1 || pid != originalPid || !pid) {
                         cleanup(function(){
@@ -625,14 +625,14 @@ define(function(require, module, exports) {
             
             function getState(){
                 return {
-                    pid     : pid,
-                    name    : procName,
-                    running : running >= 0 ? running : 0,
-                    runner  : runner
+                    pid: pid,
+                    name: procName,
+                    running: running >= 0 ? running : 0,
+                    runner: runner
                 };
             }
             
-            function detach(callback){
+            function detach(callback) {
                 // Kill the pty session
                 if (process)
                     process.write(String.fromCharCode(2) + "d");
@@ -657,27 +657,27 @@ define(function(require, module, exports) {
                  * @property {-2} CLEANING  Indicates the process run state is 
                  * being cleaned up. To be tested against the `running` property.
                  */
-                CLEANING : CLEANING,
+                CLEANING: CLEANING,
                 /**
                  * @property {-1} STOPPING  Indicates the process is being 
                  * killed. To be tested against the `running` property.
                  */
-                STOPPING : STOPPING,
+                STOPPING: STOPPING,
                 /**
                  * @property  {0} STOPPED  Indicates the process is not running. 
                  * To be tested against the `running` property.
                  */
-                STOPPED  : STOPPED,
+                STOPPED: STOPPED,
                 /**
                  * @property {1} STARTING  Indicates the process is getting 
                  * started. To be tested against the `running` property.
                  */
-                STARTING : STARTING,
+                STARTING: STARTING,
                 /**
                  * @property  {2} STARTED  Indicates the process is running. 
                  * To be tested against the `running` property.
                  */
-                STARTED  : STARTED,
+                STARTED: STARTED,
                 
                 /**
                  * @property {Number} running  Indicates the state of the process.
@@ -701,7 +701,7 @@ define(function(require, module, exports) {
                  */
                 get meta(){ return meta; },
                 
-                _events : [
+                _events: [
                     /**
                      * Fires when the process is going to be killed
                      * @event stopping
@@ -729,19 +729,19 @@ define(function(require, module, exports) {
                  * Returns the state of this process for use later.
                  * @return {Object}
                  */
-                getState : getState,
+                getState: getState,
                 
                 /**
                  * Validates whether the process is still running
                  */
-                checkState : checkState,
+                checkState: checkState,
                 
                 /**
                  * Detach from the currently running process. This is only 
                  * relevant if options.detach was set to false when starting 
                  * the process.
                  */
-                detach : detach,
+                detach: detach,
                 
                 /**
                  * Stop the currently running process.
@@ -749,7 +749,7 @@ define(function(require, module, exports) {
                  * @param {Error}    callback.err The error object, if an error 
                  * has occured.
                  */
-                stop : stop
+                stop: stop
             });
             
             if (!pid)
@@ -798,12 +798,12 @@ define(function(require, module, exports) {
          * 
          * Example:
          * 
-         *     run.getRunner("node", false, function(err, runner){
+         *     run.getRunner("node", false, function(err, runner) {
          *         if (err) throw err.message;
          *         
          *         var process = run.run(runner, {
          *             path: "/helloworld.js"
-         *         }, function(err, pid){
+         *         }, function(err, pid) {
          *             if (err) throw err.message;
          * 
          *             console.log("The PID is ", pid);
@@ -815,7 +815,7 @@ define(function(require, module, exports) {
          * 
          *     var process = run.run("auto", {
          *         path: "/helloworld.js"
-         *     }, function(err, pid){
+         *     }, function(err, pid) {
          *         if (err) throw err.message;
          *     
          *         console.log("The PID is ", pid);
@@ -879,31 +879,31 @@ define(function(require, module, exports) {
              * @property {-2} CLEANING  Indicates the process run state is 
              * being cleaned up. To be tested against the `runner` property.
              */
-            CLEANING : CLEANING,
+            CLEANING: CLEANING,
             /**
              * Indicates the process is being killed. To be tested against 
              * the `running` property.
              * @property {-1} STOPPING
              */
-            STOPPING : STOPPING,
+            STOPPING: STOPPING,
             /**
              * Indicates the process is not running. To be tested against 
              * the `running` property.
              * @property {0}  STOPPED 
              */
-            STOPPED  : STOPPED,
+            STOPPED: STOPPED,
             /**
              * Indicates the process is getting started. To be tested against 
              * the `running` property.
              * @property {1}  STARTING
              */
-            STARTING : STARTING,
+            STARTING: STARTING,
             /**
              * Indicates the process is running. To be tested against 
              * the `running` property.
              * @property {2}  STARTED 
              */
-            STARTED  : STARTED,
+            STARTED: STARTED,
             
             /**
              * @property {run.Process[]}  processes  List of running processes
@@ -914,7 +914,7 @@ define(function(require, module, exports) {
              */
             get runners(){ return runners; },
             
-            _events : [
+            _events: [
                 /**
                  * Fires when the process is going to be killed
                  * @event stopping
@@ -957,14 +957,14 @@ define(function(require, module, exports) {
              * @param {Error}    callback.err       The error object if an error occurred.
              * @param {String[]} callback.runners   A list of names of runners.
              */
-            listRunners : listRunners,
+            listRunners: listRunners,
             
             /**
              * Detect the runner that will be used to run a certain file
              * @param {Object}   options
              * @param {Function} callback
              */
-            detectRunner : detectRunner,
+            detectRunner: detectRunner,
             
             /**
              * Retrieves an individual runner's JSON object based on it's name.
@@ -973,26 +973,26 @@ define(function(require, module, exports) {
              * @param {Function} callback.err     The error object if an error occurred.
              * @param {Function} callback.runner  A runner object. See {@link #run} for more information.
              */
-            getRunner : getRunner,
+            getRunner: getRunner,
             
             /**
              * Stop all running processes
              */
-            stopAll : stopAll,
+            stopAll: stopAll,
             
             /**
              * Check whether a selector matches a certain path
              * @param {String/Array} selector
              * @param {String}       path
              */
-            matchSelector : matchSelector,
+            matchSelector: matchSelector,
             
             /**
              * Gets a process based on a pid
              * @param {Object} state  The state object returned by {@link run.Process.getState}.
              * @return {run.Process}
              */
-            restoreProcess : restoreProcess,
+            restoreProcess: restoreProcess,
             
             /**
              * Starts a process based on a runner and options that are passed.
@@ -1090,7 +1090,7 @@ define(function(require, module, exports) {
              * @param {Error}    callback.err The error object if an error occurred.
              * @returns {run.Process} The process object
              */
-            run : run
+            run: run
         });
         
         register(null, {
