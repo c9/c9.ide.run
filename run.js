@@ -9,7 +9,6 @@ define(function(require, module, exports) {
         var Plugin      = imports.Plugin;
         var settings    = imports.settings;
         var proc        = imports.proc;
-        var http        = imports.http;
         var util        = imports.util;
         var fs          = imports.fs;
         var c9          = imports.c9;
@@ -397,6 +396,7 @@ define(function(require, module, exports) {
                 var fnme, idx;
                 var path = options.path;
                 var args = options.args;
+                var port;
 
                 if (name == "file") 
                     return (path || "");
@@ -431,8 +431,14 @@ define(function(require, module, exports) {
                 if (name == "hostname")
                     return c9.hostname || "localhost";
                 if (name == "hostname_path") {
-                    var port = (options.local ? ":" + (c9.port || "8080") : "");
-                    return (c9.hostname || "localhost") + port  + "/" + options.relPath;
+                    port = (options.local ? ":" + (c9.port || "8080") : "");
+                    return ("https://" + c9.hostname || "http://localhost") + port + "/" + options.relPath;
+                }
+                if (name == "url") {
+                    port = (options.local ? ":" + (c9.port || "8080") : "");
+                    return (c9.hostname 
+                        ? "https://" + c9.hostname
+                        : "http://localhost") + port;
                 }
                 if (name == "port")
                     return c9.port || "8080";
@@ -1015,6 +1021,7 @@ define(function(require, module, exports) {
              * <tr><td>"$project_base_name"</td><td>   The name only portion of the current project file.</td></tr>
              * <tr><td>"$hostname"</td><td>            The hostname of the workspace.</td></tr>
              * <tr><td>"$hostname_path"</td><td>       The hostname of the workspace together with the relative path of the project file.</td></tr>
+             * <tr><td>"$url"</td><td>                 The full url to access the workspace.</td></tr>
              * <tr><td>"$port"</td><td>                The port assigned to the workspace.</td></tr>
              * <tr><td>"$ip"</td><td>                  The ip address to run a process against in the workspace.</td></tr>
              * </table>

@@ -1,5 +1,10 @@
 {
-    "cmd": ["apache2", "-X"],
-    "selector": "^.*\\.(php|phtml|html|shtml)$",
-    "info": "Started Apache httpd, serving \\033[01;34m$hostname_path\\033[00m."
+  "cmd": [
+    "bash",
+    "--login",
+    "-c",
+    "source /etc/apache2/envvars && apache2 -X"
+  ],
+  "selector": "^.*\\.(php|phtml|html|shtml)$",
+  "info": "Started Apache httpd, serving \\033[01;34m$hostname_path\\033[00m."
 }
