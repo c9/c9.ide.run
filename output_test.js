@@ -1,4 +1,4 @@
-/*global describe it before after  =*/
+/*global describe it before after = */
 
 "use client";
 
@@ -8,13 +8,13 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
     
     expect.setupArchitectTest([
         {
-            packagePath : "plugins/c9.core/c9",
-            workspaceId : "johndoe/dev",
-            startdate   : new Date(),
-            debug       : true,
-            hosted      : true,
-            local       : false,
-            davPrefix   : "/"
+            packagePath: "plugins/c9.core/c9",
+            workspaceId: "johndoe/dev",
+            startdate: new Date(),
+            debug: true,
+            hosted: true,
+            local: false,
+            davPrefix: "/"
         },
         
         "plugins/c9.core/ext",
@@ -27,8 +27,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         },
         "plugins/c9.core/api.js",
         {
-            packagePath  : "plugins/c9.ide.ui/ui",
-            staticPrefix : "plugins/c9.ide.ui"
+            packagePath: "plugins/c9.ide.ui/ui",
+            staticPrefix: "plugins/c9.ide.ui"
         },
         "plugins/c9.ide.editors/document",
         "plugins/c9.ide.editors/undomanager",
@@ -38,18 +38,18 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.ide.ui/focus",
         {
             packagePath: "plugins/c9.ide.console/console",
-            testing : 2
+            testing: 2
         },
         "plugins/c9.ide.editors/pane",
         "plugins/c9.ide.editors/tab",
         "plugins/c9.ide.terminal/terminal",
         "plugins/c9.ide.run/output",
         {
-            packagePath  : "plugins/c9.ide.run/run",
-            testing      : true,
-            base         : baseProc,
-            staticPrefix : "plugins/c9.ide.run",
-            runners      : {
+            packagePath: "plugins/c9.ide.run/run",
+            testing: true,
+            base: baseProc,
+            staticPrefix: "plugins/c9.ide.run",
+            runners: {
                 "node" : {
                     "caption" : "Node.js (current)",
                     "cmd": ["node", "${debug?--debug-brk=15454}", "$file"],
@@ -78,35 +78,35 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         
         // Mock plugins
         {
-            consumes : ["apf", "ui", "Plugin"],
-            provides : [
+            consumes: ["apf", "ui", "Plugin"],
+            provides: [
                 "commands", "menus", "commands", "layout", "watcher", 
                 "save", "anims", "clipboard", "dialog.alert", "auth.bootstrap",
                 "info", "debugger", "dialog.question", "run.gui", "dialog.error",
                 "dialog.filesave"
             ],
-            setup    : expect.html.mocked
+            setup: expect.html.mocked
         },
         {
-            consumes : ["tabManager", "proc", "output", "fs", "ext"],
-            provides : [],
-            setup    : main
+            consumes: ["tabManager", "proc", "output", "fs", "ext"],
+            provides: [],
+            setup: main
         }
     ], architect);
     
     function main(options, imports, register) {
-        var tabs     = imports.tabManager;
-        var output   = imports.output;
-        var fs       = imports.fs;
-        var ext      = imports.ext;
+        var tabs = imports.tabManager;
+        var output = imports.output;
+        var fs = imports.fs;
+        var ext = imports.ext;
         
-        expect.html.setConstructor(function(tab){
+        expect.html.setConstructor(function(tab) {
             if (typeof tab == "object")
                 return tab.pane.aml.getPage("editor::" + tab.editorType).$ext;
         });
         
         describe('terminal', function() {
-            before(function(done){
+            before(function(done) {
                 apf.config.setProperty("allow-select", false);
                 apf.config.setProperty("allow-blur", false);
                 
@@ -129,25 +129,25 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
             it('should open an output window and run with a runner', function(done) {
                 
                 var c = "console.log('Hello World', new Date());";
-                fs.writeFile("/helloworld.js", c, "utf8", function(err){
+                fs.writeFile("/helloworld.js", c, "utf8", function(err) {
                     if (err) throw err.message;
                 
                     tabs.open({
-                        editorType : "output",
-                        document   : {
-                            title : "Output",
-                            output : {
+                        editorType: "output",
+                        document: {
+                            title: "Output",
+                            output: {
                                 id: "testoutput",
-                                config : {
-                                    command : "/helloworld.js",
+                                config: {
+                                    command: "/helloworld.js",
                                     debug: false
                                 },
-                                runner : "auto",
-                                run    : true
+                                runner: "auto",
+                                run: true
                             }
                         }
                         
-                    }, function(err, tab){
+                    }, function(err, tab) {
                         var ace = tabs.focussedTab.editor.ace;
                         tab.editor.on("connect", function(){
                             ace.session.term.once('afterWrite', function(){
@@ -164,8 +164,8 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 });
             });
             
-            if (!onload.remain){
-                after(function(done){
+            if (!onload.remain) {
+                after(function(done) {
                     ext.unloadAllPlugins();
                     
                     document.body.style.marginBottom = "";
