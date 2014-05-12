@@ -118,10 +118,10 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 bar.$ext.style.height = "33%";
       
                 document.body.style.marginBottom = "33%";
-                tabs.on("ready", function(){
+                tabs.once("ready", function(){
                     tabs.getPanes()[0].focus();
                     done();
-                })
+                });
             });
             
             this.timeout(10000);

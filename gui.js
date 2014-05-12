@@ -599,8 +599,8 @@ define(function(require, module, exports) {
                     }
                 });
             };
-            tabs.on("ready", activateOutput.bind(this, tabs));
-            c9console.on("ready", activateOutput.bind(this, c9console));
+            tabs.once("ready", activateOutput.bind(this, tabs));
+            c9console.once("ready", activateOutput.bind(this, c9console));
     
             ace.getElement("menu", function(menu) {
                 menus.addItemToMenu(menu, new ui.item({
