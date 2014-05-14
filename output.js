@@ -44,9 +44,7 @@ define(function(require, exports, module) {
         
         var defaults = {
             "light" : ["#eef7ff", "#333333", "#89c1ff", false], 
-            "light-gray" : ["#eef7ff", "#333333", "#89c1ff", false], 
-            "dark"  : ["#003a58", "#FFFFFF", "#225477", true],
-            "dark-gray"  : ["#003a58", "#FFFFFF", "#225477", true]
+            "dark"  : ["#003a58", "#FFFFFF", "#225477", true]
         };
         
         handle.on("load", function(){
@@ -124,14 +122,6 @@ define(function(require, exports, module) {
             }, handle);
 
             settings.on("user/output", setSettings);
-            
-            layout.on("themeChange", function(e) {
-                var skin = e.oldTheme;
-                if (!(settings.get("user/output/@backgroundColor") == defaults[skin][0] &&
-                  settings.get("user/output/@foregroundColor") == defaults[skin][1] &&
-                  settings.get("user/output/@selectionColor") == defaults[skin][2]))
-                    return false;
-            });
             
             layout.on("themeDefaults", function(e) {
                 var skin = e.theme;

@@ -433,6 +433,7 @@ define(function(require, module, exports) {
                 }];
                 
                 var container = hbox.$ext.appendChild(document.createElement("div"));
+                container.style.border = "1px solid rgb(37, 37, 37)";
                 container.style.width = "600px";
                 container.style.marginBottom = "30px";
                 
