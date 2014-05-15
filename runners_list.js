@@ -18,10 +18,11 @@ function readRunners(path) {
     return results;
 }
 
+var defaultRunners = readRunners("runners");
+
 module.exports = {
-    local: readRunners("runners"),
+    local: defaultRunners,
+    ssh: defaultRunners,
     openshift: readRunners("runners-openshift"),
     docker: readRunners("runners-docker")
 };
-
-module.exports.ssh = module.exports.local;
