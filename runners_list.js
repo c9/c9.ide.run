@@ -19,7 +19,7 @@ function readRunners(path) {
 }
 
 module.exports = {
-    local: readRunners("runners-docker"), //readRunners("runners"),
+    local: readRunners("runners"),
     openshift: readRunners("runners-openshift"),
     docker: readRunners("runners-docker")
 };
