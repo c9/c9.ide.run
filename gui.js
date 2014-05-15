@@ -107,7 +107,7 @@ define(function(require, module, exports) {
             // Menus
             var c = 1000;
             menus.setRootMenu("Run", 600, plugin);
-            var itmRun = menus.addItemByPath("Run/Run", new ui.item({
+            var itmRun = new ui.item({
                 isAvailable: function(){
                     var tab = tabs.focussedTab;
                     var path = tab && tab.path;
@@ -133,8 +133,9 @@ define(function(require, module, exports) {
                         }
                     }
                 }
-            }), c += 100, plugin);
-            var itmRunLast = menus.addItemByPath("Run/Run Last", new ui.item({
+            });
+            menus.addItemByPath("Run/Run", itmRun, c += 100, plugin);
+            var itmRunLast = new ui.item({
                 command: "runlast",
                 isAvailable: function(){
                     if (process && process.running || !lastRun) {
@@ -152,7 +153,8 @@ define(function(require, module, exports) {
                         return true;
                     }
                 }
-            }), c += 100, plugin);
+            });
+            menus.addItemByPath("Run/Run Last", itmRunLast, c += 100, plugin);
             menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
             
             // menus.addItemByPath("Run/Enable Source Maps", new ui.item({
