@@ -521,8 +521,7 @@ define(function(require, module, exports) {
                         break; 
                     } 
                 }
-                if (defConfig)
-                    transformButton();
+                transformButton();
                 
                 var state = settings.get("state/run/process");
                 if (state) {
