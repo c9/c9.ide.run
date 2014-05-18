@@ -104,6 +104,16 @@ define(function(require, module, exports) {
                     itemCtxTreeRunFile.setAttribute("disabled", !(e.state & c9.PROCESS));
             }, plugin);
             
+            run.on("started", function(){
+                if (settings.getBool("user/preview/@running_app")) {
+                    commands.exec("preview", null, { 
+                        server: true,
+                        nocheck: true,
+                        pane: tabs.getPanes(tabs.container)[0]
+                    });
+                }
+            });
+            
             // Menus
             var c = 1000;
             menus.setRootMenu("Run", 600, plugin);
@@ -523,8 +533,7 @@ define(function(require, module, exports) {
                         break; 
                     } 
                 }
-                if (defConfig)
-                    transformButton();
+                transformButton();
                 
                 var state = settings.get("state/run/process");
                 if (state) {
