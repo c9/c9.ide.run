@@ -5,6 +5,6 @@
         "$IP:$PORT"
     ],
     "selector": "^.*\\.(php|phtml|html|shtml)$",
-    "info": "Started PHP built-in web server, serving \\033[01;34m$hostname_path\\033[00m.",
+    "info": "Starting PHP built-in web server, serving \\033[01;34m$hostname_path\\033[00m.",
     "cwd": "$project_path"
 }
