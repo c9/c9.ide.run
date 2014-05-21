@@ -761,7 +761,7 @@ define(function(require, exports, module) {
                 
                 session.run = function(){
                     runNow(session);
-                }
+                };
                 
                 session.setRunner = function(runner) {
                     if (!runner) {
@@ -844,7 +844,7 @@ define(function(require, exports, module) {
                             id: session.id,
                             start: -1000,
                             end: 1000
-                        }, function(e, output) {
+                        }, function(e, _1, _2, output) {
                             if (e || !output) return;
                             if (session.filter)
                                 output = session.filter(output, true);
