@@ -799,7 +799,7 @@ define(function(require, exports, module) {
                     ) {
                         session.stopped = false;
                         session.terminal.showCursor();
-                        tab.className.add(session.process 
+                        tab.classList.add(session.process 
                             && session.process.running > 0 ? "running" : "loading");
                         return;
                     }
@@ -823,7 +823,7 @@ define(function(require, exports, module) {
                         session.stopped = true;
                         session.terminal.hideCursor();
                         
-                        tab.className.remove(session.process 
+                        tab.classList.remove(session.process 
                             && session.process.running > 0 ? "running" : "loading");
                         
                         if (session.process && session.process.running > 1)
@@ -869,9 +869,9 @@ define(function(require, exports, module) {
                             : "Stopped"));
                     
                     if (process && process.running)
-                        tab.className.add("running");
+                        tab.classList.add("running");
                     else
-                        tab.className.remove("running");
+                        tab.classList.remove("running");
                 };
                 
                 session.changeCommand = function(value) {
@@ -944,7 +944,7 @@ define(function(require, exports, module) {
                 tab.on("beforeUnload", function(){
                     if (session.process && session.process.running) {
                         session.process.stop(function(){});
-                        tab.className.remove("running");
+                        tab.classList.remove("running");
                     }
                 });
                 
@@ -957,11 +957,11 @@ define(function(require, exports, module) {
                     doc.tab.backgroundColor = shade.isLight ? bg : shade.color;
                     
                     if (shade.isLight) {
-                        doc.tab.className.remove("dark");
+                        doc.tab.classList.remove("dark");
                         plugin.container.className = "c9terminalcontainer";
                     }
                     else {
-                        doc.tab.className.add("dark");
+                        doc.tab.classList.add("dark");
                         plugin.container.className = "c9terminalcontainer dark";
                     }
                 }

@@ -152,7 +152,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         tab.editor.on("connect", function(){
                             ace.session.term.once('afterWrite', function(){
                                 ace.renderer.on('afterRender', function(){
-                                    if (tab.className.names.indexOf("running") == -1
+                                    if (tab.classList.names.indexOf("running") == -1
                                       && ace.getValue().match(/Hello\s*World/)) {
                                         expect.html(ace.container).text(/Hello\s*World/);
                                         done();
