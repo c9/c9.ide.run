@@ -610,6 +610,8 @@ define(function(require, module, exports) {
                 }, function(err, pty, pid) {
                     // Process has exited
                     if (err || pid == -1 || pid != originalPid || !pid) {
+                        debugger; // There is a bug where the run button is not on stopped while the process is running
+                        
                         cleanup(function(){
                             checking = false;
                         });
