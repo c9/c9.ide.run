@@ -206,7 +206,7 @@ define(function(require, module, exports) {
             proc.on("started", function(){ handleEmit("started", event); });
             proc.on("stopping", function(){ handleEmit("stopping", event); });
             proc.on("stopped", function(){
-                handleEmit.sticky("stopped", event. proc); 
+                handleEmit("stopped", event); 
                 processes.remove(proc);
             });
             
@@ -507,7 +507,7 @@ define(function(require, module, exports) {
                     pid = 0;
                     runner = null;
                     running = STOPPED;
-                    emit.sticky("stopped");
+                    emit("stopped");
                     
                     callback && callback();
                     
