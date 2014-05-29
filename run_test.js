@@ -161,9 +161,6 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 
                 expect(value, "Output Mismatch").match(match)
                 
-                // expect.html(tabs.focussedTab, "Output Mismatch")
-                //     .text(match);
-                
                 callback();
             }, 500);
         }
