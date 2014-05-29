@@ -209,7 +209,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                 });
             });
             
-            describe.only("run()", function(){
+            describe("run()", function(){
                 this.timeout(10000);
                 
                 it('should run a file with a runner', function(done) {
@@ -263,156 +263,156 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                     });
                 });
                 
-                // it('should run a file with a runner and stop it with stop()', function(done) {
-                //     var count = 0;
+                it('should run a file with a runner and stop it with stop()', function(done) {
+                    var count = 0;
                     
-                //     run.getRunner("node", false, function(err, runner) {
-                //         if (err) throw err.message;
+                    run.getRunner("node", false, function(err, runner) {
+                        if (err) throw err.message;
                         
-                //         expect(runner).to.ok;
+                        expect(runner).to.ok;
                         
-                //         var c = "setInterval(function(){console.log('Hello World', new Date());}, 500)";
+                        var c = "setInterval(function(){console.log('Hello World', new Date());}, 500)";
                         
-                //         fs.writeFile("/helloworld.js", c, "utf8", function(err) {
-                //             if (err) throw err.message;
+                        fs.writeFile("/helloworld.js", c, "utf8", function(err) {
+                            if (err) throw err.message;
                             
-                //             var process = run.run(runner, {
-                //                 path: "helloworld.js"
-                //             }, "testoutput1", function(err, pid) {
-                //                 if (err) throw err.message;
+                            var process = run.run(runner, {
+                                path: "helloworld.js"
+                            }, "testoutput1", function(err, pid) {
+                                if (err) throw err.message;
                                 
-                //                 expect(parseInt(pid, 10), "Invalid PID").to.ok.to.gt(0);
-                //                 expect(process.running).to.equal(run.STARTED);
+                                expect(parseInt(pid, 10), "Invalid PID").to.ok.to.gt(0);
+                                expect(process.running).to.equal(run.STARTED);
                                 
-                //                 // setTimeout(function(){
-                //                 waitForOutput(/Hello\sWorld[\s\S]*Hello\sWorld/, function(){
-                //                     count++;
-                //                     process.stop(function(err, e) {
-                //                         if (err) throw err.message;
-                //                     });
-                //                 });
-                //                 // }, 4000);
-                //             });
+                                // setTimeout(function(){
+                                waitForOutput(/Hello\sWorld[\s\S]*Hello\sWorld/, function(){
+                                    count++;
+                                    process.stop(function(err, e) {
+                                        if (err) throw err.message;
+                                    });
+                                });
+                                // }, 4000);
+                            });
                             
-                //             expect(process.running).to.equal(run.STARTING);
+                            expect(process.running).to.equal(run.STARTING);
                             
-                //             function c2(){ count++; }
-                //             process.on("started", c2);
-                //             process.on("stopping", c2);
+                            function c2(){ count++; }
+                            process.on("started", c2);
+                            process.on("stopping", c2);
                             
-                //             process.on("stopped", function c1(){
-                //                 expect(process.running).is.equal(run.STOPPED);
+                            process.on("stopped", function c1(){
+                                expect(process.running).is.equal(run.STOPPED);
                                 
-                //                 process.off("started", c2);
-                //                 process.off("stopping", c2);
-                //                 process.off("stopped", c1);
-                //                 count++;
+                                process.off("started", c2);
+                                process.off("stopping", c2);
+                                process.off("stopped", c1);
+                                count++;
                                 
-                //                 fs.rmfile("/helloworld.js", function(){
-                //                     countEvents(count, 4, done);
-                //                 });
-                //             });
-                //         });
-                //     });
-                // });
+                                fs.rmfile("/helloworld.js", function(){
+                                    countEvents(count, 4, done);
+                                });
+                            });
+                        });
+                    });
+                });
                 
-                // it('should run an interactive proces in the second output window', function(done) {
-                //     var count = 0;
+                it('should run an interactive proces in the second output window', function(done) {
+                    var count = 0;
                     
-                //     var outputTab2 = tabs.getTabs()[1];
-                //     tabs.focusTab(outputTab2);
+                    var outputTab2 = tabs.getTabs()[1];
+                    tabs.focusTab(outputTab2);
                     
-                //     run.getRunner("pythoni", false, function(err, runner) {
-                //         if (err) throw err.message;
+                    run.getRunner("pythoni", false, function(err, runner) {
+                        if (err) throw err.message;
                         
-                //         expect(runner).to.ok;
+                        expect(runner).to.ok;
                         
-                //         var process = run.run(runner, {}, "testoutput2", function(err, pid) {
-                //             if (err) throw err.message;
+                        var process = run.run(runner, {}, "testoutput2", function(err, pid) {
+                            if (err) throw err.message;
                             
-                //             expect(parseInt(pid, 10)).to.ok.to.gt(0);
-                //             expect(process.running).to.equal(run.STARTED);
+                            expect(parseInt(pid, 10)).to.ok.to.gt(0);
+                            expect(process.running).to.equal(run.STARTED);
                             
-                //             waitForOutput(/copyright/, function(){
-                //                 var output = outputTab2.editor;
+                            waitForOutput(/copyright/, function(){
+                                var output = outputTab2.editor;
                                 
-                //                 output.write("print 1\n");
+                                output.write("print 1\n");
                                 
-                //                 setTimeout(function(){
-                //                     output.write(String.fromCharCode(4));
-                //                 }, 1000);
-                //             });
-                //         });
+                                setTimeout(function(){
+                                    output.write(String.fromCharCode(4));
+                                }, 1000);
+                            });
+                        });
                         
-                //         function c2(){ count++; }
-                //         process.on("started", c2);
-                //         process.on("stopping", c2);
+                        function c2(){ count++; }
+                        process.on("started", c2);
+                        process.on("stopping", c2);
                         
-                //         process.on("stopped", function c1(){
-                //             expect(process.running).is.equal(run.STOPPED);
+                        process.on("stopped", function c1(){
+                            expect(process.running).is.equal(run.STOPPED);
                             
-                //             process.off("started", c2);
-                //             process.off("stopping", c2);
-                //             process.off("stopped", c1);
+                            process.off("started", c2);
+                            process.off("stopping", c2);
+                            process.off("stopped", c1);
                             
-                //             count++;
-                //             countEvents(count, 3, done);
-                //         });
+                            count++;
+                            countEvents(count, 3, done);
+                        });
                         
-                //         expect(process.running).to.equal(run.STARTING);
-                //     })
-                // });
+                        expect(process.running).to.equal(run.STARTING);
+                    })
+                });
                 
-                // it('should run a file with a runner automatically selected in the second output window', function(done) {
-                //     var foundPid, count = 0;
+                it('should run a file with a runner automatically selected in the second output window', function(done) {
+                    var foundPid, count = 0;
                     
-                //     var outputTab2 = tabs.getTabs()[1];
-                //     tabs.focusTab(outputTab2);
+                    var outputTab2 = tabs.getTabs()[1];
+                    tabs.focusTab(outputTab2);
                     
-                //     run.getRunner("node", false, function(err, runner) {
-                //         if (err) throw err.message;
+                    run.getRunner("node", false, function(err, runner) {
+                        if (err) throw err.message;
                         
-                //         expect(runner).to.ok;
+                        expect(runner).to.ok;
                         
-                //         var c = "console.log('Hello World', new Date());";
+                        var c = "console.log('Hello World', new Date());";
                         
-                //         fs.writeFile("/helloworld.js", c, "utf8", function(err) {
-                //             if (err) throw err.message;
-                //             var process = run.run("auto", {
-                //                 path: "helloworld.js"
-                //             }, "testoutput2", function(err, pid) {
-                //                 if (err) throw err.message;
+                        fs.writeFile("/helloworld.js", c, "utf8", function(err) {
+                            if (err) throw err.message;
+                            var process = run.run("auto", {
+                                path: "helloworld.js"
+                            }, "testoutput2", function(err, pid) {
+                                if (err) throw err.message;
 
-                //                 expect(parseInt(pid, 10)).to.ok;
-                //                 expect(process.running).to.not.equal(run.STARTING);
+                                expect(parseInt(pid, 10)).to.ok;
+                                expect(process.running).to.not.equal(run.STARTING);
 
-                //                 foundPid = true;
-                //             });
+                                foundPid = true;
+                            });
                             
-                //             expect(process.running).to.equal(run.STARTING);
+                            expect(process.running).to.equal(run.STARTING);
                             
-                //             function c2(){ count++; }
-                //             process.on("started", c2);
-                //             process.on("stopping", c2);
+                            function c2(){ count++; }
+                            process.on("started", c2);
+                            process.on("stopping", c2);
                             
-                //             process.on("stopped", function c1(){
-                //                 waitForOutput(/Hello\sWorld/, function(){
-                //                     expect(process.running).is.equal(run.STOPPED);
-                //                     expect(foundPid, "found-pid").to.ok;
+                            process.on("stopped", function c1(){
+                                waitForOutput(/Hello\sWorld/, function(){
+                                    expect(process.running).is.equal(run.STOPPED);
+                                    expect(foundPid, "found-pid").to.ok;
                                     
-                //                     process.off("started", c2);
-                //                     process.off("stopping", c2);
-                //                     process.off("stopped", c1);
-                //                     count++;
+                                    process.off("started", c2);
+                                    process.off("stopping", c2);
+                                    process.off("stopped", c1);
+                                    count++;
     
-                //                     fs.rmfile("/helloworld.js", function(){
-                //                         countEvents(count, 3, done);
-                //                     });
-                //                 });
-                //             });
-                //         });
-                //     });
-                // });
+                                    fs.rmfile("/helloworld.js", function(){
+                                        countEvents(count, 3, done);
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
             });
             
             if (!onload.remain) {
