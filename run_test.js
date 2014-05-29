@@ -39,16 +39,16 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                                 }
                             },
                             active: "true"
-                        // },
-                        // {
-                        //     type: "tab",
-                        //     editorType: "output",
-                        //     document: {
-                        //         title: "Output2",
-                        //         "output" : {
-                        //             id: "testoutput2"
-                        //         }
-                        //     }
+                        },
+                        {
+                            type: "tab",
+                            editorType: "output",
+                            document: {
+                                title: "Output2",
+                                "output" : {
+                                    id: "testoutput2"
+                                }
+                            }
                         }
                     ]
                 } } }
