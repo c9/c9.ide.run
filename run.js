@@ -768,7 +768,7 @@ define(function(require, module, exports) {
                     return part;
                 return part.match(/^`.*`$/) // shell expression
                         ? part
-                        : "'" + part.replace(/'/g, "'\\''") + "'";
+                        : "\"" + part.replace(/'/g, "'\"'") + "\"";
             }).join(" ");
         }
         
