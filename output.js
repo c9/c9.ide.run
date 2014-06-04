@@ -839,12 +839,12 @@ define(function(require, exports, module) {
                 };
                 
                 session.$reloadHistory = function() {
-                    if (session.getScrollBack) {
-                        session.getScrollBack({
+                    if (session.getOutputHistory) {
+                        session.getOutputHistory({
                             id: session.id,
                             start: -1000,
                             end: 1000
-                        }, function(e, _1, _2, output) {
+                        }, function(e, output) {
                             if (e || !output) return;
                             if (session.filter)
                                 output = session.filter(output, true);
