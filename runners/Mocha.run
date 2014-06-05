@@ -8,6 +8,5 @@
     "working_dir": "$project_path",
     "env" : {},
     "debugger": "v8",
-    "debugport": 5858,
-    "selector": "source.js"
+    "debugport": 5858
 }
