@@ -328,7 +328,9 @@ define(function(require, exports, module) {
                 session.process.on("back", function(){
                     if (session == currentSession) {
                         btnRun.enable();
-                        btnRestart.enable();
+                        
+                        if (session.process.running != session.process.STOPPED)
+                            btnRestart.enable();
                     }
                 });
                 session.process.on("stopping", function(){
