@@ -334,6 +334,9 @@ define(function(require, module, exports) {
                     process = pty;
                     pid = processId;
                     
+                    // Debug #2814 no pid is giving for long running process
+                    if (pid == -1) debugger;
+                    
                     // Running
                     running = STARTED;
                     emit("started", { pty: pty });
