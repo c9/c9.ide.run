@@ -232,6 +232,10 @@ define(function(require, exports, module) {
                         term.reset();
                 }
                 
+                // ignore if tmux tries to redraw old screen
+                var filter = session.filter;
+                session.filter = function() { return "" };
+                
                 var path = tbCommand.value || session.config.command;
                 var bDebug = btnDebug.visible && btnDebug.value;
                 var args = splitPathArgs(path);
@@ -267,6 +271,9 @@ define(function(require, exports, module) {
                         debug: bDebug
                     }, session.id, function(err, pid) {
                         session.connect();
+                        
+                        if (filter)
+                            session.filter = filter;
                         
                         if (err) {
                             transformButton(session);
