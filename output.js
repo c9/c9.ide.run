@@ -744,6 +744,16 @@ define(function(require, exports, module) {
                     reloadModel();
                     
                     mnuEnv.resize();
+                    
+                    var node = datagrid.getFirstNode();
+                    var isNew = node.className == "newenv";
+                    if (isNew) datagrid.select(node);
+                    
+                    if (isNew) {
+                        setTimeout(function(){
+                            datagrid.edit.startRename(node);
+                        }, 30);
+                    }
                 });
                 
                 c9.on("stateChange", function(){
