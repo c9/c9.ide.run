@@ -467,6 +467,7 @@ define(function(require, module, exports) {
                     var nodes = datagrid.selection.getSelectedNodes();
                     nodes.forEach(function (node) {
                         removeConfig(node.name);
+                        datagrid.provider._signal("remove", node);
                     });
                 });
                 

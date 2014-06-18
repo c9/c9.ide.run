@@ -455,6 +455,9 @@ define(function(require, exports, module) {
                     width: "60%",
                     editor: "textbox"
                 }];
+                model.updateNodeAfterChange = function(node) {
+                    return findNode(node.name);
+                };
                 
                 mnuEnv.$setStyleClass(mnuEnv.$ext, "envcontainer");
                 var div = mnuEnv.$ext.appendChild(document.createElement("div"));
@@ -483,12 +486,20 @@ define(function(require, exports, module) {
                 datagrid.on("delete", function(e) {
                     datagrid.selection.getSelectedNodes().forEach(function(n) {
                         delete model.session.config.env[n.name];
+                        model._signal("remove", n);
                     });
                     
                     reloadModel();
                     saveConfig();
                     
                     mnuEnv.resize();
+                });
+                
+                datagrid.on("createEditor", function(e) {
+                    e.ace.commands.bindKeys({
+                        "Up": function(ace) { ace.treeEditor.editNext(-1, true); },
+                        "Down": function(ace) { ace.treeEditor.editNext(1, true); }
+                    });
                 });
                 
                 datagrid.on("rename", function(e) {
@@ -542,7 +553,7 @@ define(function(require, exports, module) {
                             mnuEnv.reopen = false;
                         }
                     }, 10);
-                }
+                };
             }
             
             function findNode(name) {
