@@ -580,7 +580,7 @@ define(function(require, module, exports) {
                     btnRun.setAttribute("caption", "Run Last");
                     btnRun.setAttribute("tooltip", "Run Last ("
                         + basename(lastRun[1]) + ", " 
-                        + (runner.caption || "auto") + ")");
+                        + (runner && runner.caption || "auto") + ")");
                 }
                 else {
                     btnRun.disable();
