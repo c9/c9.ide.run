@@ -847,10 +847,6 @@ define(function(require, exports, module) {
                         }
                         data = data.replace(/\s+$/, "");
                         
-                        if (session.stopped)
-                            recur = true;
-                        
-                        session.stopped = true;
                         session.terminal.hideCursor();
                         
                         tab.classList.remove(session.process 
