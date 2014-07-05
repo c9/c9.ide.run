@@ -315,7 +315,8 @@ define(function(require, exports, module) {
                         continue;
                     }
                     if (c === " ") {
-                        results.push(pathArgs.substring(lastStart, i));
+                        if (lastStart < i)
+                            results.push(pathArgs.substring(lastStart, i));
                         lastStart = i + 1;
                     }
                 }
