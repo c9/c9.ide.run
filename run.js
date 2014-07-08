@@ -435,7 +435,7 @@ define(function(require, module, exports) {
                     return c9.hostname || "localhost";
                 if (name == "hostname_path") {
                     port = (options.local ? ":" + (c9.port || "8080") : "");
-                    return ("https://" + c9.hostname || "http://localhost") + port + "/" + options.relPath;
+                    return ("https://" + c9.hostname || "http://localhost") + port + "/" + (options.relPath || "");
                 }
                 if (name == "url") {
                     port = (options.local ? ":" + (c9.port || "8080") : "");
