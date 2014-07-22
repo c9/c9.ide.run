@@ -1,6 +1,6 @@
 {
     "cmd": [
-        "`if ! which -s php || php --version | grep -qE ' [0-4]\\.| 5\\.[0-3]'; then echo Please install PHP 5.4 or later for this feature >&2; echo :; else echo php; fi`",
+        "`if ! which php &>/dev/null || php --version | grep -qE ' [0-4]\\.| 5\\.[0-3]'; then echo Please install PHP 5.4 or later for this feature >&2; echo :; else echo php; fi`",
         "-S",
         "$IP:$PORT"
     ],
