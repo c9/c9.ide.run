@@ -31,12 +31,15 @@ define(function(require, exports, module) {
         var debug = imports.debugger;
         var settings = imports.settings;
         
+        var join = require("path").join;
         var markup = require("text!./output.xml");
         
         var keys = require("ace/lib/keys");
         var Tree = require("ace_tree/tree");
         var TreeData = require("ace_tree/data_provider");
         var TreeEditor = require("ace_tree/edit");
+        
+        var basePath = options.basePath;
         
         // Set up the generic handle
         var handle = editors.register("output", "Output", Output, []);
@@ -267,9 +270,13 @@ define(function(require, exports, module) {
                     if (!runner)
                         runner = "auto";
                     
+                    var cwd = session.config.cwd || "";
+                    if (cwd.charAt(0) == "/")
+                        cwd = join(basePath, cwd);
+                    
                     session.process = run.run(runner, {
                         path: path,
-                        cwd: session.config.cwd || "",
+                        cwd: cwd,
                         env: session.config.env || {},
                         args: args,
                         debug: bDebug
