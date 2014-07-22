@@ -73,6 +73,10 @@ define(function(require, exports, module) {
                     // Search again
                     if (search(id, cmd, argv)) return;
                     
+                    var config = argv.config;
+                    if (config.debug === undefined && debug.state != "disconnected")
+                        config.debug = false;
+                    
                     // Else open the output panel in the console
                     tabs.open({
                         editorType: "output", 
@@ -82,7 +86,7 @@ define(function(require, exports, module) {
                             title: "Output",
                             output: {
                                 id: id || "output",
-                                config: argv.config,
+                                config: config,
                                 runner: argv.runner || argv.config && argv.config.runner,
                                 run: argv.run,
                                 callback: argv.callback
