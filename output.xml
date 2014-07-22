@@ -5,17 +5,19 @@
             skin     = "c9-toolbarbutton-glossy"
             caption  = "Run"
             width    = "54"
-            icon     = "run.png"
-            visible  = "true" 
-            style    = "min-width:54px" />
+            icon     = "run@2x.png"
+            iconsize = "19px 57px"
+            visible  = "true"
+            style    = "min-width:54px;" />
         <a:button
             id       = "btnRestart"
             skin     = "c9-toolbarbutton-glossy"
             width    = "22"
-            icon     = "restart-icon.png"
+            icon     = "restart-icon@2x.png"
+            iconsize = "18px 18px"
             tooltip  = "Restart"
             class    = "light"
-            style    = "min-width:22px;" />
+            style    = "min-width:22px" />
         <!--<a:button skin="c9-toolbarbutton-glossy" id="btnConsoleClear" class="clear" icon="console_clear.png" />-->
         <a:textbox skin="tbsimple" id="tbName" initial-message="Run Config Name" style="min-width:40px"/>
         <a:divider skin="c9-divider" />
