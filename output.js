@@ -76,7 +76,7 @@ define(function(require, exports, module) {
                     // Search again
                     if (search(id, cmd, argv)) return;
                     
-                    var config = argv.config;
+                    var config = argv.config || {};
                     if (config.debug === undefined && debug.state != "disconnected")
                         config.debug = false;
                     
@@ -90,7 +90,7 @@ define(function(require, exports, module) {
                             output: {
                                 id: id || "output",
                                 config: config,
-                                runner: argv.runner || argv.config && argv.config.runner,
+                                runner: argv.runner || config.runner,
                                 run: argv.run,
                                 callback: argv.callback
                             }

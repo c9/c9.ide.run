@@ -398,6 +398,8 @@ define(function(require, module, exports) {
                 var args = options.args;
                 var port;
 
+                if (name == "command") 
+                    return (options.relPath || "");
                 if (name == "file") 
                     return (path || "");
                 if (name == "file_path")
