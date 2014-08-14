@@ -317,6 +317,8 @@ define(function(require, exports, module) {
             }
 
             function splitPathArgs(pathArgs) {
+                if (!pathArgs) return [];
+                
                 var results = [];
                 var lastStart = 0;
                 for (var i = 0; i < pathArgs.length; i++) {

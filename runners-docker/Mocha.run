@@ -1,7 +1,7 @@
 {
     "cmd" : [
         "mocha", 
-        "${debug?--debug-brk}",
+        "${debug?--debug-brk=5858}",
         "$file", 
         "$args"],
     "info" : "Mocha-testing $project_path$file_name",
