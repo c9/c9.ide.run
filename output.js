@@ -84,7 +84,7 @@ define(function(require, exports, module) {
                     tabs.open({
                         editorType: "output",
                         active: true,
-                        pane: console.getPanes()[0],
+                        pane: argv.pane || console.getPanes()[0],
                         document: {
                             title: "Output",
                             output: {

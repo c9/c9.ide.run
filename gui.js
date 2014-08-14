@@ -356,6 +356,17 @@ define(function(require, module, exports) {
             }), c += 100, plugin);
 
             // Other Menus
+            
+            menus.addItemToMenu(tabs.getElement("mnuEditors"), 
+                new ui.item({
+                    caption: "New Run Configuration",
+                    hotkey: "{commands.commandManager.showoutput}",
+                    onclick: function(e) {
+                        commands.exec("showoutput", null, {
+                            pane: this.parentNode.pane
+                        });
+                    }
+                }), 250, plugin);
 
             var mnuContext = tabbehavior.contextMenu;
             // menus.addItemByPath("~", new ui.divider(), 800, mnuContext, plugin);
