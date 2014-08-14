@@ -69,9 +69,7 @@ define(function(require, module, exports) {
                     
                     if (files) {
                         files.forEach(function(file) {
-                            var name = file.name.match(/(.*)\.run$/);
-                            if (!name)
-                                return console.warn("Runner ignored, doesn't have .run extension: " + file.name);
+                            var name = file.name.match(/(.*)\.run$/) || [0, file.name];
                             if (runners.indexOf(name[1]) < 0)
                                 runners.push(name[1]);
                         });
@@ -139,10 +137,14 @@ define(function(require, module, exports) {
             }
             
             var path = settings.get("project/run/@path") + "/"  + name + ".run";
-            fs.exists(path, function(exists) {
+            fs.exists(path, function test(exists) {
                 if (!exists) {
                     if (options.runners[name])
                         return done(options.runners[name]);
+                    if (/\.run$/.test(path)) {
+                        path = settings.get("project/run/@path") + "/"  + name;
+                        return fs.exists(path, test);
+                    }
                     callback("Runner does not exist");
                 }
                 else if (runners[name] && !refresh && (!exists || options.runners[name] === runners[name]))  {
