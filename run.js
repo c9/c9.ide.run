@@ -1093,7 +1093,7 @@ define(function(require, module, exports) {
              * @param {String}  options.cwd   the current working directory
              * @param {Array}   options.args  arguments to be passed to the program
              * @param {Boolean} options.debug whether to start the process in debug mode
-             * @param {String} name   the unique name of the output buffer. 
+             * @param {String} [name]   the unique name of the output buffer. 
              *   Defaults to "output". There can only be one process running on
              *   an output buffer at the same time. After a process has ended
              *   the process object is stale.
