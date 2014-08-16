@@ -853,13 +853,13 @@ define(function(require, exports, module) {
                     // Change the last lines of TMUX saying the pane is dead
                     if (data.indexOf("Pane is dead") > -1) {
                         if (data.lastIndexOf("\x1b[1mPane is dead\x1b[H") === 0) {
-                            data = "\n[Process stopped]";
+                            data = "";
                         } else if (data === "\r\x1b[1mPane is dead\x1b[m\x1b[K") {
                             data = "";
                         } else {
                             data = data
-                              .replace(/\s*Pane is dead([\s\S]*)13H/g, "[Process stopped]$117H")
-                              .replace(/\s*Pane is dead/g, "[Process stopped]");
+                              .replace(/\s*Pane is dead([\s\S]*)13H/g, "") //"$117H")
+                              .replace(/\s*Pane is dead/g, "")
                         }
                         data = data.replace(/\s+$/, "");
 
