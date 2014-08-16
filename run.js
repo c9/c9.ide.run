@@ -16,6 +16,7 @@ define(function(require, module, exports) {
 
         var basename = require("path").basename;
         var dirname = require("path").dirname;
+        var join = require("path").join;
         
         /***** Initialization *****/
         
@@ -186,6 +187,15 @@ define(function(require, module, exports) {
             return process;
         }
         
+        function makeAbsolutePath(path){
+            if (!path) return path;
+            if (path.charAt(0) === "~")
+                return join(c9.home, path.substr(1));
+            if (path.charAt(0) !== "/")
+                return join(base, path);
+            return path;
+        }
+        
         function run(runner, options, name, callback) {
             if (typeof name == "function") {
                 callback = name;
@@ -197,11 +207,9 @@ define(function(require, module, exports) {
             
             (options instanceof Array ? options : [options]).forEach(function(a) {
                 a.relPath = a.path;
-                if (a.path && a.path.charAt(0) !== "/")
-                    a.path = base + a.path;
+                a.path = makeAbsolutePath(a.path);
                 a.path = c9.toExternalPath(a.path);
-                if (a.cwd && a.cwd.charAt(0) !== "/")
-                    a.cwd = base + a.cwd;
+                a.cwd = makeAbsolutePath(a.cwd);
             });
             
             var proc = new Process(name, runner, options, callback);
