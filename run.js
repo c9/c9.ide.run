@@ -16,7 +16,6 @@ define(function(require, module, exports) {
 
         var basename = require("path").basename;
         var dirname = require("path").dirname;
-        var join = require("path").join;
         
         /***** Initialization *****/
         
@@ -187,15 +186,6 @@ define(function(require, module, exports) {
             return process;
         }
         
-        function makeAbsolutePath(path){
-            if (!path) return path;
-            if (path.charAt(0) === "~")
-                return join(c9.home, path.substr(1));
-            if (path.charAt(0) !== "/")
-                return join(base, path);
-            return path;
-        }
-        
         function run(runner, options, name, callback) {
             if (typeof name == "function") {
                 callback = name;
@@ -207,9 +197,11 @@ define(function(require, module, exports) {
             
             (options instanceof Array ? options : [options]).forEach(function(a) {
                 a.relPath = a.path;
-                a.path = makeAbsolutePath(a.path);
+                if (a.path && a.path.charAt(0) !== "/")
+                    a.path = base + a.path;
                 a.path = c9.toExternalPath(a.path);
-                a.cwd = makeAbsolutePath(a.cwd);
+                if (a.cwd && a.cwd.charAt(0) !== "/")
+                    a.cwd = base + a.cwd;
             });
             
             var proc = new Process(name, runner, options, callback);
@@ -1101,7 +1093,7 @@ define(function(require, module, exports) {
              * @param {String}  options.cwd   the current working directory
              * @param {Array}   options.args  arguments to be passed to the program
              * @param {Boolean} options.debug whether to start the process in debug mode
-             * @param {String} [name]   the unique name of the output buffer. 
+             * @param {String} name   the unique name of the output buffer. 
              *   Defaults to "output". There can only be one process running on
              *   an output buffer at the same time. After a process has ended
              *   the process object is stale.
