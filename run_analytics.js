@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "run", "c9.analytics", "c9.analytics.cookie"
+        "run", "output", "c9.analytics", "c9.analytics.cookie"
     ];
     main.provides = ["run_analytics"];
     module.exports = main;
@@ -11,6 +11,7 @@ define(function(require, exports, module) {
         var analytics = imports["c9.analytics"];
         var cookie = imports["c9.analytics.cookie"];
         var run = imports.run;
+        var output = imports.output;
         var COOKIE_RUNNERS_NAME = "c9_runners_timestamp";
         
         // Always track in DWH
@@ -61,16 +62,18 @@ define(function(require, exports, module) {
         });
 
         // TODO: Send event when new Run Config is saved
-        run.on("runconfigsaved", function(e) {
+        output.on("runConfigSaved", function(config) {
             // only when it's a name change
         });
         // TODO: Send event when CWD is set
-        run.on("cwdset", function(e) {
+        output.on("cwdSet", function(cwd) {
             // only if different from previous value
+            // DONE
         });
         // TODO: Send event when Environment variables are set
-        run.on("envset", function(e) {
+        run.on("envSet", function(e) {
             // number of key-value pairs
+            // no: this is the same as runConfigSaved, if we need to differenciate this should happen above
         });
         
         register(null, {

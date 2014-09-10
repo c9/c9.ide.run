@@ -438,6 +438,7 @@ define(function(require, exports, module) {
                 settings.setJson("project/run/configs", json);
 
                 currentSession.updateTitle();
+                handleEmit("runConfigSaved", currentSession.config)
             }
 
             function removeConfig(){
@@ -748,6 +749,7 @@ define(function(require, exports, module) {
                             }
                             currentSession.config.cwd = directory;
                             updateToolbar(currentSession);
+                            handleEmit("cwdSet", directory);
                             hide();
                         },
                         function() {},
