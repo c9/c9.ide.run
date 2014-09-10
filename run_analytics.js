@@ -68,12 +68,11 @@ define(function(require, exports, module) {
         // TODO: Send event when CWD is set
         output.on("cwdSet", function(cwd) {
             // only if different from previous value
-            // DONE
         });
         // TODO: Send event when Environment variables are set
-        run.on("envSet", function(e) {
+        output.on("envSet", function(envVariable) {
             // number of key-value pairs
-            // no: this is the same as runConfigSaved, if we need to differenciate this should happen above
+            console.log(envVariable)
         });
         
         register(null, {

@@ -541,8 +541,12 @@ define(function(require, exports, module) {
                     if (!node.isNew || !name)
                         delete config.env[node.name];
 
-                    if (name)
+                    if (name) {
                         config.env[name] = value;
+                        var envVariable = {};
+                        envVariable[name] = value;
+                        handleEmit("envSet", envVariable);
+                    }
 
                     reloadModel();
                     saveConfig();
