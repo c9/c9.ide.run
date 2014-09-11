@@ -61,22 +61,36 @@ define(function(require, exports, module) {
             analytics.track("Runner Started", properties, analyticsOptions);
         });
 
-        // TODO: Send event when new Run Config is saved
-        output.on("runConfigSaved", function(config) {
-            // only when it's a name change
-        });
-        // TODO: Send event when CWD is set
-        output.on("cwdSet", function(cwd) {
-            // only if different from previous value
-        });
-        // TODO: Send event when Environment variables are set
-        output.on("envSet", function(envVariable) {
-            // number of key-value pairs
-            console.log(envVariable)
-        });
+        // "runConfigSaved" is fired on every change & IDE load, so discarding
+        // Send event when Runner Name changes, which is effectively saving a 
+        // Runner Config
         output.on("runnerNameChanged", function(name) {
-            // number of key-value pairs
-            console.log(name)
+            // Send this one to all integrations
+            analyticsOptions["All"] = true;
+            var properties = {
+                runnerName: name
+            };
+            analytics.track("Runner Config Saved", properties, 
+                analyticsOptions);
+        });
+        // Send event when CWD is set
+        output.on("cwdSet", function(cwd) {
+            // we don't want to send the exact CWD (privacy), but it's 
+            // interesting to know if it differs from the root
+            var properties = {
+                isRoot: true
+            };
+            if (cwd != "/")
+                properties.isRoot = false;
+            analytics.track("CWD Set On Runner", properties, analyticsOptions);
+        });
+        // Send event when Environment variables are set
+        output.on("envSet", function(envVariable, config) {
+            var properties = {
+                numEnvironmentVariables: Object.keys(config).length
+            };
+            analytics.track("Environment Variables Set On Runner", properties, 
+                analyticsOptions);
         });
         
         register(null, {

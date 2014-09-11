@@ -545,7 +545,7 @@ define(function(require, exports, module) {
                         config.env[name] = value;
                         var envVariable = {};
                         envVariable[name] = value;
-                        handleEmit("envSet", envVariable);
+                        handleEmit("envSet", name, config.env);
                     }
 
                     reloadModel();
