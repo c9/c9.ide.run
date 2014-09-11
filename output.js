@@ -939,6 +939,7 @@ define(function(require, exports, module) {
                                 removeConfig();
                                 session.config.name = "";
                                 session.updateTitle();
+                                handleEmit("runnerNameChanged", "");
                             },
                             function(){ // No
                                 // Revert change
@@ -949,6 +950,7 @@ define(function(require, exports, module) {
                         removeConfig();
                         session.config.name = value;
                         saveConfig();
+                        handleEmit("runnerNameChanged", value);
                     }
                 }
 

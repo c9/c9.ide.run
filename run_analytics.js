@@ -74,6 +74,10 @@ define(function(require, exports, module) {
             // number of key-value pairs
             console.log(envVariable)
         });
+        output.on("runnerNameChanged", function(name) {
+            // number of key-value pairs
+            console.log(name)
+        });
         
         register(null, {
             "run_analytics": {}
