@@ -41,8 +41,8 @@ define(function(require, exports, module) {
                 if (!rCookie[runnerName] || 
                     !rCookie[runnerName].lastTimeLogged || 
                     rCookie[runnerName].lastTimeLogged === "" || 
-                    new Date(+rCookie[runnerName].lastTimeLogged).getDate() != 
-                    new Date().getDate()) {
+                    new Date(parseInt(rCookie[runnerName].lastTimeLogged, 
+                        10)).getDate() != new Date().getDate()) {
                         sendToAllIntegrations(rCookie);
                 }
             }
