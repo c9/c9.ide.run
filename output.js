@@ -739,7 +739,10 @@ define(function(require, exports, module) {
                 };
 
                 btnCwd.on("click", function selectCwd(e, cwd) {
-                    cwd = cwd || currentSession.config.cwd || currentSession.runner.working_dir || "/";
+                    cwd = cwd || currentSession.config && currentSession.config.cwd 
+                        || currentSession.runner && currentSession.runner.working_dir 
+                        || "/";
+                        
                     showSave("Select current working directory", cwd,
                         function(directory, stat, hide) {
                             if (!stat) {
