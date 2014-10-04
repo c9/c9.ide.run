@@ -1094,7 +1094,15 @@ define(function(require, exports, module) {
                 /**
                  * @param {Session} session
                  */
-                run: runNow
+                run: runNow,
+                
+                get relatedPath() {
+                    if (!currentSession) return;
+                    var path = currentSession && currentSession.config.command;
+                    if (path && path[0] != "~" && path[0] != "/")
+                        path = "/" + path;
+                    return path && splitPathArgs(path)[0];
+                }
             });
 
             return plugin;
