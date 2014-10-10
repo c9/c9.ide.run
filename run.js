@@ -962,7 +962,14 @@ define(function(require, module, exports) {
                  * @param {Object} e
                  * @param {run.Process} e.process the process that is stopped
                  */
-                "started"
+                "started",
+                /**
+                 * Fires when the process is created.
+                 * @event create
+                 * @param {Object} e
+                 * @param {run.Process} e.process the process that is created
+                 */
+                "create"
             ],
             
             /**
