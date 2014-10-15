@@ -1,5 +1,5 @@
 {
-    "cmd" : ["meteor", "--port", "$PORT"],
+    "cmd" : ["meteor"],
     "info" : "Meteor",
     "working_dir": "$project_path",
     "env" : {
