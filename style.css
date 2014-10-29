@@ -1,17 +1,18 @@
 .output .toolbar{
-    height: 22px;
-    padding : 2px;
+    height: @output-toolbar-height;
+    padding : @output-toolbar-padding;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     background: @output-toolbar-background;
     box-shadow: @output-toolbar-box-shadow;
+    box-sizing: border-box;
     border-bottom: 1px solid @output-toolbar-border-color;
     .display-flex();
 }
 .output .toolbar>*{
-    margin-right: 3px;
+    margin-right: 10px;
 }
 
 .editor_tab .output .c9terminal .c9terminalcontainer.dark {
@@ -19,18 +20,19 @@
 }
 
 .output .ace_editor{
-    top : 27px !important;
+    top : (@output-toolbar-height + 5px) !important;
 }
 
 .output .toolbar .tbsimple{
-    background: transparent;
+    background: @output-textbox-background-color;
+    border-radius: @output-textbox-border-radius;
     color: @output-textbox-color;
     margin-top: 1px;
     padding: 1px 6px 2px 6px;
     .font-smoothing(@output-font-smoothing);
     height: 17px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
+    font-family: @general-font-family;
+    font-size: @general-font-size;
     .transition(background-color 0.1s linear);
 }
 
@@ -49,13 +51,14 @@
 .output .toolbar .c9-divider{
     height: 26px;
     margin-top: -2px;
+    width: @output-divider-width;
     border-left: 1px solid @output-divider-color;
 }
 
 .output .toolbar .label{
-    padding : 4px 0 0 4px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
+    padding : @output-label-padding;
+    font-family: @general-font-family;
+    font-size: @general-font-size;
     color: @output-label-color;
 }
 
