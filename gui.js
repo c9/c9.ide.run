@@ -486,45 +486,45 @@ define(function(require, module, exports) {
                     });
                 });
 
-                new ui.button({
+                new ui.hbox({
                     htmlNode: container.parentNode,
-                    caption: "Remove Selected Configs",
-                    skin: "c9-toolbarbutton-glossy",
-                    style: "width:160px;position:absolute;left:10px;bottom:10px",
-                    onclick: function(){
-                        datagrid.execCommand("delete");
-                    }
-                });
-                new ui.button({
-                    htmlNode: container.parentNode,
-                    caption: "Add New Config",
-                    skin: "c9-toolbarbutton-glossy",
-                    style: "width:105px;position:absolute;left:175px;bottom:10px",
-                    onclick: function(){
-                        commands.exec("showoutput", null, {});
-                    }
-                });
-                new ui.button({
-                    htmlNode: container.parentNode,
-                    caption: "Set As Default",
-                    skin: "c9-toolbarbutton-glossy",
-                    style: "width:95px;position:absolute;left:285px;bottom:10px",
-                    onclick: function(){
-                        var node = datagrid.selection.getSelectedNodes()[0];
-                        if (!node) return;
-
-                        var json = settings.getJson("project/run/configs") || {};
-                        var wasDefault = json[node.name]["default"];
-                        for (var name in json){ delete json[name]["default"]; }
-                        json[node.name]["default"] = !wasDefault;
-                        settings.setJson("project/run/configs", json);
-
-                        defConfig = wasDefault ? null : node.name;
-
-                        reloadModel();
-                        transformButton();
-                    }
-                });
+                    style: "position:absolute;left:10px;bottom:10px",
+                    childNodes: [
+                        new ui.button({
+                            caption: "Remove Selected Configs",
+                            skin: "c9-toolbarbutton-glossy",
+                            onclick: function(){
+                                datagrid.execCommand("delete");
+                            }
+                        }),
+                        new ui.button({
+                            caption: "Add New Config",
+                            skin: "c9-toolbarbutton-glossy",
+                            onclick: function(){
+                                commands.exec("showoutput", null, {});
+                            }
+                        }),
+                        new ui.button({
+                            caption: "Set As Default",
+                            skin: "c9-toolbarbutton-glossy",
+                            onclick: function(){
+                                var node = datagrid.selection.getSelectedNodes()[0];
+                                if (!node) return;
+        
+                                var json = settings.getJson("project/run/configs") || {};
+                                var wasDefault = json[node.name]["default"];
+                                for (var name in json){ delete json[name]["default"]; }
+                                json[node.name]["default"] = !wasDefault;
+                                settings.setJson("project/run/configs", json);
+        
+                                defConfig = wasDefault ? null : node.name;
+        
+                                reloadModel();
+                                transformButton();
+                            }
+                        })
+                    ]
+                })
 
                 reloadModel();
             }, plugin);
