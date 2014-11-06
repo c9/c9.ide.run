@@ -23,6 +23,5 @@ var defaultRunners = readRunners("runners");
 module.exports = {
     local: defaultRunners,
     ssh: defaultRunners,
-    openshift: readRunners("runners-openshift"),
     docker: readRunners("runners-docker")
 };
