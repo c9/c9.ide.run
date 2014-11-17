@@ -650,8 +650,8 @@ define(function(require, module, exports) {
                 command: "run",
                 caption: "Run",
                 disabled: true,
-                icon: "run@2x.png",
-                iconsize: "19px 57px"
+                class: "runbtn stopped",
+                icon: "run.png",
             }), 100, plugin);
 
             btnRun.on("contextmenu", function(e) {
@@ -804,17 +804,13 @@ define(function(require, module, exports) {
         function transformButton(to) {
             if (to == "stop") {
                 btnRun.setAttribute("command", "stop");
-                btnRun.setAttribute("icon", "stop@2x.png");
-                btnRun.setAttribute("iconsize", "21px 57px");
                 btnRun.setAttribute("caption", "Stop");
                 btnRun.setAttribute("tooltip", "");
-                btnRun.setAttribute("class", "running");
+                btnRun.setAttribute("class", "runbtn running");
                 btnRun.enable();
             }
             else {
-                btnRun.setAttribute("icon", "run@2x.png");
-                btnRun.setAttribute("iconsize", "19px 57px");
-                btnRun.setAttribute("class", "stopped");
+                btnRun.setAttribute("class", "runbtn stopped");
 
                 if (defConfig) {
                     btnRun.setAttribute("caption", "Run Project");

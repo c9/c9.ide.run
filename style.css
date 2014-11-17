@@ -95,3 +95,10 @@
 .tree-row.newenv:not(.selected) {
     color: rgb(151, 151, 151);
 }
+
+.runbtn.stopped .c9-icon{
+    .image-2x(@runbtn-stopped-image, @runbtn-stopped-image-width, @runbtn-stopped-image-height, no-repeat, true);
+}
+.runbtn.running .c9-icon{
+    .image-2x(@runbtn-running-image, @runbtn-running-image-width, @runbtn-running-image-height, no-repeat, true);
+}
