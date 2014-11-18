@@ -376,11 +376,9 @@ define(function(require, exports, module) {
                 btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
 
                 if (session && session.process && session.process.running) {
-                    btnRun.setAttribute("icon", "stop@2x.png");
-                    btnRun.setAttribute("iconsize", "21px 57px");
                     btnRun.setAttribute("caption", "Stop");
                     btnRun.setAttribute("tooltip", "");
-                    btnRun.setAttribute("class", "running");
+                    btnRun.setAttribute("class", "runbtn running");
                     btnRun.enable();
 
                     btnRestart.show();
@@ -389,10 +387,8 @@ define(function(require, exports, module) {
                 else {
                     var path = (tbCommand.value || "").split(" ", 1)[0];
 
-                    btnRun.setAttribute("icon", "run@2x.png");
-                    btnRun.setAttribute("iconsize", "19px 57px");
                     btnRun.setAttribute("caption", "Run");
-                    btnRun.setAttribute("class", "stopped");
+                    btnRun.setAttribute("class", "runbtn stopped");
 
                     btnRestart.disable();
 
@@ -459,7 +455,10 @@ define(function(require, exports, module) {
 
                 model = new TreeData();
                 model.emptyMessage = "Type a new environment variable here...";
-                model.rowHeight = 18;
+                
+                var height = parseInt(ui.getStyleRule(".blackdg .row", "height"), 10) || 24;
+                model.rowHeightInner = height - 1;
+                model.rowHeight = height;
 
                 model.$sorted = false;
                 model.columns = [{

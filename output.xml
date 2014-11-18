@@ -5,18 +5,17 @@
             skin     = "c9-toolbarbutton-glossy"
             caption  = "Run"
             width    = "54"
-            icon     = "run@2x.png"
-            iconsize = "19px 57px"
+            icon     = "run.png"
+            class    = "runbtn stopped"
             visible  = "true"
             style    = "min-width:54px;" />
         <a:button
             id       = "btnRestart"
             skin     = "c9-toolbarbutton-glossy"
             width    = "22"
-            icon     = "restart-icon@2x.png"
-            iconsize = "18px 18px"
+            icon     = "restart-icon.png"
             tooltip  = "Restart"
-            class    = "light"
+            class    = "light restart"
             style    = "min-width:22px" />
         <!--<a:button skin="c9-toolbarbutton-glossy" id="btnConsoleClear" class="clear" icon="console_clear.png" />-->
         <a:textbox skin="tbsimple" id="tbName" initial-message="Run Config Name" style="min-width:40px"/>
@@ -37,7 +36,6 @@
             id       = "btnCwd"
             skin     = "c9-toolbarbutton-glossy"
             caption  = "CWD"
-            class    = "bug"
             tooltip  = "Set current working directory"
             style    = "min-width:45px"/>
         <a:button skin="c9-toolbarbutton-glossy" id="btnEnv" caption="Environment" style="min-width:30px"/>

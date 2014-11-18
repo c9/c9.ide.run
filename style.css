@@ -27,8 +27,8 @@
     background: @output-textbox-background-color;
     border-radius: @output-textbox-border-radius;
     color: @output-textbox-color;
-    margin-top: 1px;
-    padding: 1px 6px 2px 6px;
+    margin-top: @output-textbox-margin-top;
+    padding: @output-textbox-padding;
     .font-smoothing(@output-font-smoothing);
     height: 17px;
     font-family: @general-font-family;
@@ -101,4 +101,10 @@
 }
 .runbtn.running .c9-icon{
     .image-2x(@runbtn-running-image, @runbtn-running-image-width, @runbtn-running-image-height, no-repeat, true);
+}
+.restart .c9-icon{
+    .image-2x(@output-restart-image, @output-restart-image-width, @output-restart-image-height, no-repeat, true);
+}
+.bug .c9-icon{
+    .image-2x(@output-bug-image, @output-bug-image-width, @output-bug-image-height, no-repeat, true);
 }
