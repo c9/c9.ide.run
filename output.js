@@ -456,9 +456,13 @@ define(function(require, exports, module) {
                 model = new TreeData();
                 model.emptyMessage = "Type a new environment variable here...";
                 
-                var height = parseInt(ui.getStyleRule(".blackdg .row", "height"), 10) || 24;
-                model.rowHeightInner = height - 1;
-                model.rowHeight = height;
+                layout.on("eachTheme", function(e){
+                    var height = parseInt(ui.getStyleRule(".blackdg .row", "height"), 10) || 24;
+                    model.rowHeightInner = height - 1;
+                    model.rowHeight = height;
+                    
+                    if (e.changed) datagrid.resize();
+                });
 
                 model.$sorted = false;
                 model.columns = [{

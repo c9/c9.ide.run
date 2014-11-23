@@ -455,9 +455,13 @@ define(function(require, module, exports) {
                     width: "10%"
                 }];
                 
-                var height = parseInt(ui.getStyleRule(".bar-preferences .blackdg .tree-row", "height"), 10) || 24;
-                model.rowHeightInner = height;
-                model.rowHeight = height + 1;
+                layout.on("eachTheme", function(e){
+                    var height = parseInt(ui.getStyleRule(".bar-preferences .blackdg .tree-row", "height"), 10) || 24;
+                    model.rowHeightInner = height;
+                    model.rowHeight = height + 1;
+                    
+                    if (e.changed) datagrid.resize();
+                });
 
                 var container = hbox.$ext.appendChild(document.createElement("div"));
                 container.style.width = "600px";
