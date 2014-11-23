@@ -460,7 +460,7 @@ define(function(require, module, exports) {
                     model.rowHeightInner = height;
                     model.rowHeight = height + 1;
                     
-                    if (e.changed) datagrid.resize();
+                    if (e.changed) (datagrid).resize(true);
                 });
 
                 var container = hbox.$ext.appendChild(document.createElement("div"));

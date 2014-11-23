@@ -461,7 +461,7 @@ define(function(require, exports, module) {
                     model.rowHeightInner = height - 1;
                     model.rowHeight = height;
                     
-                    if (e.changed) datagrid.resize();
+                    if (e.changed) (datagrid).resize(true);
                 });
 
                 model.$sorted = false;
