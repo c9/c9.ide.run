@@ -34,10 +34,11 @@
         <a:button skin="c9-toolbarbutton-glossy" id="btnRunner" caption="Runner: Auto" style="min-width:30px"/>
         <a:button
             id       = "btnCwd"
+            class    = "cwd"
             skin     = "c9-toolbarbutton-glossy"
             caption  = "CWD"
             tooltip  = "Set current working directory"
             style    = "min-width:45px"/>
-        <a:button skin="c9-toolbarbutton-glossy" id="btnEnv" caption="Environment" style="min-width:30px"/>
+        <a:button skin="c9-toolbarbutton-glossy" id="btnEnv" caption="ENV" style="min-width:30px" class="env"/>
     </div>
 </a:application>
