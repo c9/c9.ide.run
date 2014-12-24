@@ -118,7 +118,7 @@ define(function(require, exports, module) {
             }
 
             settings.on("read", function(e) {
-                var skin = settings.get("user/general/@skin") || "dark";
+                var skin = settings.get("user/general/@skin");
 
                 settings.setDefaults("user/output", [
                     ["backgroundColor", defaults[skin][0]],
