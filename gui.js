@@ -317,7 +317,7 @@ define(function(require, module, exports) {
                         return;
                     }
                     else if (e.value == "manage") {
-                        commands.exec("openpreferences", null, {
+                        commands.exec("togglepreferences", null, {
                             pane: "project"
                         });
                         return;
