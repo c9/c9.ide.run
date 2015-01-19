@@ -1,6 +1,6 @@
 {
     "cmd": [
-        "node",
+        "iojs",
         "${debug?--nocrankshaft}",
         "${debug?--nolazy}",
         "${debug?--nodead_code_elimination}",
