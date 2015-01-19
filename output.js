@@ -118,12 +118,13 @@ define(function(require, exports, module) {
             }
 
             settings.on("read", function(e) {
-                var skin = settings.get("user/general/@skin") || "dark";
+                var skin = settings.get("user/general/@skin");
+                var colors = defaults[skin] || defaults["dark"];
 
                 settings.setDefaults("user/output", [
-                    ["backgroundColor", defaults[skin][0]],
-                    ["foregroundColor", defaults[skin][1]],
-                    ["selectionColor", defaults[skin][2]],
+                    ["backgroundColor", colors[0]],
+                    ["foregroundColor", colors[1]],
+                    ["selectionColor", colors[2]],
                     ["nosavequestion", "false"],
                     ["keepOutput", "false"]
                 ]);
