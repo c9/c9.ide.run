@@ -245,7 +245,7 @@ define(function(require, module, exports) {
             
             var running = STOPPED;
             var meta = {};
-            var pid, process;
+            var pid, process, cmd;
             
             if (typeof procName == "object") {
                 pid = procName.pid;
@@ -296,7 +296,7 @@ define(function(require, module, exports) {
                 if (!(options instanceof Array))
                     options = [options];
                 
-                var cmd = runner.map(function(runner, idx) {
+                cmd = runner.map(function(runner, idx) {
                     var cmd = "";
                     
                     // Display a message prior to running the command
@@ -719,6 +719,10 @@ define(function(require, module, exports) {
                  * @property {Object} meta
                  */
                 get meta(){ return meta; },
+                /**
+                 * @property {Object} command  The command that started this process
+                 */
+                get command(){ return cmd; },
                 
                 _events: [
                     /**
