@@ -775,8 +775,11 @@ define(function(require, module, exports) {
                 stop: stop,
                 /**
                  * Fetch variables from a string. See the {@link run#run run method} for more info.
+                 * @param {String} str
                  */
-                insertVariables: insertVariables
+                insertVariables: function(str){
+                    return insertVariables(str, options);
+                }
             });
             
             if (!pid)
