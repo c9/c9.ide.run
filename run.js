@@ -772,7 +772,11 @@ define(function(require, module, exports) {
                  * @param {Error}    callback.err The error object, if an error 
                  * has occured.
                  */
-                stop: stop
+                stop: stop,
+                /**
+                 * Fetch variables from a string. See the {@link run#run run method} for more info.
+                 */
+                insertVariables: insertVariables
             });
             
             if (!pid)
