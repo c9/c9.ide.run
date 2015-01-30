@@ -1101,6 +1101,11 @@ define(function(require, exports, module) {
                  */
                 run: runNow,
                 
+                /**
+                 * @ignore This is here to overwrite default behavior
+                 */
+                isClipboardAvailable: function(e) { return !e.fromKeyboard },
+                
                 get relatedPath() {
                     if (!currentSession) return;
                     var path = currentSession && currentSession.config.command;
