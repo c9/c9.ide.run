@@ -9,17 +9,15 @@
         "url": "http://github.com/c9/c9.ide.run.git"
     },
     "plugins": {
-        "plugin": {
-            "gui": {},
-            "output": {},
-            "run": {},
-            "run_analytics": {}
-        }
+        "gui": {},
+        "output": {},
+        "run": {},
+        "run_analytics": {}
     },
     "categories": [
         "core"
     ],
     "licenses": [
-        ""
+        "MIT"
     ]
 }
