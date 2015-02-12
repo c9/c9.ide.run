@@ -197,7 +197,7 @@ define(function(require, exports, module) {
                     if (argv && argv.run)
                         tablist[i].editor.run(tablist[i].document.getSession(), argv.callback);
 
-                    tabs.focusTab(tablist[i]);
+                    tabs.activateTab(tablist[i]);
                     return true;
                 }
             }
