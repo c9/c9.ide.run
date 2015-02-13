@@ -3,7 +3,7 @@ define(function(require, exports, module) {
         "Editor", "editors", "util", "commands", "terminal",
         "settings", "ui", "proc", "tabManager", "run", "console", "run.gui",
         "layout", "debugger", "settings", "dialog.question", "c9", "preferences",
-        "dialog.error", "dialog.filesave", "dialog.alert"
+        "dialog.error", "dialog.file", "dialog.alert"
     ];
     main.provides = ["output"];
     return main;
@@ -26,7 +26,7 @@ define(function(require, exports, module) {
         var question = imports["dialog.question"];
         var showError = imports["dialog.error"].show;
         var showAlert = imports["dialog.alert"].show;
-        var showSave = imports["dialog.filesave"].show;
+        var showSave = imports["dialog.file"].show;
         var Terminal = imports.terminal.Terminal;
         var debug = imports.debugger;
         var settings = imports.settings;
