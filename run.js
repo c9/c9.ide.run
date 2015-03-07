@@ -1104,6 +1104,11 @@ define(function(require, module, exports) {
              * @param {Boolean} [runner.shell] If true, cmd will be run through the shell.
              *  In our implementation all commands run through the shell.
              *  This cannot be changed.
+             * @param {Boolean} [runner.debugger] Set this to the type string of
+             *  the debugger that should connect to the process. The built-in
+             *  debuggers are 'v8' and 'gdb'.
+             * @param {Boolean} [runner.debugport] Set this to the port number
+             *  that the debugger will connect to.
              * @param {String} [runner.path] This string will replace the current process’ 
              *  PATH before calling cmd. The old PATH value will be restored 
              *  after that.
