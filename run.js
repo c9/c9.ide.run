@@ -588,28 +588,13 @@ define(function(require, module, exports) {
                 running = STOPPING;
                 emit("stopping");
     
-                // Kill the pty session
-                if (c9.platform == "win32") {
-                    if (!process)
-                        return cleanup(function(){
-                            callback();
-                        });
-                    process.on("kill", function(){
-                        cleanup(function(){
-                            callback();
-                        });
+                proc.execFile("kill", {args:[pid]}, function(err, e) {
+                    // Clean up here to make sure runner is in correct state
+                    // when the callback is called
+                    cleanup(function(){
+                        callback(err, e);
                     });
-                    process.kill(-1);
-                }
-                else {
-                    proc.execFile("kill", {args:[pid]}, function(err, e) {
-                        // Clean up here to make sure runner is in correct state
-                        // when the callback is called
-                        cleanup(function(){
-                            callback(err, e);
-                        });
-                    });
-                }
+                });
             }
             
             var checking;
