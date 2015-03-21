@@ -584,11 +584,14 @@ define(function(require, module, exports) {
                     }
                     return;
                 }
-                
                 running = STOPPING;
                 emit("stopping");
     
-                proc.execFile("kill", {args:[pid]}, function(err, e) {
+                // Kill process and potential runaway debugger process
+                var kill = "kill -9 " + pid;
+                if (meta.debug && runner[0].debugport)
+                    kill =  "kill -9 $(lsof -i:" + runner[0].debugPort + " -t); " + kill;
+                proc.execFile("sh", { args: ["-c", kill] }, function(err, e) {
                     // Clean up here to make sure runner is in correct state
                     // when the callback is called
                     cleanup(function(){
