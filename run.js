@@ -590,10 +590,11 @@ define(function(require, module, exports) {
                 // Kill process and potential runaway debugger process
                 var kill = "kill -9 " + pid;
                 if (meta.debug && runner[0].debugport)
-                    kill =  "kill -9 $(lsof -i:" + runner[0].debugPort + " -t); " + kill;
+                    kill +=  " $(lsof -i:" + runner[0].debugPort + " -t)";
                 proc.execFile("sh", { args: ["-c", kill] }, function(err, e) {
                     // Clean up here to make sure runner is in correct state
-                    // when the callback is called
+                    if (err && err.code !== "EDISCONNECT")
+                        err = null;
                     cleanup(function(){
                         callback(err, e);
                     });
