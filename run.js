@@ -587,7 +587,10 @@ define(function(require, module, exports) {
                 running = STOPPING;
                 emit("stopping");
     
-                // Kill process and potential runaway debugger process
+                killOldProcess(callback);
+            }
+            
+            function killOldProcess(callback) {
                 // (on Windows, execFile("kill") is handled specially)
                 if (c9.platform === "win32")
                     return proc.execFile("kill", { args: [pid] }, done);
