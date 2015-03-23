@@ -588,17 +588,23 @@ define(function(require, module, exports) {
                 emit("stopping");
     
                 // Kill process and potential runaway debugger process
+                // (on Windows, execFile("kill") is handled specially)
+                if (c9.platform === "win32")
+                    return proc.execFile("kill", { args: [pid] }, done);
+                
                 var kill = "kill -9 " + pid;
                 if (meta.debug && runner[0].debugport)
                     kill +=  " $(lsof -i:" + runner[0].debugPort + " -t)";
-                proc.execFile("sh", { args: ["-c", kill] }, function(err, e) {
+                proc.execFile("sh", { args: ["-c", kill] }, done);
+                
+                function done(err, e) {
                     // Clean up here to make sure runner is in correct state
                     if (err && err.code !== "EDISCONNECT")
                         err = null;
                     cleanup(function(){
                         callback(err, e);
                     });
-                });
+                }
             }
             
             var checking;
