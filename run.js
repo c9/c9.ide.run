@@ -244,6 +244,7 @@ define(function(require, module, exports) {
             emit.setMaxListeners(100);
             
             var running = STOPPED;
+            var deferred = options && options.deferred;
             var meta = {};
             var pid, process, cmd;
             
@@ -295,6 +296,9 @@ define(function(require, module, exports) {
                     
                 if (!(options instanceof Array))
                     options = [options];
+                
+                if (deferred)
+                    return setTimeout(callback);
                 
                 cmd = runner.map(function(runner, idx) {
                     var cmd = "";
@@ -771,6 +775,19 @@ define(function(require, module, exports) {
                  * has occured.
                  */
                 stop: stop,
+                
+                /**
+                 * 
+                 */
+                run: function(callback){
+                    if (!deferred) return;
+                    
+                    deferred = false;
+                    options.force = true;
+                    
+                    run(runner, options, callback || function(){});
+                },
+                
                 /**
                  * Fetch variables from a string. See the {@link run#run run method} for more info.
                  * @param {String} str

@@ -276,7 +276,7 @@ define(function(require, exports, module) {
                     if (cwd.charAt(0) == "/")
                         cwd = join(basePath, cwd);
                     
-                    session.process = run.run(runner, {
+                    session.process = debug.run(runner, {
                         path: path,
                         cwd: cwd,
                         env: session.config.env || {},
@@ -300,13 +300,6 @@ define(function(require, exports, module) {
                             return;
 
                         session.process.meta.debug = bDebug;
-
-                        if (bDebug) {
-                            debug.debug(session.process, function(err) {
-                                if (err)
-                                    return; // Either the debugger is not found or paused
-                            });
-                        }
                     });
 
                     decorateProcess(session);
@@ -356,6 +349,9 @@ define(function(require, exports, module) {
                             btnRestart.enable();
                     }
                 });
+                session.process.on("started", function(){
+                    session.updateTitle();
+                }, plugin);
                 session.process.on("stopping", function(){
                     if (session == currentSession) {
                         btnRun.disable();
