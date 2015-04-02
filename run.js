@@ -58,11 +58,16 @@ define(function(require, module, exports) {
         
         /***** Methods *****/
         
+        function addRunner(name, runner, plugin) {
+            runners[name] = runner;
+            plugin.addOther(function(){ delete runners[name]; });
+        }
+        
         function listRunners(callback) {
-            var runners = Object.keys(options.runners || {});
+            var _runners = Object.keys(runners || {});
             fs.exists(settings.get("project/run/@path"), function(exists) {
                 if (!exists)
-                    return callback(null, runners);
+                    return callback(null, _runners);
                 
                 fs.readdir(settings.get("project/run/@path"), function(err, files) {
                     // if (err && err.code == "ENOENT")
@@ -76,12 +81,12 @@ define(function(require, module, exports) {
                                     return console.warn("Runner ignored, doesn't have .run extension: " + file.name);
                                 name = [0, file.name];
                             }
-                            if (runners.indexOf(name[1]) < 0)
-                                runners.push(name[1]);
+                            if (_runners.indexOf(name[1]) < 0)
+                                _runners.push(name[1]);
                         });
                     }
                     
-                    callback(null, runners);
+                    callback(null, _runners);
                 });
             });
         }
@@ -1027,6 +1032,13 @@ define(function(require, module, exports) {
              * @param {Function} callback.runner  A runner object. See {@link #run} for more information.
              */
             getRunner: getRunner,
+            
+            /**
+             * Adds a new runner to the list of runners
+             * @param {String} name       The name of the runner to add
+             * @param {Object} runner     The runner to add
+             */
+            addRunner: addRunner,
             
             /**
              * Stop all running processes
