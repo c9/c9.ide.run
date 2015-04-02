@@ -779,8 +779,9 @@ define(function(require, module, exports) {
                 /**
                  * 
                  */
-                run: function(callback){
-                    if (!deferred) return;
+                run: function(callback) {
+                    if (!deferred)
+                        return callback(new Error("Cannot call run() on non-deferred process"));
                     
                     deferred = false;
                     options.force = true;
