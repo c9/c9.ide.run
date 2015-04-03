@@ -165,14 +165,10 @@ define(function(require, module, exports) {
                     fs.readFile(path, "utf8", function(err, data) {
                         if (err)
                             return callback(err);
-                            
-                        // Remove comments
-                        data = data.replace(/(^|\n)\s*\/\/.*/g, "");
-                            
-                        var runner;
-                        try { runner = JSON.parse(data); }
-                        catch (e) { return callback(e); }
-                            
+                        
+                        var runner = util.safeParseJson(data, callback);    
+                        if (!runner) return;
+                        
                         runner.caption = name.replace(/\.run$/, "");
                         runners[runner.caption] = runner;
                         done(runner);
