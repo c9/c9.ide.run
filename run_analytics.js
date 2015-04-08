@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "run", "output", "c9.analytics", "c9.analytics.cookie"
+        "run", "output", "analytics", "analytics.cookie"
     ];
     main.provides = ["run_analytics"];
     module.exports = main;
@@ -8,8 +8,8 @@ define(function(require, exports, module) {
     return main;
 
     function main(options, imports, register) {
-        var analytics = imports["c9.analytics"];
-        var cookie = imports["c9.analytics.cookie"];
+        var analytics = imports.analytics;
+        var cookie = imports["analytics.cookie"];
         var run = imports.run;
         var output = imports.output;
         var COOKIE_RUNNERS_NAME = "c9_runners_timestamp";
