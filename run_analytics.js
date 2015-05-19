@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "run", "output", "analytics", "analytics.cookie"
+        "run", "output", "analytics.client", "analytics.cookie"
     ];
     main.provides = ["run_analytics"];
     module.exports = main;
@@ -8,7 +8,7 @@ define(function(require, exports, module) {
     return main;
 
     function main(options, imports, register) {
-        var analytics = imports.analytics;
+        var analytics = imports["analytics.client"];
         var cookie = imports["analytics.cookie"];
         var run = imports.run;
         var output = imports.output;
