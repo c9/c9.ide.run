@@ -602,7 +602,7 @@ define(function(require, module, exports) {
                 
                 var kill = "kill -9 " + pid;
                 if (meta.debug && runner[0].debugport)
-                    kill +=  " $(lsof -i:" + runner[0].debugPort + " -t)";
+                    kill +=  " $(lsof -i:" + runner[0].debugport + " -t)";
                 proc.execFile("sh", { args: ["-c", kill] }, done);
                 
                 function done(err, e) {
