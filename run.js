@@ -600,10 +600,12 @@ define(function(require, module, exports) {
                 if (c9.platform === "win32")
                     return proc.execFile("kill", { args: [pid] }, done);
                 
-                var kill = "kill -9 " + pid;
-                if (meta.debug && runner[0].debugport)
-                    kill +=  " $(lsof -i:" + runner[0].debugport + " -t)";
-                proc.execFile("sh", { args: ["-c", kill] }, done);
+                proc.killtree(pid, {graceful: true}, done);
+                
+                if (meta.debug && runner[0].debugport) {
+                    var kill = "kill -9 $(lsof -i:" + runner[0].debugport + " -t)";
+                    proc.execFile("sh", { args: ["-c", kill] }, done);
+                }
                 
                 function done(err, e) {
                     // Clean up here to make sure runner is in correct state
