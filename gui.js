@@ -318,7 +318,8 @@ define(function(require, module, exports) {
                     }
                     else if (e.value == "manage") {
                         commands.exec("openpreferences", null, {
-                            pane: "project"
+                            panel: "preferences.project",
+                            section: "Run Configuration"
                         });
                         return;
                     }
