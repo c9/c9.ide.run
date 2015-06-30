@@ -603,7 +603,8 @@ define(function(require, module, exports) {
                 proc.killtree(pid, {graceful: true}, done);
                 
                 if (meta.debug && runner[0].debugport) {
-                    var kill = "kill -9 $(lsof -i:" + runner[0].debugport + " -t)";
+                    var kill = "kill -9 $(lsof -i:" + runner[0].debugport + " -t);"
+                        + "if sudo -n true; then sudo kill -9 $(sudo lsof -i:" + runner[0].debugport + " -t); fi";
                     proc.execFile("sh", { args: ["-c", kill] }, done);
                 }
                 
