@@ -5,6 +5,12 @@
     "env" : {
         "NODE_OPTIONS": "${debug?--debug-brk=5757}"
     },
+    "pathMap": [
+        {
+            "toInternal": {"regex": "^app/", "replacement": "/"},
+            "toExternal": {"regex": "^/(?=[^.])", "replacement": "app/"}
+        }
+    ],
     "debugger": "v8",
     "debugport": 5757
 }

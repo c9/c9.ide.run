@@ -7,6 +7,12 @@
         "ROOT_URL": "https://$C9_HOSTNAME", 
         "BIND_IP": "$IP"
     },
+    "pathMap": [
+        {
+            "toInternal": {"regex": "^app/", "replacement": "/"},
+            "toExternal": {"regex": "^/(?=[^.])", "replacement": "app/"}
+        }
+    ],
     "debugger": "v8",
     "debugport": 5757
 }
