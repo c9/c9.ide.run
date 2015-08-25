@@ -579,34 +579,7 @@ define(function(require, module, exports) {
                 if (process && process.running)
                     return;
 
-                if (defConfig)
-                    return transformButton();
-
-                var path = findTabToRun();
-                if (path) {
-                    btnRun.enable();
-                    btnRun.setAttribute("command", "run");
-                    btnRun.setAttribute("caption", "Run");
-                    btnRun.setAttribute("tooltip", "Run "
-                        + basename(path));
-                }
-                else if (lastRun) {
-                    var runner = lastRun[0] == "auto"
-                        ? getRunner(lastRun[1])
-                        : lastRun[0];
-
-                    btnRun.enable();
-                    btnRun.setAttribute("command", "runlast");
-                    btnRun.setAttribute("caption", "Run Last");
-                    btnRun.setAttribute("tooltip", "Run Last ("
-                        + basename(lastRun[1]) + ", "
-                        + (runner && runner.caption || "auto") + ")");
-                }
-                else {
-                    btnRun.disable();
-                    btnRun.setAttribute("caption", "Run");
-                    btnRun.setAttribute("tooltip", "");
-                }
+                transformButton();
             }, plugin);
 
             tabs.on("tabDestroy", function(e) {
@@ -813,33 +786,45 @@ define(function(require, module, exports) {
                 btnRun.setAttribute("tooltip", "");
                 btnRun.setAttribute("class", "runbtn running");
                 btnRun.enable();
+
+                return btnRun;
             }
             else {
                 btnRun.setAttribute("class", "runbtn stopped");
 
-                if (defConfig) {
+                var path = findTabToRun();
+                if (emit("updateRunButton", { path: "/" + path, button: btnRun }) === false) {
+                    return;
+                }
+                else if (defConfig) {
                     btnRun.setAttribute("caption", "Run Project");
                     btnRun.setAttribute("tooltip", "");
                     btnRun.setAttribute("command", "run");
                     btnRun.setAttribute("disabled", "false");
                 }
-                else {
-                    var path = findTabToRun();
-                    var runner = !path && lastRun && (lastRun[0] == "auto"
+                else if (path) {
+                    btnRun.enable();
+                    btnRun.setAttribute("command", "run");
+                    btnRun.setAttribute("caption", "Run");
+                    btnRun.setAttribute("tooltip", "Run "
+                        + basename(path));
+                }
+                else if (lastRun) {
+                    var runner = lastRun[0] == "auto"
                         ? getRunner(lastRun[1])
-                        : lastRun[0]);
+                        : lastRun[0];
 
-                    btnRun.setAttribute("caption", !path && lastRun ? "Run Last" : "Run");
-                    btnRun.setAttribute("tooltip", path
-                        ? "Run " + basename(path)
-                        : (lastRun
-                            ? "Run Last ("
-                                + basename(lastRun[1]) + ", "
-                                + (runner.caption || "auto") + ")"
-                            : ""));
-                    btnRun.setAttribute("command", !path && lastRun ? "runlast" : "run");
-
-                    return path;
+                    btnRun.enable();
+                    btnRun.setAttribute("command", "runlast");
+                    btnRun.setAttribute("caption", "Run Last");
+                    btnRun.setAttribute("tooltip", "Run Last ("
+                        + basename(lastRun[1]) + ", "
+                        + (runner && runner.caption || "auto") + ")");
+                }
+                else {
+                    btnRun.disable();
+                    btnRun.setAttribute("caption", "Run");
+                    btnRun.setAttribute("tooltip", "");
                 }
             }
         }
@@ -899,6 +884,11 @@ define(function(require, module, exports) {
         plugin.freezePublicAPI({
             get lastRun(){ return lastRun },
             set lastRun(lr){ lastRun = lr },
+
+            /**
+             *
+             */
+            transformButton: transformButton
         });
 
         register(null, {
