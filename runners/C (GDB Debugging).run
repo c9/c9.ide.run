@@ -4,7 +4,7 @@
   "cmd": [
     "sh",
     "-c",
-    "/usr/bin/make $file_base_name && gdbserver :15470 $file_path/$file_base_name $args"
+    "/usr/bin/make $file_base_name && gdbserver --once :15470 $file_path/$file_base_name $args && echo '' || echo 'Please be sure to stop other debuggers before continuing.'"
   ],
 
   "info": "Compiling $file ...",
