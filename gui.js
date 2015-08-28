@@ -167,17 +167,6 @@ define(function(require, module, exports) {
             menus.addItemByPath("Run/Run Last", itmRunLast, c += 100, plugin);
             menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
 
-            // menus.addItemByPath("Run/Enable Source Maps", new ui.item({
-            //     type    : "check",
-            //     checked : "project/debug/@sourcemaps"
-            // }), c += 100, plugin);
-            menus.addItemByPath("Run/Show Debugger at Break", new ui.item({
-                type: "check",
-                checked: "user/debug/@autoshow"
-            }), c += 100, plugin);
-
-            menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
-
             var lastOpener, preventLoop;
             var mnuRunAs = new ui.menu({
                 id: "mnuRunAs",
@@ -337,6 +326,16 @@ define(function(require, module, exports) {
                 isAvailable: function(){ return false; }
             }), c += 100, plugin);
             menus.addItemByPath("Run/Run Configurations/", mnuRunCfg, c += 100, plugin);
+            
+            menus.addItemByPath("Run/~", new ui.divider(), c += 1000, plugin);
+            // menus.addItemByPath("Run/Enable Source Maps", new ui.item({
+            //     type    : "check",
+            //     checked : "project/debug/@sourcemaps"
+            // }), c += 100, plugin);
+            menus.addItemByPath("Run/Show Debugger at Break", new ui.item({
+                type: "check",
+                checked: "user/debug/@autoshow"
+            }), c += 100, plugin);
 
             c = 0;
             menus.addItemByPath("Run/Run Configurations/~", new ui.divider(), c += 1000, plugin);
