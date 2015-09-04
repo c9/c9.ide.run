@@ -167,17 +167,6 @@ define(function(require, module, exports) {
             menus.addItemByPath("Run/Run Last", itmRunLast, c += 100, plugin);
             menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
 
-            // menus.addItemByPath("Run/Enable Source Maps", new ui.item({
-            //     type    : "check",
-            //     checked : "project/debug/@sourcemaps"
-            // }), c += 100, plugin);
-            menus.addItemByPath("Run/Show Debugger at Break", new ui.item({
-                type: "check",
-                checked: "user/debug/@autoshow"
-            }), c += 100, plugin);
-
-            menus.addItemByPath("Run/~", new ui.divider(), c += 100, plugin);
-
             var lastOpener, preventLoop;
             var mnuRunAs = new ui.menu({
                 id: "mnuRunAs",
@@ -337,6 +326,16 @@ define(function(require, module, exports) {
                 isAvailable: function(){ return false; }
             }), c += 100, plugin);
             menus.addItemByPath("Run/Run Configurations/", mnuRunCfg, c += 100, plugin);
+            
+            menus.addItemByPath("Run/~", new ui.divider(), c += 1000, plugin);
+            // menus.addItemByPath("Run/Enable Source Maps", new ui.item({
+            //     type    : "check",
+            //     checked : "project/debug/@sourcemaps"
+            // }), c += 100, plugin);
+            menus.addItemByPath("Run/Show Debugger at Break", new ui.item({
+                type: "check",
+                checked: "user/debug/@autoshow"
+            }), c += 100, plugin);
 
             c = 0;
             menus.addItemByPath("Run/Run Configurations/~", new ui.divider(), c += 1000, plugin);
@@ -579,34 +578,7 @@ define(function(require, module, exports) {
                 if (process && process.running)
                     return;
 
-                if (defConfig)
-                    return transformButton();
-
-                var path = findTabToRun();
-                if (path) {
-                    btnRun.enable();
-                    btnRun.setAttribute("command", "run");
-                    btnRun.setAttribute("caption", "Run");
-                    btnRun.setAttribute("tooltip", "Run "
-                        + basename(path));
-                }
-                else if (lastRun) {
-                    var runner = lastRun[0] == "auto"
-                        ? getRunner(lastRun[1])
-                        : lastRun[0];
-
-                    btnRun.enable();
-                    btnRun.setAttribute("command", "runlast");
-                    btnRun.setAttribute("caption", "Run Last");
-                    btnRun.setAttribute("tooltip", "Run Last ("
-                        + basename(lastRun[1]) + ", "
-                        + (runner && runner.caption || "auto") + ")");
-                }
-                else {
-                    btnRun.disable();
-                    btnRun.setAttribute("caption", "Run");
-                    btnRun.setAttribute("tooltip", "");
-                }
+                transformButton();
             }, plugin);
 
             tabs.on("tabDestroy", function(e) {
@@ -813,33 +785,45 @@ define(function(require, module, exports) {
                 btnRun.setAttribute("tooltip", "");
                 btnRun.setAttribute("class", "runbtn running");
                 btnRun.enable();
+
+                return btnRun;
             }
             else {
                 btnRun.setAttribute("class", "runbtn stopped");
 
-                if (defConfig) {
+                var path = findTabToRun();
+                if (emit("updateRunButton", { path: "/" + path, button: btnRun }) === false) {
+                    return;
+                }
+                else if (defConfig) {
                     btnRun.setAttribute("caption", "Run Project");
                     btnRun.setAttribute("tooltip", "");
                     btnRun.setAttribute("command", "run");
                     btnRun.setAttribute("disabled", "false");
                 }
-                else {
-                    var path = findTabToRun();
-                    var runner = !path && lastRun && (lastRun[0] == "auto"
+                else if (path) {
+                    btnRun.enable();
+                    btnRun.setAttribute("command", "run");
+                    btnRun.setAttribute("caption", "Run");
+                    btnRun.setAttribute("tooltip", "Run "
+                        + basename(path));
+                }
+                else if (lastRun) {
+                    var runner = lastRun[0] == "auto"
                         ? getRunner(lastRun[1])
-                        : lastRun[0]);
+                        : lastRun[0];
 
-                    btnRun.setAttribute("caption", !path && lastRun ? "Run Last" : "Run");
-                    btnRun.setAttribute("tooltip", path
-                        ? "Run " + basename(path)
-                        : (lastRun
-                            ? "Run Last ("
-                                + basename(lastRun[1]) + ", "
-                                + (runner.caption || "auto") + ")"
-                            : ""));
-                    btnRun.setAttribute("command", !path && lastRun ? "runlast" : "run");
-
-                    return path;
+                    btnRun.enable();
+                    btnRun.setAttribute("command", "runlast");
+                    btnRun.setAttribute("caption", "Run Last");
+                    btnRun.setAttribute("tooltip", "Run Last ("
+                        + basename(lastRun[1]) + ", "
+                        + (runner && runner.caption || "auto") + ")");
+                }
+                else {
+                    btnRun.disable();
+                    btnRun.setAttribute("caption", "Run");
+                    btnRun.setAttribute("tooltip", "");
                 }
             }
         }
@@ -899,6 +883,11 @@ define(function(require, module, exports) {
         plugin.freezePublicAPI({
             get lastRun(){ return lastRun },
             set lastRun(lr){ lastRun = lr },
+
+            /**
+             *
+             */
+            transformButton: transformButton
         });
 
         register(null, {
