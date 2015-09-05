@@ -811,6 +811,8 @@ define(function(require, module, exports) {
         }
         
         function bashQuote(commandArgs, alsoQuoteArgs) {
+            if (!commandArgs) 
+                return "";
             return commandArgs.map(function(part) {
                 if (part === "$args" && !alsoQuoteArgs)
                     return part;
