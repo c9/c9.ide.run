@@ -13,6 +13,9 @@
             "toExternal": {"regex": "^/(?=[^.])", "replacement": "app/"}
         }
     ],
+    "disabled": {
+        "liveUpdate": true
+    },
     "debugger": "v8",
     "debugport": 5757
 }
