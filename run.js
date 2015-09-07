@@ -600,20 +600,13 @@ define(function(require, module, exports) {
                 if (c9.platform === "win32")
                     return proc.execFile("kill", { args: [pid] }, done);
                 
-                proc.killtree(pid, {graceful: true}, function() {
-                    if (runner[0]["cleanup-cmd"]) {
-                        proc.execFile("bash", { args: ["-c", bashQuote(runner["cleanup-cmd"])] }, done);
-                    }
-                    else if (meta.debug && runner[0].debugport) {
-                        var kill = "kill -9 $(lsof -i:" + runner[0].debugport + " -t);"
-                            + "if sudo -n true; then sudo kill -9 $(sudo lsof -i:" + runner[0].debugport + " -t); fi";
-                        proc.execFile("sh", { args: ["-c", kill] }, done);
-                    }
-                    else {
-                        done();
-                    }
-                });
+                proc.killtree(pid, {graceful: true}, done);
                 
+                if (meta.debug && runner[0].debugport) {
+                    var kill = "kill -9 $(lsof -i:" + runner[0].debugport + " -t);"
+                        + "if sudo -n true; then sudo kill -9 $(sudo lsof -i:" + runner[0].debugport + " -t); fi";
+                    proc.execFile("sh", { args: ["-c", kill] }, done);
+                }
                 
                 function done(err, e) {
                     // Clean up here to make sure runner is in correct state
@@ -818,8 +811,6 @@ define(function(require, module, exports) {
         }
         
         function bashQuote(commandArgs, alsoQuoteArgs) {
-            if (!commandArgs) 
-                return "";
             return commandArgs.map(function(part) {
                 if (part === "$args" && !alsoQuoteArgs)
                     return part;
