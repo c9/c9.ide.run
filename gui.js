@@ -179,7 +179,7 @@ define(function(require, module, exports) {
                             }
 
                             var c = 300;
-                            names.forEach(function(name) {
+                            names.sort().forEach(function(name) {
                                 menus.addItemToMenu(mnuRunAs, new ui.item({
                                     caption: uCaseFirst(name),
                                     value: name
