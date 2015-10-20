@@ -792,7 +792,10 @@ define(function(require, module, exports) {
                 btnRun.setAttribute("class", "runbtn stopped");
 
                 var path = findTabToRun();
-                if (emit("updateRunButton", { path: "/" + path, button: btnRun }) === false) {
+                if (path && emit("updateRunButton", { 
+                    path: "/" + path, 
+                    button: btnRun 
+                }) === false) {
                     return;
                 }
                 else if (defConfig) {
