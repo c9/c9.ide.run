@@ -582,7 +582,7 @@ define(function(require, module, exports) {
             }, plugin);
 
             tabs.on("tabDestroy", function(e) {
-                if (e.last && !defConfig) {
+                if (e.last && !defConfig && !tabs.focussedTab) {
                     btnRun.disable();
                     btnRun.setAttribute("tooltip", "");
                 }
