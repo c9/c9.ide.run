@@ -500,14 +500,11 @@ define(function(require, module, exports) {
                     return false; // Prevent error when watchfile doesn't exist
                 }
                 
-                if (running == CLEANING || running == STOPPED) {
-                    setTimeout(function(){
-                        if (running !== 0)
-                            finish();
-                        else
-                            callback && callback();
-                    }, 2000);
-                    return;
+                if (running == CLEANING || running == STOPPING || running == STOPPED) {
+                    if (running !== 0)
+                        return finish();
+                    else
+                        return callback && callback();
                 }
     
                 if (running > 0) {
@@ -515,7 +512,7 @@ define(function(require, module, exports) {
                     emit("stopping");
                 }
                 
-                running = CLEANING;
+                checkState();
             }
             
             function stop(callback) {
@@ -600,17 +597,13 @@ define(function(require, module, exports) {
                     session: procName,
                     fetchpid: true
                 }, function(err, pty, pid) {
+                    checking = false;
                     // Process has exited
                     if (err || pid == -1 || pid != originalPid || !pid) {
-                        // debugger; // There is a bug where the run button is not on stopped while the process is running
-                        
-                        cleanup(function(){
-                            checking = false;
-                        });
+                        cleanup();
                     }
                     else {
                         emit("back");
-                        checking = false;
                     }
                 });
             }
