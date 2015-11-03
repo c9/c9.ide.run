@@ -256,8 +256,6 @@ define(function(require, module, exports) {
                 procName = procName.name;
             }
             
-            var WATCHFILE = installPath + "/.run_" + procName + ".watch";
-
             // Deal with connection issues
             c9.on("stateChange", function(e) {
                 if (e.state & c9.PROCESS) {
@@ -372,42 +370,8 @@ define(function(require, module, exports) {
                             cleanup();
                         }
                         else {
-                            // Start the monitor
-                            monitor();
                             callback(null, pid);
                         }
-                    }
-                });
-            }
-            
-            function monitor(callback) {
-                // Set watcher
-                fs.watch(WATCHFILE, function watch(err, event, filename) {
-                    if (err) {
-                        if (err.code == "ENOENT") {
-                            // The watch file is already gone. Lets stop the process
-                            return cleanup(callback);
-                        }
-                        else {
-                            // Retry when comes online
-                            
-                            callback && callback();
-                        }
-                    }
-                    
-                    if (event == "init")
-                        return callback && callback();
-                    
-                    // Process has exited
-                    if (event == "delete") {
-                        // Process is stopped
-                        cleanup();
-                    }
-                    // Process is restarted
-                    else {
-                        // Unwatch the proces - whoever restarted it will add
-                        // another monitor
-                        fs.unwatch(WATCHFILE, watch);
                     }
                 });
             }
@@ -552,8 +516,6 @@ define(function(require, module, exports) {
                 }
                 
                 running = CLEANING;
-                
-                fs.rmfile(WATCHFILE, finish);
             }
             
             function stop(callback) {
@@ -647,10 +609,8 @@ define(function(require, module, exports) {
                         });
                     }
                     else {
-                        monitor(function(){
-                            emit("back");
-                            checking = false;
-                        });
+                        emit("back");
+                        checking = false;
                     }
                 });
             }
