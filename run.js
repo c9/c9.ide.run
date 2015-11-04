@@ -585,10 +585,11 @@ define(function(require, module, exports) {
             }
             
             var checking;
-            function checkState(){
-                if (!running || checking) return;
+            function checkState(cb){
+                if (!running) return cb && cb();
+                if (checking) return checking.push(cb);
                 
-                checking = true;
+                checking = [cb];
                 
                 var originalPid = pid;
                 
@@ -597,6 +598,7 @@ define(function(require, module, exports) {
                     session: procName,
                     fetchpid: true
                 }, function(err, pty, pid) {
+                    var callbacks = checking || [];
                     checking = false;
                     // Process has exited
                     if (err || pid == -1 || pid != originalPid || !pid) {
@@ -605,6 +607,7 @@ define(function(require, module, exports) {
                     else {
                         emit("back");
                     }
+                    callbacks.forEach(function(cb) { cb && cb() });
                 });
             }
             
