@@ -793,7 +793,7 @@ define(function(require, module, exports) {
 
                 var path = findTabToRun();
                 if (path && emit("updateRunButton", { 
-                    path: "/" + path, 
+                    path: /[~\/]/.test(path.charAt(0)) ? path : "/" + path, 
                     button: btnRun 
                 }) === false) {
                     return;
