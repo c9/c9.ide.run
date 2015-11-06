@@ -256,8 +256,6 @@ define(function(require, module, exports) {
                 procName = procName.name;
             }
             
-            var WATCHFILE = installPath + "/.run_" + procName + ".watch";
-
             // Deal with connection issues
             c9.on("stateChange", function(e) {
                 if (e.state & c9.PROCESS) {
@@ -372,42 +370,8 @@ define(function(require, module, exports) {
                             cleanup();
                         }
                         else {
-                            // Start the monitor
-                            monitor();
                             callback(null, pid);
                         }
-                    }
-                });
-            }
-            
-            function monitor(callback) {
-                // Set watcher
-                fs.watch(WATCHFILE, function watch(err, event, filename) {
-                    if (err) {
-                        if (err.code == "ENOENT") {
-                            // The watch file is already gone. Lets stop the process
-                            return cleanup(callback);
-                        }
-                        else {
-                            // Retry when comes online
-                            
-                            callback && callback();
-                        }
-                    }
-                    
-                    if (event == "init")
-                        return callback && callback();
-                    
-                    // Process has exited
-                    if (event == "delete") {
-                        // Process is stopped
-                        cleanup();
-                    }
-                    // Process is restarted
-                    else {
-                        // Unwatch the proces - whoever restarted it will add
-                        // another monitor
-                        fs.unwatch(WATCHFILE, watch);
                     }
                 });
             }
@@ -536,14 +500,11 @@ define(function(require, module, exports) {
                     return false; // Prevent error when watchfile doesn't exist
                 }
                 
-                if (running == CLEANING || running == STOPPED) {
-                    setTimeout(function(){
-                        if (running !== 0)
-                            finish();
-                        else
-                            callback && callback();
-                    }, 2000);
-                    return;
+                if (running == CLEANING || running == STOPPING || running == STOPPED) {
+                    if (running !== 0)
+                        return finish();
+                    else
+                        return callback && callback();
                 }
     
                 if (running > 0) {
@@ -551,9 +512,7 @@ define(function(require, module, exports) {
                     emit("stopping");
                 }
                 
-                running = CLEANING;
-                
-                fs.rmfile(WATCHFILE, finish);
+                checkState();
             }
             
             function stop(callback) {
@@ -626,10 +585,11 @@ define(function(require, module, exports) {
             }
             
             var checking;
-            function checkState(){
-                if (!running || checking) return;
+            function checkState(cb){
+                if (!running) return cb && cb();
+                if (checking) return checking.push(cb);
                 
-                checking = true;
+                checking = [cb];
                 
                 var originalPid = pid;
                 
@@ -638,20 +598,16 @@ define(function(require, module, exports) {
                     session: procName,
                     fetchpid: true
                 }, function(err, pty, pid) {
+                    var callbacks = checking || [];
+                    checking = false;
                     // Process has exited
                     if (err || pid == -1 || pid != originalPid || !pid) {
-                        // debugger; // There is a bug where the run button is not on stopped while the process is running
-                        
-                        cleanup(function(){
-                            checking = false;
-                        });
+                        cleanup();
                     }
                     else {
-                        monitor(function(){
-                            emit("back");
-                            checking = false;
-                        });
+                        emit("back");
                     }
+                    callbacks.forEach(function(cb) { cb && cb() });
                 });
             }
             

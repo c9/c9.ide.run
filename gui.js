@@ -582,7 +582,7 @@ define(function(require, module, exports) {
             }, plugin);
 
             tabs.on("tabDestroy", function(e) {
-                if (e.last && !defConfig) {
+                if (e.last && !defConfig && !tabs.focussedTab) {
                     btnRun.disable();
                     btnRun.setAttribute("tooltip", "");
                 }
@@ -792,7 +792,10 @@ define(function(require, module, exports) {
                 btnRun.setAttribute("class", "runbtn stopped");
 
                 var path = findTabToRun();
-                if (emit("updateRunButton", { path: "/" + path, button: btnRun }) === false) {
+                if (path && emit("updateRunButton", { 
+                    path: /[~\/]/.test(path.charAt(0)) ? path : "/" + path, 
+                    button: btnRun 
+                }) === false) {
                     return;
                 }
                 else if (defConfig) {
