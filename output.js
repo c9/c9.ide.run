@@ -297,7 +297,7 @@ define(function(require, exports, module) {
 
                         session.updateTitle();
 
-                        if (session.process.running < session.process.STARTING)
+                        if (!session.process || session.process.running < session.process.STARTING)
                             return;
 
                         session.process.meta.debug = bDebug;
@@ -346,7 +346,7 @@ define(function(require, exports, module) {
                     if (session == currentSession) {
                         btnRun.enable();
 
-                        if (session.process.running != session.process.STOPPED)
+                        if (!session.process || session.process.running != session.process.STOPPED)
                             btnRestart.enable();
                     }
                 });
