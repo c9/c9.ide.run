@@ -5,7 +5,7 @@
         "-S", "$ip:$port"
     ],
     "selector": "^.*\\.(php)$",
-    "cwd": "$project_path",
+    "working_dir": "$project_path",
     "debugger": "xdebug",
     "debugport": 9000,
     "env": {
