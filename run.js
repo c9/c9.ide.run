@@ -560,10 +560,10 @@ define(function(require, module, exports) {
                     return proc.execFile("kill", { args: [pid] }, done);
                 
                 proc.killtree(pid, {graceful: true}, function() {
-                    if (runner[0]["cleanup-cmd"]) {
+                    if (runner && runner[0]["cleanup-cmd"]) {
                         proc.execFile("bash", { args: ["-c", bashQuote(runner["cleanup-cmd"])] }, done);
                     }
-                    else if (meta.debug && runner[0].debugport) {
+                    else if (meta.debug && runner && runner[0].debugport) {
                         var kill = "kill -9 $(lsof -i:" + runner[0].debugport + " -t);"
                             + "if sudo -n true; then sudo kill -9 $(sudo lsof -i:" + runner[0].debugport + " -t); fi";
                         proc.execFile("sh", { args: ["-c", kill] }, done);
