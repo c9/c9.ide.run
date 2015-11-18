@@ -6,5 +6,5 @@
     ],
     "selector": "^.*\\.(php|phar)$",
     "info": "Running PHP script $file",
-    "cwd": "$project_path"
+    "working_dir": "$project_path"
 }

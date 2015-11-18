@@ -216,7 +216,7 @@ define(function(require, module, exports) {
             var proc = new Process(name, runner, options, callback);
             processes.push(proc);
             
-            var event = { process: proc };
+            var event = { process: proc, runner: runner };
             
             proc.on("starting", function(){ handleEmit("starting", event); });
             proc.on("started", function(){ handleEmit("started", event); });
@@ -354,7 +354,7 @@ define(function(require, module, exports) {
                     
                     // Running
                     running = STARTED;
-                    emit("started", { pty: pty });
+                    emit("started", { pty: pty, options: options });
                     
                     // if not detached
                     if (options.detach === false) {
