@@ -559,9 +559,15 @@ define(function(require, module, exports) {
                 if (c9.platform === "win32")
                     return proc.execFile("kill", { args: [pid] }, done);
                 
+                var runCfg = runner && runner[0];
+                
+                if (runCfg && runCfg.cmdStop) {
+                    return proc.execFile("bash", { args: ["-c", bashQuote(runCfg.cmdStop)] }, done);
+                }
+                
                 proc.killtree(pid, {graceful: true}, function() {
-                    if (runner && runner[0]["cleanup-cmd"]) {
-                        proc.execFile("bash", { args: ["-c", bashQuote(runner["cleanup-cmd"])] }, done);
+                    if (runCfg && runCfg.cmdCleanup) {
+                        proc.execFile("bash", { args: ["-c", bashQuote(runCfg.cmdCleanup)] }, done);
                     }
                     else if (meta.debug && runner && runner[0].debugport) {
                         var kill = "kill -9 $(lsof -i:" + runner[0].debugport + " -t);"
@@ -572,7 +578,6 @@ define(function(require, module, exports) {
                         done();
                     }
                 });
-                
                 
                 function done(err, e) {
                     // Clean up here to make sure runner is in correct state

@@ -2,7 +2,7 @@
   "cmd": [
     "run-apache2", "${debug?debug}"
   ],
-  "cleanup-cmd": [
+  "cmdStop": [
     "run-apache2", "stop"
   ],
   "debugger": "xdebug",
