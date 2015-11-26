@@ -140,36 +140,35 @@ define(function(require, module, exports) {
                 return false;
             }
         }
-        
+
         function getRunner(name, refresh, callback) {
             if (typeof refresh == "function") {
                 callback = refresh;
                 refresh = false;
             }
-            
+
+            // When runner is loaded and we don't require a refresh
+            if (runners[name] && refresh === false) {
+                return done(runners[name]);
+            }
+
+            // Search for <name>.run or <name> and load
             var path = settings.get("project/run/@path") + "/"  + name + ".run";
             fs.exists(path, function test(exists) {
                 if (!exists) {
-                    if (options.runners[name])
-                        return done(options.runners[name]);
                     if (/\.run$/.test(path)) {
                         path = settings.get("project/run/@path") + "/"  + name;
                         return fs.exists(path, test);
                     }
                     callback("Runner does not exist");
-                }
-                else if (runners[name] && !refresh && (!exists || options.runners[name] === runners[name]))  {
-                    done(runners[name]);
-                }
-                else {
+                } else {
                     fs.readFile(path, "utf8", function(err, data) {
-                        if (err)
-                            return callback(err);
+                        if (err) return callback(err);
                         
                         var runner = util.safeParseJson(data, callback);    
                         if (!runner) return;
                         
-                        runner.caption = name.replace(/\.run$/, "");
+                        runner.caption = runner.caption || name.replace(/\.run$/, "");
                         runners[runner.caption] = runner;
                         done(runner);
                     });
@@ -177,11 +176,10 @@ define(function(require, module, exports) {
             });
             
             function done(runner) {
-                runner.caption = name;
                 callback(null, runner);
             }
         }
-        
+
         function restoreProcess(state) {
             var process = new Process(state);
             handleEmit("create", { process: process });
