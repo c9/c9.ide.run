@@ -111,6 +111,9 @@ define(function(require, module, exports) {
             function done(){
                 for (var name in runners) {
                     var runner = runners[name];
+                    if (runner.python_version
+                        && runner.python_version !== settings.get("project/python/@version"))
+                        continue;
                     if (matchSelector(runner.selector, options.path))
                         return callback(null, runner);
                 }
@@ -146,6 +149,12 @@ define(function(require, module, exports) {
                 callback = refresh;
                 refresh = false;
             }
+            
+            // Fix legacy runner names
+            if (name === "Python 2.7")
+                name = "Python 2";
+            if (name === "Python 3.4")
+                name = "Python 3";
 
             // When runner is loaded and we don't require a refresh
             if (runners[name] && refresh === false) {
