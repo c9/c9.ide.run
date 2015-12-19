@@ -430,6 +430,8 @@ define(function(require, module, exports) {
                     return "0.0.0.0";
                 if (name == "home")
                     return c9.home;
+                if (name == "python")
+                    return settings.get("project/python/@version");
                 return "$" + name;
             }
             function reverse(str) { 
