@@ -12,13 +12,11 @@ define(function(require, exports, module) {
         var cookie = imports["analytics.cookie"];
         var run = imports.run;
         var output = imports.output;
-        var COOKIE_RUNNERS_NAME = "c9_runners_timestamp";
+        var COOKIE_RUNNERS_NAME = "c9_runners_timestamp"; 
         
-        // Always track in DWH
         var analyticsOptions = {
             integrations: {
-                "All": false,
-                "DWH": true
+                "All": false
             }
         };
         
@@ -51,7 +49,7 @@ define(function(require, exports, module) {
             }
             
             function sendToAllIntegrations(rCookie) {
-                analyticsOptions.integrations["All"] = true;
+                analyticsOptions.integrations["Mixpanel"] = true;
                 
                 rCookie = rCookie ? rCookie : {};
                 rCookie[runnerName] = { lastTimeLogged: Date.now() };
@@ -65,8 +63,7 @@ define(function(require, exports, module) {
         // Send event when Runner Name changes, which is effectively saving a 
         // Runner Config
         output.on("runnerNameChanged", function(name) {
-            // Send this one to all integrations
-            analyticsOptions["All"] = true;
+            analyticsOptions.integrations["Mixpanel"] = true;
             var properties = {
                 runnerName: name
             };
