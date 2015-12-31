@@ -441,6 +441,8 @@ define(function(require, module, exports) {
                     return c9.home;
                 if (name == "python")
                     return settings.get("project/python/@version");
+                if (name == "python_path")
+                    return settings.get("project/python/@path");
                 return "$" + name;
             }
             function reverse(str) { 
