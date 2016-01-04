@@ -602,25 +602,27 @@ define(function(require, module, exports) {
             
             var checking;
             function checkState(cb){
-                if (!running) return cb && cb();
                 if (checking) return checking.push(cb);
                 
                 checking = [cb];
-                
-                var originalPid = pid;
                 
                 // Execute run.sh
                 proc.tmux("", {
                     session: procName,
                     fetchpid: true
-                }, function(err, pty, pid) {
+                }, function(err, pty, newPid) {
                     var callbacks = checking || [];
                     checking = false;
                     // Process has exited
-                    if (err || pid == -1 || pid != originalPid || !pid) {
+                    if (err || newPid == -1 || !newPid) {
                         cleanup();
                     }
                     else {
+                        pid = newPid;
+                        if (!running) {
+                            running = STARTED;
+                            emit("started", { pty: pty, options: options });
+                        }
                         emit("back");
                     }
                     callbacks.forEach(function(cb) { cb && cb() });
