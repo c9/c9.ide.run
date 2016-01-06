@@ -351,6 +351,11 @@ define(function(require, exports, module) {
                     }
                 });
                 session.process.on("started", function(){
+                    if (session == currentSession) {
+                        btnRun.enable();
+                        btnRestart.enable();
+                        transformButton(session);
+                    }
                     session.updateTitle();
                 }, plugin);
                 session.process.on("stopping", function(){
@@ -856,9 +861,21 @@ define(function(require, exports, module) {
                     ) {
                         session.stopped = false;
                         session.terminal.showCursor();
-                        tab.classList.add(session.process
-                            && session.process.running > 0 ? "running" : "loading");
-                        return;
+                        if (!session.process) {
+                            plugin.setState(session.doc, {
+                                running: {
+                                    runner: session.runner,
+                                    debug: session.config.debug,
+                                    name: session.id,
+                                    pid: -1,
+                                },
+                                cwd: session.cwd,
+                                id: session.id,
+                            });
+                        }
+                        // tab.classList.add(session.process
+                        //     && session.process.running > 0 ? "running" : "loading");
+                        return session.process && session.process.checkState();
                     }
 
                     // Change the last lines of TMUX saying the pane is dead
@@ -869,8 +886,8 @@ define(function(require, exports, module) {
                             data = "";
                         } else {
                             data = data
-                              .replace(/\s*Pane is dead([\s\S]*)13H/g, "") //"$117H")
-                              .replace(/\s*Pane is dead/g, "")
+                              .replace(/\s*Pane is dead([\s\S]*)13H/g, "") // "$117H")
+                              .replace(/\s*Pane is dead/g, "");
                         }
                         data = data.replace(/\s+$/, "");
 
@@ -925,6 +942,7 @@ define(function(require, exports, module) {
                         tab.classList.add("running");
                     else
                         tab.classList.remove("running");
+                    tab.classList.remove("loading");
                 };
 
                 session.changeCommand = function(value) {
@@ -957,7 +975,7 @@ define(function(require, exports, module) {
                         saveConfig();
                         handleEmit("runnerNameChanged", value);
                     }
-                }
+                };
 
                 session.show = function(v) {
                     // plugin.ace.container.style.visibility = "visible";
