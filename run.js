@@ -527,6 +527,8 @@ define(function(require, module, exports) {
             }
             
             function stop(callback) {
+                callback = callback || function() {};
+                
                 if (!running)
                     return callback();
                 
