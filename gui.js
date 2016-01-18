@@ -458,7 +458,7 @@ define(function(require, module, exports) {
                 layout.on("eachTheme", function(e){
                     var height = parseInt(ui.getStyleRule(".bar-preferences .blackdg .tree-row", "height"), 10) || 24;
                     model.rowHeightInner = height;
-                    model.rowHeight = height + 1;
+                    model.rowHeight = height;
                     
                     if (e.changed) (datagrid).resize(true);
                 });
@@ -713,11 +713,21 @@ define(function(require, module, exports) {
                         command: isEscapedPath ? path : util.escapeShell(path)
                     };
                 }
-
+                var id;
+                if (defConfig) {
+                    id = "output-default";
+                    if (config.name) {
+                        id += config.name.replace(/[^\w]/g, function(i) {
+                            return "-" + i.charCodeAt(0).toString(36);
+                        });
+                    }
+                }
+                
                 commands.exec("showoutput", null, {
                     runner: runner,
                     run: true,
                     config: config,
+                    id: id,
                     callback: function(proc, tab) {
                         if (defConfig) {
                             process = proc;

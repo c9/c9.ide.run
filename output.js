@@ -247,7 +247,7 @@ define(function(require, exports, module) {
                 session.filter = function() { return "" };
 
                 var path = tbCommand.value || session.config.command;
-                var bDebug = btnDebug.visible && btnDebug.value;
+                var cfg = session.config;
                 var args = splitPathArgs(path);
 
                 path = args.shift();
@@ -262,7 +262,13 @@ define(function(require, exports, module) {
                         // Make sure we have the latest runner if possible, or ignore err
                         if (!err)
                             runner = result;
-                        if (bDebug)
+                        if (!runner.debugger) {
+                            cfg.debug = undefined;
+                        } else if (cfg.debug == null) {
+                            cfg.debug = runner.$debugDefaultState != false;
+                        }
+                        
+                        if (cfg.debug)
                             debug.checkAttached(start);
                         else
                             start();
@@ -282,7 +288,7 @@ define(function(require, exports, module) {
                         cwd: cwd,
                         env: session.config.env || {},
                         args: args,
-                        debug: bDebug
+                        debug: cfg.debug
                     }, session.id, function(err, pid) {
                         session.connect();
 
@@ -300,11 +306,11 @@ define(function(require, exports, module) {
                         if (!session.process || session.process.running < session.process.STARTING)
                             return;
 
-                        session.process.meta.debug = bDebug;
+                        session.process.meta.debug = cfg.debug;
                     });
 
                     decorateProcess(session);
-                    transformButton(session);
+                    updateToolbar(session);
 
                     callback && callback(session.process, session.tab);
                 }
@@ -658,7 +664,8 @@ define(function(require, exports, module) {
                 var cfg = session.config;
                 btnDebug.setAttribute("visible",
                     !session.runner || session.runner.debugger ? true : false);
-                btnDebug.setAttribute("value", cfg.debug);
+                if (cfg.debug != null)
+                    btnDebug.setAttribute("value", cfg.debug);
                 btnRunner.setAttribute("caption", "Runner: "
                     + (cfg.runner || "Auto"));
                 tbCommand.setAttribute("value", cfg.command);
