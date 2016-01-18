@@ -1,6 +1,24 @@
 {
-    "cmd" : ["sh", "-c", "/usr/bin/gcc $file -o runme && chmod 755 $file_path/runme && $file_path/runme"],
-    "info": "Running $file_path/$file_name",
-    "env": {},
+    "script" : [
+        "set -e",
+        "if [ \"$debug\" == true ]; then ",
+            "/usr/bin/gcc -ggdb3 -O0 -std=c99 $file -o \"$file\".o",
+            "chmod 755 $file.o",
+            "gdbserver --once :15470 \"$file.o\" $args",
+        "else",
+            "/usr/bin/gcc -std=c99 $file -o $file.o",
+            "chmod 755 \"$file.o\"",
+            "\"$file.o\" $args",
+        "fi"
+    ],
+    "info": "Running \"$file\"",
+    
+    "debugport": 15470,
+    "debugger": "gdb",
+    "executable": "$file.o",
+    "maxdepth": 50,
+    "$debugDefaultState": false,
+    
+    "env" : {},
     "selector": "^.*\\.c$"
 }

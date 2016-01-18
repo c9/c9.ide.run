@@ -323,11 +323,27 @@ define(function(require, module, exports) {
                     }
     
                     // Open a pty session with tmux on the output buffer
-                    // @todo add argument escaping
-                    cmd += bashQuote(options[idx].debug && runner["cmd-debug"] || runner.cmd);
-                    
-                    // Replace variables
-                    cmd = insertVariables(cmd, options[idx]);
+                    if (runner.script) {
+                        // Replace variables
+                        cmd = insertVariables(cmd, options[idx]);
+                        cmd += typeof runner.script == "string" ? runner.script : runner.script.join("\n");
+                        var matches = cmd.match(/\$[\w\-]+/g);
+                        var seen = {};
+                        cmd = matches.map(function(key) {
+                            if (seen[key])
+                                return "";
+                            seen[key] = 1;
+                            var val = getVariable(key.slice(1), options[idx]);
+                            if (val == key)
+                                return "";
+                            return key.slice(1) + "=" + bashQuote([val]) + ";";
+                        }).join("") + "\n" + cmd;
+                    } else {
+                        // @todo add argument escaping
+                        cmd += bashQuote(options[idx].debug && runner["cmd-debug"] || runner.cmd);
+                        // Replace variables
+                        cmd = insertVariables(cmd, options[idx]);
+                    }
                     
                     return cmd;
                 }).join("; ");
@@ -338,7 +354,7 @@ define(function(require, module, exports) {
                 var cwd = options.cwd || runner[0].working_dir 
                         || options.path && dirname(c9.toInternalPath(options.path)) || "/";
                 cwd = insertVariables(cwd, options);
-                
+                console.log(cmd);
                 // Execute run.sh
                 proc.tmux(cmd, {
                     session: procName,
@@ -443,6 +459,8 @@ define(function(require, module, exports) {
                     return settings.get("project/python/@version");
                 if (name == "python_path")
                     return settings.get("project/python/@path");
+                if (name == "debug")
+                    return options.debug + "";
                 return "$" + name;
             }
             function reverse(str) { 
