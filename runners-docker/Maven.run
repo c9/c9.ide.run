@@ -1,0 +1,5 @@
+{
+    "cmd": ["mvn", "$command $args"],
+    "default": true,
+    "selector": "pom.xml",
+}
