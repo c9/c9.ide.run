@@ -319,7 +319,7 @@ define(function(require, module, exports) {
                         
                     var env = util.extend({}, options[idx].env, runner.env);
                     for (var name in env) {
-                        cmd += "export " + name + "=" + env[name] + " ; ";
+                        cmd += "export " + name + "='" + env[name].replace("'", "'\\''") + "'; ";
                     }
     
                     // Open a pty session with tmux on the output buffer
