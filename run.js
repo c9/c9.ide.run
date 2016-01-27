@@ -319,7 +319,12 @@ define(function(require, module, exports) {
                         
                     var env = util.extend({}, options[idx].env, runner.env);
                     for (var name in env) {
-                        cmd += "export " + name + "='" + env[name].replace(/'/g, "'\\''") + "'; ";
+                        // HACK: old configurations used double quoting of environment values;
+                        //       let's support such nastiness for now
+                        var value = /^["'].*["']$/.test(env[name])
+                            ? env[name]
+                            : env[name].replace(/'/g, "'\\''");
+                        cmd += "export " + name + "='" + value + "'; ";
                     }
     
                     // Open a pty session with tmux on the output buffer
