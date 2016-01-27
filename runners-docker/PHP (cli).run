@@ -11,6 +11,6 @@
     "debugger": "xdebug",
     "debugport": 9000,
     "env": {
-        "XDEBUG_CONFIG": "\"idekey=cloud9ide remote_host=localhost remote_port=9000 remote_mode=req\""
+        "XDEBUG_CONFIG": "idekey=cloud9ide remote_host=localhost remote_port=9000 remote_mode=req"
     }
 }
