@@ -672,7 +672,7 @@ define(function(require, module, exports) {
         /***** Methods *****/
 
         function getRunner(path) {
-            var ext = fs.getExtension(path);
+            var ext = path && fs.getExtension(path);
             for (var name in run.runners) {
                 if (run.runners[name].selector == "source." + ext)
                     return run.runners[name];
