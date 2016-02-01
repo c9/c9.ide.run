@@ -1,4 +1,4 @@
-/*global describe it before after = */
+/*global describe it before after bar */
 
 "use client";
 
@@ -76,17 +76,21 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
         "plugins/c9.vfs.client/endpoint",
         "plugins/c9.ide.auth/auth",
         
-        // Mock plugins
-        {
-            consumes: ["apf", "ui", "Plugin"],
-            provides: [
-                "commands", "menus", "commands", "layout", "watcher", 
-                "save", "anims", "clipboard", "dialog.alert", "auth.bootstrap",
-                "info", "debugger", "dialog.question", "run.gui", "dialog.error",
-                "dialog.file"
-            ],
-            setup: expect.html.mocked
-        },
+        
+        "plugins/c9.ide.ace/ace",
+        
+        // "plugins/c9.ide.panels/panels",
+        // "plugins/c9.ide.panels/panel",
+        // "plugins/c9.ide.panels/area",
+        "plugins/c9.ide.run.debug/debuggers/debugger",
+        "plugins/c9.ide.run.debug/breakpoints",
+        "plugins/c9.ide.run.debug/debugpanel",
+        "plugins/c9.ide.run.debug/callstack",
+        "plugins/c9.ide.run.debug/debuggers/socket",
+        
+        "plugins/c9.fs/net",
+        "plugins/c9.ide.ui/menus",
+        
         {
             consumes: ["tabManager", "proc", "output", "fs", "ext"],
             provides: [],
@@ -139,7 +143,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                             output: {
                                 id: "testoutput",
                                 config: {
-                                    command: "/helloworld.js",
+                                    command: "./helloworld.js",
                                     debug: false
                                 },
                                 runner: "auto",
@@ -148,6 +152,7 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                         }
                         
                     }, function(err, tab) {
+                        expect(err).to.not.ok;
                         var ace = tabs.focussedTab.editor.ace;
                         tab.editor.on("connect", function(){
                             ace.session.term.once('afterWrite', function(){
