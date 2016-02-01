@@ -246,7 +246,7 @@ define(function(require, exports, module) {
                 var filter = session.filter;
                 session.filter = function() { return "" };
 
-                var path = tbCommand.value || session.config.command;
+                var path = session.config.command;
                 var cfg = session.config;
                 var args = splitPathArgs(path);
 
@@ -382,6 +382,9 @@ define(function(require, exports, module) {
             }
 
             function transformButton(session) {
+                if (session != currentSession)
+                    return;
+                
                 btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
 
                 if (session && session.process && session.process.running) {
@@ -635,8 +638,7 @@ define(function(require, exports, module) {
                 session.config = cfg;
                 updateRunner(session);
 
-                if (currentSession == session)
-                    updateToolbar(session);
+                updateToolbar(session);
             }
 
             function updateRunner(session) {
@@ -659,6 +661,9 @@ define(function(require, exports, module) {
             }
 
             function updateToolbar(session) {
+                if (session != currentSession)
+                    return;
+                
                 transformButton(session);
 
                 var cfg = session.config;
@@ -1060,6 +1065,7 @@ define(function(require, exports, module) {
 
             plugin.on("documentActivate", function(e) {
                 if (currentSession && currentSession.loaded) {
+                    // needed because tab change fires before blur event
                     if (tbCommand.getValue() != currentSession.config.command)
                         currentSession.changeCommand(tbCommand.getValue());
                     if (tbName.getValue() != currentSession.config.name)
