@@ -1020,7 +1020,7 @@ define(function(require, exports, module) {
                                 if (question.dontAsk)
                                     settings.set("user/output/nosavequestion", "true");
                             },
-                            { showDontAsk: true });
+                            { showDontAsk: true, yes: "Close", no: "Abort" });
                         return false;
                     }
                 }, session);
