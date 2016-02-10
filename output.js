@@ -258,7 +258,10 @@ define(function(require, exports, module) {
                     done();
 
                 function done(){
-                    run.getRunner(runner.caption, function(err, result) {
+                    var refresh = tabs.getTabs().some(function(tab) {
+                        return tab.path && /\.run$/.test(tab.path);
+                    });
+                    run.getRunner(runner.caption, refresh, function(err, result) {
                         // Make sure we have the latest runner if possible, or ignore err
                         if (!err)
                             runner = result;
