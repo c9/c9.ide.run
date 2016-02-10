@@ -7,6 +7,7 @@
   ],
   "debugger": "xdebug",
   "debugport": 9000,
+  "$debugDefaultState": false,
   "selector": "^.*\\.(php|phtml|html|shtml)$",
   "env": {
     "XDEBUG_CONFIG": "xdebug.remote_enable=1 idekey=cloud9ide remote_host=localhost remote_port=9000 remote_mode=req"
