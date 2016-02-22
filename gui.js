@@ -714,7 +714,7 @@ define(function(require, module, exports) {
                     };
                 }
                 var id;
-                if (defConfig) {
+                if (defConfig && config.name == defConfig) {
                     id = "output-default";
                     if (config.name) {
                         id += config.name.replace(/[^\w]/g, function(i) {

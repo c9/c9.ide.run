@@ -186,19 +186,23 @@ define(function(require, exports, module) {
             }, handle);
         });
 
-        //Search through pages
+        // Search through pages
         function search(id, cmd, argv) {
             if (!id) id = "output";
-            var tablist = tabs.getTabs(), session;
+            var tablist = tabs.getTabs();
             for (var i = 0; i < tablist.length; i++) {
-                if (tablist[i].editorType == "output"
-                  && (session = tablist[i].document.getSession())
-                  && (session.id == id || cmd && session.config
-                  && (session.config.command || "").indexOf(cmd) === 0)) {
-                    if (argv && argv.run)
-                        tablist[i].editor.run(tablist[i].document.getSession(), argv.callback);
-
+                if (tablist[i].editorType != "output")
+                    continue;
+                var state = tablist[i].document.getState();
+                var session = tablist[i].document.getSession();
+                var config = state.output && state.output.config || session.config;
+                var command = config.command || "";
+                var isSameCommand = command == cmd || command.startsWith(cmd) && /\s/.test(command[cmd.length]);
+                if (session.id == id || cmd && isSameCommand) {
                     tabs.activateTab(tablist[i]);
+                    
+                    if (argv && argv.run)
+                        tablist[i].editor.run(session, argv.callback);
                     return true;
                 }
             }
