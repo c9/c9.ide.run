@@ -687,7 +687,7 @@ define(function(require, module, exports) {
             }
 
             if (settings.getBool("user/runconfig/@saveallbeforerun"))
-                save.saveAll(start);
+                save.saveAll({skipNewFiles: true}, start);
             else
                 start();
 
