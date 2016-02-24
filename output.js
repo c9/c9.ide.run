@@ -195,6 +195,8 @@ define(function(require, exports, module) {
                     continue;
                 var state = tablist[i].document.getState();
                 var session = tablist[i].document.getSession();
+                if (!session)
+                    continue;
                 var config = state.output && state.output.config || session.config;
                 var command = config.command || "";
                 var isSameCommand = command == cmd || command.startsWith(cmd) && /\s/.test(command[cmd.length]);
