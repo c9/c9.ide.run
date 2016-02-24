@@ -270,7 +270,7 @@ define(function(require, exports, module) {
                     run.getRunner(runner.caption, refresh, function(err, result) {
                         // Make sure we have the latest runner if possible, or ignore err
                         if (!err)
-                            runner = result;
+                            runner = session.runner = result;
                         if (!runner.debugger) {
                             cfg.debug = undefined;
                         } else if (cfg.debug == null) {
