@@ -4,16 +4,18 @@ function readRunners(path) {
     var results = {};
     var runnersPath = __dirname + "/" + path + "/";
     fs.readdirSync(runnersPath).forEach(function (name) {
-        var json;
+        var runner = fs.readFileSync(runnersPath + name, "utf8");        
         try {
-            json = JSON.parse(fs.readFileSync(runnersPath + name, "utf8").replace(/(^|\n)\s*\/\/.*$/mg, ""));
+            // handle symlinks on windows
+            if (/^..\//.test(runner))
+                runner = fs.readFileSync(runnersPath + runner.trim(), "utf8");
+            var json = JSON.parse(runner.replace(/(^|\n)\s*\/\/.*$/mg, ""));
+            json.caption = name.replace(/\.run$/, "");
+            json.$builtin = true;
+            results[json.caption] = json;
         } catch (e) {
             console.error("Syntax error in runner", runnersPath + name, e);
-            throw e;
         }
-        json.caption = name.replace(/\.run$/, "");
-        json.$builtin = true;
-        results[json.caption] = json;
     });
     return results;
 }
