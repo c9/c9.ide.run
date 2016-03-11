@@ -199,7 +199,7 @@ define(function(require, module, exports) {
             if (!path) return path;
             if (path.charAt(0) === "~")
                 return join(c9.home, path.substr(1));
-            if (path.charAt(0) !== "/")
+            if (!/^([a-zA-Z]:)?\//.test(path))
                 return join(base, path);
             return path;
         }
