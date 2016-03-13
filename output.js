@@ -82,6 +82,9 @@ define(function(require, exports, module) {
                     if (config.debug === undefined && debug.state != "disconnected")
                         config.debug = false;
 
+                    if (config.toolbar === undefined)
+                        config.toolbar = true;
+
                     // Else open the output panel in the console
                     tabs.open({
                         editorType: "output",
@@ -223,6 +226,7 @@ define(function(require, exports, module) {
         function Output(){
             var plugin = new Terminal(true);
 
+            var htmlNode;
             var btnRun, currentSession, btnRunner, btnDebug, btnRestart;
             var tbName, tbCommand, btnEnv, btnCwd;
 
@@ -688,6 +692,12 @@ define(function(require, exports, module) {
                 btnCwd.$ext.title = cfg.cwd || "Current working directory (unset)";
 
                 btnRun.setAttribute("disabled", !c9.has(c9.NETWORK));
+
+                if (session.config.toolbar === false) {
+                    htmlNode.classList.add("hidetoolbar");
+                } else {
+                    htmlNode.classList.remove("hidetoolbar");
+                }
             }
 
             /***** Lifecycle *****/
@@ -695,6 +705,8 @@ define(function(require, exports, module) {
             plugin.on("draw", function(e) {
                 // Create UI elements
                 ui.insertMarkup(e.tab, markup, plugin);
+
+                htmlNode = e.htmlNode;
 
                 // Set output class name
                 e.htmlNode.className += " output";

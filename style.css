@@ -15,12 +15,16 @@
     margin-right: 10px;
 }
 
-.editor_tab .output .c9terminal .c9terminalcontainer.dark {
+.editor_tab .output:not(.hidetoolbar) .c9terminal .c9terminalcontainer.dark {
     .gradient(~"linear-gradient(top, rgba(0, 0, 0, 0.25) 0, rgba(0, 0, 0, 0.1) 28px, rgba(0, 0, 0, 0.29) 28px, rgba(0, 0, 0, 0.11) 36px, rgba(0, 0, 0, 0.01) 41px, transparent 43px);");
 }
 
-.output .ace_editor{
+.output:not(.hidetoolbar) .ace_editor{
     top : (@output-toolbar-height + 5px) !important;
+}
+
+.output.hidetoolbar .toolbar{
+    display: none;
 }
 
 .output .toolbar .tbsimple{
