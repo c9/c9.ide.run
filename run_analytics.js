@@ -57,8 +57,6 @@ define(function(require, exports, module) {
                 rCookie[runnerName] = { lastTimeLogged: Date.now() };
                 cookie.set(COOKIE_RUNNERS_NAME, JSON.stringify(rCookie), 1);
             }
-            
-            analytics.track("Runner Started", properties, analyticsOptions);
         });
 
         // "runConfigSaved" is fired on every change & IDE load, so discarding
