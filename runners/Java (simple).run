@@ -4,5 +4,5 @@
     "java $file_base_name"
   ],
   "info": "Building $file_name and running $file_base_name",
-  "selector": "source.java"
+  "selector": "^.*\\.(java)$"
 }

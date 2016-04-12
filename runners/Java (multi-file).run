@@ -10,5 +10,5 @@
     ],
     "env": {},
     "info": "\\033[01;34mRunning\\033[00m \\033[01;31m$file_name\\033[00m\n",
-    "selector": "source.java"
+    "selector": "^.*\\.(java)$"
 }
