@@ -332,7 +332,7 @@ define(function(require, module, exports) {
                         // Replace variables
                         cmd = insertVariables(cmd, options[idx]);
                         cmd += typeof runner.script == "string" ? runner.script : runner.script.join("\n");
-                        var matches = cmd.match(/\$[\w\-]+/g);
+                        var matches = cmd.match(/\$[\w\-]+/g) || [];
                         var seen = {};
                         cmd = matches.map(function(key) {
                             if (seen[key])
