@@ -2,11 +2,11 @@
     "script" : [
         "set -e",
         "if [ \"$debug\" == true ]; then ",
-            "/usr/bin/gcc -ggdb3 -O0 -std=c99 $file -o \"$file\".o",
+            "gcc -ggdb3 -O0 -std=c99 $file -o \"$file\".o",
             "chmod 755 $file.o",
             "gdbserver --once :15470 \"$file.o\" $args",
         "else",
-            "/usr/bin/gcc -std=c99 $file -o $file.o",
+            "gcc -std=c99 $file -o $file.o",
             "chmod 755 \"$file.o\"",
             "\"$file.o\" $args",
         "fi"

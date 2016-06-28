@@ -216,7 +216,7 @@ define(function(require, module, exports) {
             (options instanceof Array ? options : [options]).forEach(function(a) {
                 a.relPath = a.path;
                 a.path = makeAbsolutePath(a.path);
-                a.path = c9.toExternalPath(a.path);
+                a.path = c9.toExternalPath(a.path, "/");
                 a.cwd = makeAbsolutePath(a.cwd);
             });
             
