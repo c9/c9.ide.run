@@ -1149,7 +1149,7 @@ define(function(require, exports, module) {
             });
 
             plugin.on("unload", function(){
-
+                currentSession = null;
             });
 
             plugin.freezePublicAPI({

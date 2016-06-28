@@ -154,12 +154,13 @@ require(["lib/architect/architect", "lib/chai/chai", "/vfs-root"],
                     }, function(err, tab) {
                         expect(err).to.not.ok;
                         var ace = tabs.focussedTab.editor.ace;
-                        tab.editor.on("connect", function(){
+                        tab.editor.once("connect", function(){
                             ace.session.term.once('afterWrite', function(){
-                                ace.renderer.on('afterRender', function(){
+                                ace.renderer.on('afterRender', function afterRender(){
                                     if (tab.classList.names.indexOf("running") == -1
                                       && ace.getValue().match(/Hello\s*World/)) {
                                         expect.html(ace.container).text(/Hello\s*World/);
+                                        ace.renderer.off('afterRender', afterRender);
                                         done();
                                     }
                                 });
