@@ -1,7 +1,7 @@
 {
   "script": [
     "set -e",
-    "/usr/bin/make \"$file_base_name\"",
+    "make \"$file_base_name\"",
     "if [ \"$debug\" == true ]; then ",
         "gdbserver --once :15470 \"$file_path/$file_base_name\" $args",
     "else",
