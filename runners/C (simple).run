@@ -4,7 +4,7 @@
         "if [ \"$debug\" == true ]; then ",
             "gcc -ggdb3 -O0 -std=c99 $file -o \"$file\".o",
             "chmod 755 $file.o",
-            "gdbserver --once :15470 \"$file.o\" $args",
+            "node /home/ubuntu/bin/c9gdbshim.js \"$file.o\" $args",
         "else",
             "gcc -std=c99 $file -o $file.o",
             "chmod 755 \"$file.o\"",
@@ -13,7 +13,6 @@
     ],
     "info": "Running \"$file\"",
     
-    "debugport": 15470,
     "debugger": "gdb",
     "executable": "$file.o",
     "maxdepth": 50,
