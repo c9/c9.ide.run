@@ -3,18 +3,19 @@
     "set -e",
     "if [ \"$debug\" == true ]; then ",
     "    go build -gcflags \"-N -l\" $file",
-    "    gdbserver --once :15475 \"$file_path/$file_base_name\" $args",
+    "    node /home/ubuntu/bin/c9gdbshim.js \"$file_path/$file_base_name\" $args",
     "else",
     "    go run $file $args",
     "fi"
   ],
   "info": "Running ... $file",
-  "debugport": 15475,
+  "socketpath": "/home/ubuntu/.c9/gdbdebugger.socket",
+  "retryCount": 1000,
+  "retryInterval": 300,
   "debugger": "gdb",
   "$debugDefaultState": false,
   
   "executable": "$file_path/$file_base_name",
-  "maxdepth": 50,
   "env": {},
   
   "selector": "source.go"

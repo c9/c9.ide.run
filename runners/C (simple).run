@@ -13,9 +13,11 @@
     ],
     "info": "Running \"$file\"",
     
+    "socketpath": "/home/ubuntu/.c9/gdbdebugger.socket",
+    "retryCount": 1000,
+    "retryInterval": 300,
     "debugger": "gdb",
     "executable": "$file.o",
-    "maxdepth": 50,
     "$debugDefaultState": false,
     
     "env" : {},
