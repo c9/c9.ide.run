@@ -15,7 +15,6 @@
   "debugger": "gdb",
   "$debugDefaultState": false,
   
-  "executable": "$file_path/$file_base_name",
   "env": {},
   
   "selector": "source.go"

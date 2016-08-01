@@ -15,7 +15,6 @@
   "retryCount": 1000,
   "retryInterval": 300,
   "debugger": "gdb",
-  "executable": "$file_path/$file_base_name",
   "$debugDefaultState": true,
 
   "env": {},

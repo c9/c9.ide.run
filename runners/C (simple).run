@@ -17,7 +17,6 @@
     "retryCount": 1000,
     "retryInterval": 300,
     "debugger": "gdb",
-    "executable": "$file.o",
     "$debugDefaultState": false,
     
     "env" : {},
