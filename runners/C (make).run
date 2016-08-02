@@ -3,7 +3,7 @@
     "set -e",
     "make \"$file_base_name\"",
     "if [ \"$debug\" == true ]; then ",
-        "node /home/ubuntu/bin/c9gdbshim.js \"$file_path/$file_base_name\" $args",
+        "node $HOME/bin/c9gdbshim.js \"$file_path/$file_base_name\" $args",
     "else",
         "chmod 755 \"$file_path/$file_base_name\"",
         "\"$file_path/$file_base_name\" $args",
@@ -11,9 +11,6 @@
   ],
   "info": "Compiling $file ...",
 
-  "socketpath": "/home/ubuntu/.c9/gdbdebugger.socket",
-  "retryCount": 1000,
-  "retryInterval": 300,
   "debugger": "gdb",
   "$debugDefaultState": true,
 

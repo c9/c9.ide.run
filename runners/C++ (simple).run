@@ -4,7 +4,7 @@
         "if [ \"$debug\" == true ]; then ",
             "/usr/bin/g++ -ggdb3 -std=c++11 $file -o $file.o",
             "chmod 755 \"$file.o\"",
-            "node /home/ubuntu/bin/c9gdbshim.js \"$file.o\" $args",
+            "node $HOME/bin/c9gdbshim.js \"$file.o\" $args",
         "else",
             "/usr/bin/g++ -std=c++11 $file -o $file.o",
             "chmod 755 $file.o",
@@ -13,9 +13,6 @@
     ],
     "info": "Running $file",
     
-    "socketpath": "/home/ubuntu/.c9/gdbdebugger.socket",
-    "retryCount": 1000,
-    "retryInterval": 300,
     "debugger": "gdb",
     "$debugDefaultState": false,
     

@@ -3,15 +3,13 @@
     "set -e",
     "if [ \"$debug\" == true ]; then ",
     "    go build -gcflags \"-N -l\" $file",
-    "    node /home/ubuntu/bin/c9gdbshim.js \"$file_path/$file_base_name\" $args",
+    "    node $HOME/bin/c9gdbshim.js \"$file_path/$file_base_name\" $args",
     "else",
     "    go run $file $args",
     "fi"
   ],
   "info": "Running ... $file",
-  "socketpath": "/home/ubuntu/.c9/gdbdebugger.socket",
-  "retryCount": 1000,
-  "retryInterval": 300,
+  
   "debugger": "gdb",
   "$debugDefaultState": false,
   
