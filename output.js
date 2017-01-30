@@ -46,15 +46,15 @@ define(function(require, exports, module) {
         var handleEmit = handle.getEmitter();
 
         var defaults = {
-            "flat-light" : ["#e0e5e7", "#333333", "#aebabf", false],
-            "flat-dark"  : ["#003a58", "#FFFFFF", "#225477", true],
-            "light" : ["#eef7ff", "#333333", "#89c1ff", false],
-            "light-gray" : ["#eef7ff", "#333333", "#89c1ff", false],
-            "dark"  : ["#003a58", "#FFFFFF", "#225477", true],
-            "dark-gray"  : ["#003a58", "#FFFFFF", "#225477", true]
+            "flat-light": ["#e0e5e7", "#333333", "#aebabf", false],
+            "flat-dark": ["#003a58", "#FFFFFF", "#225477", true],
+            "light": ["#eef7ff", "#333333", "#89c1ff", false],
+            "light-gray": ["#eef7ff", "#333333", "#89c1ff", false],
+            "dark": ["#003a58", "#FFFFFF", "#225477", true],
+            "dark-gray": ["#003a58", "#FFFFFF", "#225477", true]
         };
 
-        handle.on("load", function(){
+        handle.on("load", function() {
             // Import CSS
             ui.insertCss(require("text!./style.css"), options.staticPrefix, handle);
 
@@ -100,11 +100,11 @@ define(function(require, exports, module) {
                                 callback: argv.callback
                             }
                         }
-                    }, function(){});
+                    }, function() {});
                 }
             }, handle);
 
-            function setSettings(){
+            function setSettings() {
                 var cname = ".output .c9terminal .c9terminalcontainer .terminal";
                 var sname = ".output .c9terminal .c9terminalcontainer";
                 var fcolor = settings.get("user/output/@foregroundColor");
@@ -156,30 +156,30 @@ define(function(require, exports, module) {
             // Settings UI
 
             prefs.add({
-                "Editors" : {
-                    "Output" : {
+                "Editors": {
+                    "Output": {
                         position: 130,
-                        "Text Color" : {
+                        "Text Color": {
                            type: "colorbox",
                            path: "user/output/@foregroundColor",
                            position: 10100
                         },
-                        "Background Color" : {
+                        "Background Color": {
                            type: "colorbox",
                            path: "user/output/@backgroundColor",
                            position: 10200
                         },
-                        "Selection Color" : {
+                        "Selection Color": {
                            type: "colorbox",
                            path: "user/output/@selectionColor",
                            position: 10250
                         },
-                        "Warn Before Closing Unnamed Configuration" : {
+                        "Warn Before Closing Unnamed Configuration": {
                            type: "checkbox",
                            path: "user/output/@nosavequestion",
                            position: 10300
                         },
-                        "Preserve log between runs" : {
+                        "Preserve log between runs": {
                            type: "checkbox",
                            path: "user/output/@keepOutput",
                            position: 10300
@@ -213,8 +213,8 @@ define(function(require, exports, module) {
             }
         }
 
-        function getOutputId(){
-            return "output" + Math.round(Math.random()*100000) + counter++;
+        function getOutputId() {
+            return "output" + Math.round(Math.random() * 100000) + counter++;
         }
 
         handle.search = search;
@@ -223,7 +223,7 @@ define(function(require, exports, module) {
 
         var counter = 0;
 
-        function Output(){
+        function Output() {
             var plugin = new Terminal(true);
 
             var htmlNode;
@@ -254,7 +254,7 @@ define(function(require, exports, module) {
 
                 // ignore if tmux tries to redraw old screen
                 var filter = session.filter;
-                session.filter = function() { return "" };
+                session.filter = function() { return ""; };
 
                 var path = session.config.command;
                 var cfg = session.config;
@@ -267,7 +267,7 @@ define(function(require, exports, module) {
                 else
                     done();
 
-                function done(){
+                function done() {
                     var refresh = tabs.getTabs().some(function(tab) {
                         return tab.path && /\.run$/.test(tab.path);
                     });
@@ -288,7 +288,7 @@ define(function(require, exports, module) {
                     });
                 }
 
-                function start(){
+                function start() {
                     if (!runner)
                         runner = "auto";
                     
@@ -355,13 +355,13 @@ define(function(require, exports, module) {
             }
 
             function decorateProcess(session) {
-                session.process.on("away", function(){
+                session.process.on("away", function() {
                     if (session == currentSession) {
                         btnRun.disable();
                         btnRestart.disable();
                     }
                 });
-                session.process.on("back", function(){
+                session.process.on("back", function() {
                     if (session == currentSession) {
                         btnRun.enable();
 
@@ -369,7 +369,7 @@ define(function(require, exports, module) {
                             btnRestart.enable();
                     }
                 });
-                session.process.on("started", function(){
+                session.process.on("started", function() {
                     if (session == currentSession) {
                         btnRun.enable();
                         btnRestart.enable();
@@ -377,14 +377,14 @@ define(function(require, exports, module) {
                     }
                     session.updateTitle();
                 }, plugin);
-                session.process.on("stopping", function(){
+                session.process.on("stopping", function() {
                     if (session == currentSession) {
                         btnRun.disable();
                         btnRestart.disable();
                     }
                     session.updateTitle();
                 }, plugin);
-                session.process.on("stopped", function(){
+                session.process.on("stopped", function() {
                     if (session == currentSession) {
                         btnRun.enable();
                         btnRestart.enable();
@@ -422,7 +422,7 @@ define(function(require, exports, module) {
             }
 
             function stop(callback) {
-                var session = currentSession
+                var session = currentSession;
                 if (!session) return;
 
                 var process = session.process;
@@ -451,7 +451,7 @@ define(function(require, exports, module) {
                 });
             }
 
-            function saveConfig(){
+            function saveConfig() {
                 if (!currentSession || !currentSession.config.name)
                     return;
 
@@ -460,10 +460,10 @@ define(function(require, exports, module) {
                 settings.setJson("project/run/configs", json);
 
                 currentSession.updateTitle();
-                handleEmit("runConfigSaved", currentSession.config)
+                handleEmit("runConfigSaved", currentSession.config);
             }
 
-            function removeConfig(){
+            function removeConfig() {
                 if (!currentSession || !currentSession.config.name)
                     return;
 
@@ -475,13 +475,13 @@ define(function(require, exports, module) {
             }
 
             var model, datagrid, mnuEnv;
-            function drawEnv(){
+            function drawEnv() {
                 if (model) return;
 
                 model = new TreeData();
                 model.emptyMessage = "Type a new environment variable here...";
                 
-                layout.on("eachTheme", function(e){
+                layout.on("eachTheme", function(e) {
                     var height = parseInt(ui.getStyleRule(".blackdg .row", "height"), 10) || 24;
                     model.rowHeightInner = height - 1;
                     model.rowHeight = height;
@@ -509,7 +509,7 @@ define(function(require, exports, module) {
                 var div = mnuEnv.$ext.appendChild(document.createElement("div"));
 
                 datagrid = new Tree(div);
-                datagrid.renderer.setTheme({cssClass: "blackdg"});
+                datagrid.renderer.setTheme({ cssClass: "blackdg" });
                 datagrid.setOption("maxLines", 200);
                 datagrid.setDataProvider(model);
                 datagrid.edit = new TreeEditor(datagrid);
@@ -590,13 +590,13 @@ define(function(require, exports, module) {
 
                 datagrid.on("rename", function(e) {
                     justEdited = true;
-                    setTimeout(function(){ justEdited = false }, 500);
+                    setTimeout(function() { justEdited = false; }, 500);
                 });
 
-                mnuEnv.resize = function(){
+                mnuEnv.resize = function() {
                     if (!mnuEnv.visible) return;
 
-                    setTimeout(function(){
+                    setTimeout(function() {
                         if (mnuEnv.opener) {
                             mnuEnv.reopen = true;
                             mnuEnv.display(null, null, true, mnuEnv.opener);
@@ -614,7 +614,7 @@ define(function(require, exports, module) {
                 return f;
             }
 
-            function reloadModel(){
+            function reloadModel() {
                 var env = [];
                 var cfg = model.session.config;
                 var sel = model.selection.getCursor();
@@ -721,24 +721,24 @@ define(function(require, exports, module) {
                 btnEnv = plugin.getElement("btnEnv");
                 btnCwd = plugin.getElement("btnCwd");
 
-                btnRun.on("click", function(){
+                btnRun.on("click", function() {
                     var session = currentSession;
                     if (!session) return;
 
                     if (session.process && session.process.running) {
-                        stop(function(){});
+                        stop(function() {});
                     }
                     else {
                         runNow(session);
                     }
                 });
 
-                btnRestart.on("click", function(){
+                btnRestart.on("click", function() {
                     var session = currentSession;
                     if (!session) return;
 
                     if (session.process && session.process.running > 0)
-                        stop(function(){ runNow(session); });
+                        stop(function() { runNow(session); });
                 });
 
                 btnDebug.on("prop.value", function(e) {
@@ -804,7 +804,7 @@ define(function(require, exports, module) {
                             chooseCaption: "Select",
                             hideFileInput: true
                         }
-                    )
+                    );
                 });
 
                 mnuEnv = new ui.menu({
@@ -833,13 +833,13 @@ define(function(require, exports, module) {
                     if (isNew) datagrid.select(node);
 
                     if (isNew) {
-                        setTimeout(function(){
+                        setTimeout(function() {
                             datagrid.edit.startRename(node);
                         }, 30);
                     }
                 });
 
-                c9.on("stateChange", function(){
+                c9.on("stateChange", function() {
                     updateToolbar(currentSession);
                 }, plugin);
             });
@@ -850,11 +850,11 @@ define(function(require, exports, module) {
                 var session = doc.getSession();
 
                 if (!session.config)
-                    session.config = { env : {} };
+                    session.config = { env: {}};
 
                 session.tab = tab;
 
-                session.run = function(){
+                session.run = function() {
                     runNow(session);
                 };
 
@@ -960,7 +960,7 @@ define(function(require, exports, module) {
                     }
                 };
 
-                session.updateTitle = function(){
+                session.updateTitle = function() {
                     var process = session.process;
 
                     doc.tooltip =
@@ -991,13 +991,13 @@ define(function(require, exports, module) {
                         question.show("Remove this configuration?",
                             "You have cleared the name of this configuration.",
                             "Would you like to remove this configuration from your project settings?",
-                            function(){ // Yes
+                            function() { // Yes
                                 removeConfig();
                                 session.config.name = "";
                                 session.updateTitle();
                                 handleEmit("runnerNameChanged", "");
                             },
-                            function(){ // No
+                            function() { // No
                                 // Revert change
                                 tbName.setAttribute("value", session.config.name);
                             });
@@ -1018,7 +1018,7 @@ define(function(require, exports, module) {
                     // plugin.ace.container.style.visibility = "hidden";
                 };
 
-                tab.on("beforeClose", function(){
+                tab.on("beforeClose", function() {
                     if (!settings.getBool("user/output/nosavequestion")
                       && (!session.config.name && session.config.command
                       && !tab.meta.$ignore)) {
@@ -1028,14 +1028,14 @@ define(function(require, exports, module) {
                             + "for easy access later. If you would like to do "
                             + "this, choose No and fill in the name of the "
                             + "run configuration prior to closing this tab.",
-                            function(){ // Yes
+                            function() { // Yes
                                 tab.meta.$ignore = true;
                                 tab.close();
 
                                 if (question.dontAsk)
                                     settings.set("user/output/nosavequestion", "true");
                             },
-                            function(){ // No
+                            function() { // No
                                 // do nothing; allow user to set a name
 
                                 if (question.dontAsk)
@@ -1047,9 +1047,9 @@ define(function(require, exports, module) {
                 }, session);
 
                 // Preferred before to be before the state is serialized
-                tab.on("beforeUnload", function(){
+                tab.on("beforeUnload", function() {
                     if (session.process && session.process.running) {
-                        session.process.stop(function(){});
+                        session.process.stop(function() {});
                         tab.classList.remove("running");
                     }
                 });
@@ -1057,7 +1057,7 @@ define(function(require, exports, module) {
                 if (e.state.hidden || e.state.run)
                     session.hide();
 
-                function setTabColor(){
+                function setTabColor() {
                     var bg = settings.get("user/output/@backgroundColor");
                     var shade = util.shadeColor(bg, 0.75);
                     var skinName = settings.get("user/general/@skin");
@@ -1131,7 +1131,7 @@ define(function(require, exports, module) {
 
                     if (state.running.debug && session.process.running > 0) {
                         session.process.meta.debug = true;
-                        session.process.once("back", function(){
+                        session.process.once("back", function() {
                             debug.debug(session.process, true, function(err) {
                                 if (err)
                                     return; // Either the debugger is not found or paused
@@ -1148,7 +1148,7 @@ define(function(require, exports, module) {
                 session.updateTitle();
             });
 
-            plugin.on("unload", function(){
+            plugin.on("unload", function() {
                 currentSession = null;
             });
 
@@ -1161,7 +1161,7 @@ define(function(require, exports, module) {
                 /**
                  * @ignore This is here to overwrite default behavior
                  */
-                isClipboardAvailable: function(e) { return !e.fromKeyboard },
+                isClipboardAvailable: function(e) { return !e.fromKeyboard; },
                 
                 get relatedPath() {
                     if (!currentSession) return;

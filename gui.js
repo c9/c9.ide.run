@@ -46,7 +46,7 @@ define(function(require, module, exports) {
         var model, datagrid, defConfig;
 
         var loaded = false;
-        function load(){
+        function load() {
             if (loaded) return false;
             loaded = true;
 
@@ -54,7 +54,7 @@ define(function(require, module, exports) {
             commands.addCommand({
                 name: "run",
                 group: "Run & Debug",
-                "hint"  : "run or debug an application",
+                "hint": "run or debug an application",
                 bindKey: { mac: "Option-F5", win: "Alt-F5" },
                 exec: function(editor, args) {
                     runNow(null, null, null, args.callback);
@@ -64,18 +64,18 @@ define(function(require, module, exports) {
             commands.addCommand({
                 name: "stop",
                 group: "Run & Debug",
-                "hint"  : "stop a running node program on the server",
+                "hint": "stop a running node program on the server",
                 bindKey: { mac: "Shift-F5", win: "Shift-F5" },
-                exec: function(){ stop(function(){}) }
+                exec: function() { stop(function() {}); }
             }, plugin);
 
             commands.addCommand({
                 name: "runlast",
                 group: "Run & Debug",
-                "hint"  : "run or debug the last run file",
+                "hint": "run or debug the last run file",
                 bindKey: { mac: "F5", win: "F5" },
-                exec: function(){ runLastFile() },
-                isAvailable: function(){
+                exec: function() { runLastFile(); },
+                isAvailable: function() {
                     return lastRun ? true : false;
                 }
             }, plugin);
@@ -86,10 +86,10 @@ define(function(require, module, exports) {
                 match: "file",
                 enabled: !c9.readonly,
                 caption: "Run",
-                isAvailable: function(){
+                isAvailable: function() {
                     return tree.selectedNode && !tree.selectedNode.isFolder;
                 },
-                onclick: function(){
+                onclick: function() {
                     runNow("auto", tree.selected.replace(/^\//, ""));
                 }
             });
@@ -104,7 +104,7 @@ define(function(require, module, exports) {
                     itemCtxTreeRunFile.setAttribute("disabled", !(e.state & c9.PROCESS));
             }, plugin);
 
-            run.on("started", function(){
+            run.on("started", function() {
                 if (settings.getBool("user/preview/@running_app")) {
                     commands.exec("preview", null, {
                         server: true,
@@ -118,7 +118,7 @@ define(function(require, module, exports) {
             var c = 1000;
             menus.setRootMenu("Run", 600, plugin);
             var itmRun = new ui.item({
-                isAvailable: function(){
+                isAvailable: function() {
                     var tab = tabs.focussedTab;
                     var path = tab && tab.path;
 
@@ -147,7 +147,7 @@ define(function(require, module, exports) {
             menus.addItemByPath("Run/Run", itmRun, c += 100, plugin);
             var itmRunLast = new ui.item({
                 command: "runlast",
-                isAvailable: function(){
+                isAvailable: function() {
                     if (process && process.running || !lastRun) {
                         itmRunLast.setAttribute("caption", "Run Last");
                         return false;
@@ -231,7 +231,7 @@ define(function(require, module, exports) {
                                     customSyntax: "javascript"
                                 }
                             }
-                        }, function(){});
+                        }, function() {});
                         return;
                     }
                     else if (e.value === "edit-run-system") {
@@ -262,7 +262,7 @@ define(function(require, module, exports) {
                                             customSyntax: "javascript"
                                         }
                                     }
-                                }, function(){});
+                                }, function() {});
                             });
                         });
                         return;
@@ -323,7 +323,7 @@ define(function(require, module, exports) {
 
             menus.addItemByPath("Run/Run With/", mnuRunAs, c += 100, plugin);
             menus.addItemByPath("Run/Run History/", new ui.item({
-                isAvailable: function(){ return false; }
+                isAvailable: function() { return false; }
             }), c += 100, plugin);
             menus.addItemByPath("Run/Run Configurations/", mnuRunCfg, c += 100, plugin);
             
@@ -371,12 +371,12 @@ define(function(require, module, exports) {
             var mnuContext = tabbehavior.contextMenu;
             // menus.addItemByPath("~", new ui.divider(), 800, mnuContext, plugin);
             menus.addItemByPath("Run This File", new ui.item({
-                onclick: function(){
+                onclick: function() {
                     var tab = mnuContext.$tab;
                     if (tab && tab.path)
                         runNow("auto", tab.path.replace(/^\//, ""));
                 },
-                isAvailable: function(){
+                isAvailable: function() {
                     var tab = mnuContext.$tab;
                     return tab && tab.path && (!process || !process.running);
                 }
@@ -387,11 +387,11 @@ define(function(require, module, exports) {
 
             // Preferences
             prefs.add({
-                "Run" : {
+                "Run": {
                     position: 600,
-                    "Run & Debug" : {
+                    "Run & Debug": {
                         position: 100,
-                        "Save All Unsaved Tabs Before Running" : {
+                        "Save All Unsaved Tabs Before Running": {
                            type: "checkbox",
                            path: "user/runconfig/@saveallbeforerun",
                            position: 100
@@ -401,18 +401,18 @@ define(function(require, module, exports) {
             }, plugin);
 
             prefs.add({
-                "Project" : {
-                    "Run & Debug" : {
+                "Project": {
+                    "Run & Debug": {
                         position: 300,
-                        "Runner Path in Workspace" : {
+                        "Runner Path in Workspace": {
                             type: "textbox",
                             path: "project/run/@path",
                             position: 1000
                         }
                     },
-                    "Run Configurations" : {
+                    "Run Configurations": {
                         position: 200,
-                        "Run Configurations" : {
+                        "Run Configurations": {
                             type: "custom",
                             name: "runcfg",
                             title: "Run Configurations",
@@ -455,7 +455,7 @@ define(function(require, module, exports) {
                     width: "10%"
                 }];
                 
-                layout.on("eachTheme", function(e){
+                layout.on("eachTheme", function(e) {
                     var height = parseInt(ui.getStyleRule(".bar-preferences .blackdg .tree-row", "height"), 10) || 24;
                     model.rowHeightInner = height;
                     model.rowHeight = height;
@@ -468,11 +468,11 @@ define(function(require, module, exports) {
                 container.style.marginBottom = "30px";
 
                 datagrid = new Tree(container);
-                datagrid.setTheme({cssClass: "blackdg"});
+                datagrid.setTheme({ cssClass: "blackdg" });
                 datagrid.setOption("maxLines", 200);
                 datagrid.setDataProvider(model);
 
-                datagrid.on("afterChoose", function(){
+                datagrid.on("afterChoose", function() {
                     var nodes = datagrid.selection.getSelectedNodes();
                     var cfgs = settings.getJson("project/run/configs");
                     nodes.forEach(function (node) {
@@ -497,27 +497,27 @@ define(function(require, module, exports) {
                         new ui.button({
                             caption: "Remove Selected Configs",
                             skin: "c9-toolbarbutton-glossy",
-                            onclick: function(){
+                            onclick: function() {
                                 datagrid.execCommand("delete");
                             }
                         }),
                         new ui.button({
                             caption: "Add New Config",
                             skin: "c9-toolbarbutton-glossy",
-                            onclick: function(){
+                            onclick: function() {
                                 commands.exec("showoutput", null, {});
                             }
                         }),
                         new ui.button({
                             caption: "Set As Default",
                             skin: "c9-toolbarbutton-glossy",
-                            onclick: function(){
+                            onclick: function() {
                                 var node = datagrid.selection.getSelectedNodes()[0];
                                 if (!node) return;
         
                                 var json = settings.getJson("project/run/configs") || {};
                                 var wasDefault = json[node.name]["default"];
-                                for (var name in json){ delete json[name]["default"]; }
+                                for (var name in json) { delete json[name]["default"]; }
                                 json[node.name]["default"] = !wasDefault;
                                 settings.setJson("project/run/configs", json);
         
@@ -528,7 +528,7 @@ define(function(require, module, exports) {
                             }
                         })
                     ]
-                })
+                });
 
                 reloadModel();
             }, plugin);
@@ -570,7 +570,7 @@ define(function(require, module, exports) {
                 }
             }, plugin);
 
-            settings.on("project/run/configs", function(){
+            settings.on("project/run/configs", function() {
                 reloadModel();
             }, plugin);
 
@@ -615,7 +615,7 @@ define(function(require, module, exports) {
         }
 
         var drawn = false;
-        function draw(){
+        function draw() {
             if (drawn) return;
             drawn = true;
 
@@ -649,7 +649,7 @@ define(function(require, module, exports) {
             settings.setJson("project/run/configs", cfgs);
         }
 
-        function reloadModel(){
+        function reloadModel() {
             if (!model) return;
 
             var cfgs = settings.getJson("project/run/configs") || {};
@@ -657,7 +657,7 @@ define(function(require, module, exports) {
                 return cfgs[name];
             }).sort();
 
-            model.setRoot({children : nodes});
+            model.setRoot({ children: nodes });
 
             defConfig = null;
             for (var name in cfgs) {
@@ -687,18 +687,18 @@ define(function(require, module, exports) {
             }
 
             if (settings.getBool("user/runconfig/@saveallbeforerun"))
-                save.saveAll({skipNewFiles: true}, start);
+                save.saveAll({ skipNewFiles: true }, start);
             else
                 start();
 
-            function start(){
+            function start() {
                 if (process && process.running)
                     stop(done);
                 else
                     done();
             }
 
-            function done(){
+            function done() {
                 if (!runner)
                     runner = "auto";
 
@@ -746,17 +746,17 @@ define(function(require, module, exports) {
             lastRun = [runner, path];
         }
 
-        function decorateProcess(){
-            process.on("away", function(){
+        function decorateProcess() {
+            process.on("away", function() {
                 btnRun.disable();
             }, plugin);
-            process.on("back", function(){
+            process.on("back", function() {
                 btnRun.enable();
             }, plugin);
-            process.on("stopping", function(){
+            process.on("stopping", function() {
                 btnRun.disable();
             }, plugin);
-            process.on("stopped", function(){
+            process.on("stopped", function() {
                 btnRun.enable();
 
                 var path = transformButton();
@@ -769,7 +769,7 @@ define(function(require, module, exports) {
             }, plugin);
         }
 
-        function findTabToRun(){
+        function findTabToRun() {
             var path = tabs.focussedTab && tabs.focussedTab.path;
             if (path) return path.replace(/^\//, "");
 
@@ -855,23 +855,23 @@ define(function(require, module, exports) {
                 });
         }
 
-        function runLastFile(){
+        function runLastFile() {
             if (lastRun)
                 runNow(lastRun[0], lastRun[1], true);
         }
 
         /***** Lifecycle *****/
 
-        plugin.on("load", function(){
+        plugin.on("load", function() {
             load();
         });
-        plugin.on("enable", function(){
+        plugin.on("enable", function() {
 
         });
-        plugin.on("disable", function(){
+        plugin.on("disable", function() {
 
         });
-        plugin.on("unload", function(){
+        plugin.on("unload", function() {
             loaded = false;
             drawn = false;
         });
@@ -894,8 +894,8 @@ define(function(require, module, exports) {
          * @command runlast Stops the last run file
          */
         plugin.freezePublicAPI({
-            get lastRun(){ return lastRun },
-            set lastRun(lr){ lastRun = lr },
+            get lastRun() { return lastRun; },
+            set lastRun(lr) { lastRun = lr; },
 
             /**
              *

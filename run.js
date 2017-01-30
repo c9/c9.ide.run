@@ -42,7 +42,7 @@ define(function(require, module, exports) {
         var processes = [];
         
         var loaded = false;
-        function load(){
+        function load() {
             if (loaded) return false;
             loaded = true;
             
@@ -60,7 +60,7 @@ define(function(require, module, exports) {
         
         function addRunner(name, runner, plugin) {
             runners[name] = runner;
-            plugin.addOther(function(){ delete runners[name]; });
+            plugin.addOther(function() { delete runners[name]; });
         }
         
         function listRunners(callback) {
@@ -99,7 +99,7 @@ define(function(require, module, exports) {
                 names.forEach(function(name) {
                     if (!runners[name]) {
                         count++;
-                        getRunner(name, false, function(){
+                        getRunner(name, false, function() {
                             if (--count === 0)
                                 done();
                         });
@@ -108,7 +108,7 @@ define(function(require, module, exports) {
                 if (count === 0) done();
             });
             
-            function done(){
+            function done() {
                 for (var name in runners) {
                     var runner = runners[name];
                     if (runner.python_version
@@ -162,11 +162,11 @@ define(function(require, module, exports) {
             }
 
             // Search for <name>.run or <name> and load
-            var path = settings.get("project/run/@path") + "/"  + name + ".run";
+            var path = settings.get("project/run/@path") + "/" + name + ".run";
             fs.exists(path, function test(exists) {
                 if (!exists) {
                     if (/\.run$/.test(path)) {
-                        path = settings.get("project/run/@path") + "/"  + name;
+                        path = settings.get("project/run/@path") + "/" + name;
                         return fs.exists(path, test);
                     }
                     callback("Runner does not exist");
@@ -195,7 +195,7 @@ define(function(require, module, exports) {
             return process;
         }
         
-        function makeAbsolutePath(path){
+        function makeAbsolutePath(path) {
             if (!path) return path;
             if (path.charAt(0) === "~")
                 return join(c9.home, path.substr(1));
@@ -225,10 +225,10 @@ define(function(require, module, exports) {
             
             var event = { process: proc, runner: runner };
             
-            proc.on("starting", function(){ handleEmit("starting", event); });
-            proc.on("started", function(){ handleEmit("started", event); });
-            proc.on("stopping", function(){ handleEmit("stopping", event); });
-            proc.on("stopped", function(){
+            proc.on("starting", function() { handleEmit("starting", event); });
+            proc.on("started", function() { handleEmit("started", event); });
+            proc.on("stopping", function() { handleEmit("stopping", event); });
+            proc.on("stopped", function() {
                 handleEmit("stopped", event); 
                 processes.remove(proc);
             });
@@ -238,7 +238,7 @@ define(function(require, module, exports) {
             return proc;
         }
         
-        function stopAll(){
+        function stopAll() {
             processes.forEach(function(proc) {
                 proc.stop();
             });
@@ -387,8 +387,8 @@ define(function(require, module, exports) {
                     // if not detached
                     if (options.detach === false) {
                         // Hook data and exit events
-                        pty.on("data", function(data){ emit("data", data); });
-                        pty.on("exit", function(){ emit("detach"); });
+                        pty.on("data", function(data) { emit("data", data); });
+                        pty.on("exit", function() { emit("detach"); });
                     }
                     // Else if detached
                     else {
@@ -495,7 +495,7 @@ define(function(require, module, exports) {
                             // Test for conditional value
                             if (nameBrackets.match(/^([\w_]+)\?(.*)$/))
                                 if (options[RegExp.$1])
-                                    return startChar + RegExp.$2 + endChar
+                                    return startChar + RegExp.$2 + endChar;
                                 else if (startChar.trim().charAt(0).match(/['"]/))
                                     return ""; // remove quotes
                                 else
@@ -523,7 +523,7 @@ define(function(require, module, exports) {
             }
             
             function cleanup(callback) {
-                function finish(){
+                function finish() {
                     pid = 0;
                     runner = null;
                     running = STOPPED;
@@ -559,8 +559,8 @@ define(function(require, module, exports) {
                     // If there's no PID yet, wait until we get one and then stop
                     if (running === STARTING) {
                         // Make sure the process times out
-                        var timer = setTimeout(function(){
-                            cleanup(function(){
+                        var timer = setTimeout(function() {
+                            cleanup(function() {
                                 callback(new Error("Could not get PID from process. "
                                     + "The process seemed to not be running anymore."));
                             });
@@ -576,7 +576,7 @@ define(function(require, module, exports) {
                         });
                     }
                     else {
-                        cleanup(function(){
+                        cleanup(function() {
                             callback(new Error("Could not get PID from running "
                                 + "process. Process might still be running in the "
                                 + "background."));
@@ -593,22 +593,22 @@ define(function(require, module, exports) {
             function killOldProcess(callback) {
                 // (on Windows, execFile("kill") is handled specially)
                 if (c9.platform === "win32")
-                    return proc.execFile("kill", { args: [pid] }, done);
+                    return proc.execFile("kill", { args: [pid]}, done);
                 
                 var runCfg = runner && runner[0];
                 
                 if (runCfg && runCfg.cmdStop) {
-                    return proc.execFile("bash", { args: ["-c", bashQuote(runCfg.cmdStop)] }, done);
+                    return proc.execFile("bash", { args: ["-c", bashQuote(runCfg.cmdStop)]}, done);
                 }
                 
-                proc.killtree(pid, {graceful: true}, function() {
+                proc.killtree(pid, { graceful: true }, function() {
                     if (runCfg && runCfg.cmdCleanup) {
-                        proc.execFile("bash", { args: ["-c", bashQuote(runCfg.cmdCleanup)] }, done);
+                        proc.execFile("bash", { args: ["-c", bashQuote(runCfg.cmdCleanup)]}, done);
                     }
                     else if (meta.debug && runner && runner[0].debugport) {
                         var kill = "kill -9 $(lsof -i:" + runner[0].debugport + " -t);"
                             + "if sudo -n true; then sudo kill -9 $(sudo lsof -i:" + runner[0].debugport + " -t); fi";
-                        proc.execFile("sh", { args: ["-c", kill] }, done);
+                        proc.execFile("sh", { args: ["-c", kill]}, done);
                     }
                     else {
                         done();
@@ -619,14 +619,14 @@ define(function(require, module, exports) {
                     // Clean up here to make sure runner is in correct state
                     if (err && err.code !== "EDISCONNECT")
                         err = null;
-                    cleanup(function(){
+                    cleanup(function() {
                         callback(err, e);
                     });
                 }
             }
             
             var checking;
-            function checkState(cb){
+            function checkState(cb) {
                 if (checking) return checking.push(cb);
                 
                 checking = [cb];
@@ -650,11 +650,11 @@ define(function(require, module, exports) {
                         }
                         emit("back");
                     }
-                    callbacks.forEach(function(cb) { cb && cb() });
+                    callbacks.forEach(function(cb) { cb && cb(); });
                 });
             }
             
-            function getState(){
+            function getState() {
                 return {
                     pid: pid,
                     name: procName,
@@ -713,28 +713,28 @@ define(function(require, module, exports) {
                 /**
                  * @property {Number} running  Indicates the state of the process.
                  */
-                get running(){ return running; },
+                get running() { return running; },
                 /**
                  * @property {Object} runner  The object describing how to run 
                  * the process.
                  */
-                get runner(){ return runner; },
+                get runner() { return runner; },
                 /**
                  * @property {Number} pid  The pid of the running process if any
                  */
-                get pid(){ return pid; },
+                get pid() { return pid; },
                 /**
                  * @property {String} name  The name of the process.
                  */
-                get name(){ return procName; },
+                get name() { return procName; },
                 /**
                  * @property {Object} meta
                  */
-                get meta(){ return meta; },
+                get meta() { return meta; },
                 /**
                  * @property {Object} command  The command that started this process
                  */
-                get command(){ return cmd; },
+                get command() { return cmd; },
                 
                 _events: [
                     /**
@@ -796,20 +796,20 @@ define(function(require, module, exports) {
                     deferred = false;
                     options.force = true;
                     
-                    run(runner, options, callback || function(){});
+                    run(runner, options, callback || function() {});
                 },
                 
                 /**
                  * Fetch variables from a string. See the {@link run#run run method} for more info.
                  * @param {String} str
                  */
-                insertVariables: function(str){
+                insertVariables: function(str) {
                     return insertVariables(str, options);
                 }
             });
             
             if (!pid)
-                run(runner, options, callback || function(){});
+                run(runner, options, callback || function() {});
             else
                 checkState();
             
@@ -830,16 +830,16 @@ define(function(require, module, exports) {
         
         /***** Lifecycle *****/
         
-        handle.on("load", function(){
+        handle.on("load", function() {
             load();
         });
-        handle.on("enable", function(){
+        handle.on("enable", function() {
             
         });
-        handle.on("disable", function(){
+        handle.on("disable", function() {
             
         });
-        handle.on("unload", function(){
+        handle.on("unload", function() {
             loaded = false;
         });
         
@@ -966,11 +966,11 @@ define(function(require, module, exports) {
             /**
              * @property {run.Process[]}  processes  List of running processes
              */
-            get processes(){ return processes; },
+            get processes() { return processes; },
             /**
              * @property {Object[]}  runners  List of available runners
              */
-            get runners(){ return runners; },
+            get runners() { return runners; },
             
             _events: [
                 /**

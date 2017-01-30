@@ -15,7 +15,7 @@ define(function(require, module, exports) {
 
         var lastRun;
         
-        function load(){}
+        function load() {}
 
 
         /***** Helper Methods *****/
@@ -25,16 +25,16 @@ define(function(require, module, exports) {
 
         /***** Lifecycle *****/
 
-        plugin.on("load", function(){
+        plugin.on("load", function() {
             load();
         });
-        plugin.on("enable", function(){
+        plugin.on("enable", function() {
 
         });
-        plugin.on("disable", function(){
+        plugin.on("disable", function() {
 
         });
-        plugin.on("unload", function(){
+        plugin.on("unload", function() {
             
         });
 
@@ -56,8 +56,8 @@ define(function(require, module, exports) {
          * @command runlast Stops the last run file
          */
         plugin.freezePublicAPI({
-            get lastRun(){ return lastRun },
-            set lastRun(lr){ lastRun = lr },
+            get lastRun() { return lastRun; },
+            set lastRun(lr) { lastRun = lr; },
 
             /**
              *
